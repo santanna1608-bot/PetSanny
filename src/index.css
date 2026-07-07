@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-olive-50: #f4f6f0;
+  --color-olive-100: #e4e9db;
+  --color-olive-200: #cbdabc;
+  --color-olive-300: #aac595;
+  --color-olive-400: #89aa6f;
+  --color-olive-500: #688e4f;
+  --color-olive-600: #51723c;
+  --color-olive-700: #405a30;
+  --color-olive-800: #354a29;
+  --color-olive-900: #2e3f24;
+  --color-olive-950: #172212;
+
+  --color-terracotta-50: #fdf6f4;
+  --color-terracotta-100: #fbebe6;
+  --color-terracotta-200: #f6d2c6;
+  --color-terracotta-300: #efa995;
+  --color-terracotta-400: #e47a5f;
+  --color-terracotta-500: #d95333;
+  --color-terracotta-600: #c53f21;
+  --color-terracotta-700: #a43018;
+  --color-terracotta-800: #872917;
+  --color-terracotta-900: #712618;
+  --color-terracotta-950: #3e1009;
+
+  --font-sans: 'Outfit', 'Inter', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-stone-50 text-stone-900 font-sans antialiased transition-colors duration-200;
+  }
+  .dark body {
+    @apply bg-stone-950 text-stone-100;
+  }
+}
+
+/* Custom scrollbar para estética premium */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-stone-200 rounded-full hover:bg-stone-300 transition-colors;
+}
