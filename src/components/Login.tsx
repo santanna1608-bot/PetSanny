@@ -144,9 +144,9 @@ export const Login: React.FC = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     disabled={loading}
-                    className="w-full bg-stone-50 dark:bg-stone-955 text-stone-850 dark:text-stone-100 text-xs rounded-xl pl-9 pr-4 py-3 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 outline-none transition-all"
+                    className="peer w-full bg-stone-50 dark:bg-stone-955 text-stone-900 dark:text-stone-50 text-xs rounded-xl pl-9 pr-4 py-3 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 outline-none transition-all placeholder:text-stone-400 dark:placeholder:text-stone-550"
                   />
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-stone-400">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-stone-400 peer-focus:text-olive-500 dark:peer-focus:text-olive-400 transition-colors">
                     <User className="w-4 h-4" />
                   </div>
                 </div>
@@ -165,9 +165,9 @@ export const Login: React.FC = () => {
                     value={tenantName}
                     onChange={(e) => setTenantName(e.target.value)}
                     disabled={loading}
-                    className="w-full bg-stone-50 dark:bg-stone-955 text-stone-850 dark:text-stone-100 text-xs rounded-xl pl-9 pr-4 py-3 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 outline-none transition-all"
+                    className="peer w-full bg-stone-50 dark:bg-stone-955 text-stone-900 dark:text-stone-50 text-xs rounded-xl pl-9 pr-4 py-3 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 outline-none transition-all placeholder:text-stone-400 dark:placeholder:text-stone-550"
                   />
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-stone-400">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-stone-400 peer-focus:text-olive-500 dark:peer-focus:text-olive-400 transition-colors">
                     <Building className="w-4 h-4" />
                   </div>
                 </div>
@@ -186,9 +186,9 @@ export const Login: React.FC = () => {
                     value={tenantLocation}
                     onChange={(e) => setTenantLocation(e.target.value)}
                     disabled={loading}
-                    className="w-full bg-stone-50 dark:bg-stone-955 text-stone-850 dark:text-stone-100 text-xs rounded-xl pl-9 pr-4 py-3 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 outline-none transition-all"
+                    className="peer w-full bg-stone-50 dark:bg-stone-955 text-stone-900 dark:text-stone-50 text-xs rounded-xl pl-9 pr-4 py-3 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 outline-none transition-all placeholder:text-stone-400 dark:placeholder:text-stone-550"
                   />
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-stone-400">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-stone-400 peer-focus:text-olive-500 dark:peer-focus:text-olive-400 transition-colors">
                     <MapPin className="w-4 h-4" />
                   </div>
                 </div>
@@ -235,9 +235,9 @@ export const Login: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
-                className="w-full bg-stone-50 dark:bg-stone-955 text-stone-850 dark:text-stone-100 text-xs rounded-xl pl-9 pr-4 py-3 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 outline-none transition-all"
+                className="peer w-full bg-stone-50 dark:bg-stone-955 text-stone-900 dark:text-stone-50 text-xs rounded-xl pl-9 pr-4 py-3 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 outline-none transition-all placeholder:text-stone-400 dark:placeholder:text-stone-550"
               />
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-stone-400">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-stone-400 peer-focus:text-olive-500 dark:peer-focus:text-olive-400 transition-colors">
                 <Mail className="w-4 h-4" />
               </div>
             </div>
@@ -256,15 +256,15 @@ export const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
-                className="w-full bg-stone-50 dark:bg-stone-955 text-stone-850 dark:text-stone-100 text-xs rounded-xl pl-9 pr-10 py-3 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 outline-none transition-all font-mono"
+                className="peer w-full bg-stone-50 dark:bg-stone-955 text-stone-900 dark:text-stone-50 text-xs rounded-xl pl-9 pr-10 py-3 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 outline-none transition-all font-mono placeholder:text-stone-400 dark:placeholder:text-stone-550"
               />
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-stone-400">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-stone-400 peer-focus:text-olive-500 dark:peer-focus:text-olive-400 transition-colors">
                 <Lock className="w-4 h-4" />
               </div>
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-stone-400 hover:text-stone-600 cursor-pointer"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 cursor-pointer peer-focus:text-olive-500 dark:peer-focus:text-olive-400 transition-colors"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
