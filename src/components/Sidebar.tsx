@@ -11,15 +11,18 @@ import {
   LogOut,
   Users,
   CreditCard,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  X
 } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isOpen = false, onClose }) => {
   const { currentTenant, setCurrentTenant, tenants } = useAppointments();
   const { user, logout } = useAuth();
   const { t } = useLanguage();
@@ -34,20 +37,45 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
   ];
 
   return (
-    <aside className="w-72 bg-stone-900 text-stone-300 flex flex-col justify-between shrink-0 h-screen sticky top-0 border-r border-stone-800 shadow-xl z-20">
-      <div className="flex flex-col flex-1">
-        {/* Header/Logo */}
-        <div className="p-6 border-b border-stone-800 flex items-center gap-3">
-          <img 
-            src={logoImg} 
-            alt="PetSanny Logo" 
-            className="w-10 h-10 rounded-full object-contain shadow-md shadow-stone-950/50" 
-          />
-          <div>
-            <h1 className="text-lg font-bold text-stone-100 font-sans tracking-tight leading-none">PetSanny</h1>
-            <span className="text-[10px] text-stone-500 font-semibold uppercase tracking-wider">{t('sidebar.tagline')}</span>
+    <>
+      {/* Backdrop para fechar no clique externo (mobile) */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 md:hidden animate-fade-in"
+          onClick={onClose}
+        />
+      )}
+
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-72 bg-stone-900 text-stone-300 flex flex-col justify-between shrink-0 h-screen border-r border-stone-800 shadow-xl
+        transition-transform duration-305 ease-in-out
+        md:sticky md:top-0 md:translate-x-0
+        ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        <div className="flex flex-col flex-1">
+          {/* Header/Logo */}
+          <div className="p-6 border-b border-stone-800 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <img 
+                src={logoImg} 
+                alt="PetSanny Logo" 
+                className="w-10 h-10 rounded-full object-contain shadow-md shadow-stone-950/50" 
+              />
+              <div>
+                <h1 className="text-lg font-bold text-stone-100 font-sans tracking-tight leading-none">PetSanny</h1>
+                <span className="text-[10px] text-stone-500 font-semibold uppercase tracking-wider">{t('sidebar.tagline')}</span>
+              </div>
+            </div>
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="md:hidden p-2 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-xl transition-all cursor-pointer"
+                title="Fechar menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
           </div>
-        </div>
 
         {/* Tenant Selector */}
         {isSuperAdmin ? (
@@ -110,7 +138,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  onClose?.();
+                }}
                 className={`flex items-center gap-3 px-4 py-3 text-xs font-semibold rounded-lg transition-all duration-200 ${
                   isActive 
                     ? highlightBg 
@@ -151,7 +182,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
 
         {/* Botão de Logout */}
         <button
-          onClick={logout}
+          onClick={() => {
+            logout();
+            onClose?.();
+          }}
           className="w-full flex items-center justify-center gap-2 bg-stone-850 hover:bg-rose-950/30 text-stone-400 hover:text-rose-455 border border-stone-800 hover:border-rose-950/30 font-bold text-[10px] py-2 rounded-xl transition-all duration-200 cursor-pointer"
         >
           <LogOut className="w-3.5 h-3.5" />
@@ -165,5 +199,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
         </div>
       </div>
     </aside>
+    </>
   );
 };

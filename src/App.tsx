@@ -14,17 +14,20 @@ import { AppointmentModal } from './components/AppointmentModal';
 import { ToastContainer } from './components/ToastContainer';
 import { SaaSSubscriptions } from './components/SaaSSubscriptions';
 import { Settings } from './components/Settings';
+import logoImg from './assets/logo.png';
 import { 
   Plus, 
   Sparkles,
   Building,
   AlertCircle,
   Sun,
-  Moon
+  Moon,
+  Menu
 } from 'lucide-react';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Persiste a view atual no sessionStorage para sobreviver ao refresh
   const [currentView, setCurrentViewRaw] = useState<'landing' | 'auth'>(() => {
@@ -127,12 +130,34 @@ function AppContent() {
   }
 
   return (
-    <div className="flex bg-stone-50 dark:bg-stone-950 min-h-screen font-sans antialiased text-stone-900 dark:text-stone-100 transition-colors duration-200">
+    <div className="flex flex-col md:flex-row bg-stone-50 dark:bg-stone-950 min-h-screen font-sans antialiased text-stone-900 dark:text-stone-100 transition-colors duration-200">
       {/* Sidebar de Navegação Lateral */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+      />
 
-      {/* Conteúdo Principal */}
-      <main className="flex-1 overflow-y-auto h-screen p-8 lg:p-10">
+      {/* Layout de Conteúdo: Barra Superior Mobile + Conteúdo Principal */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Barra Superior Mobile (só aparece no mobile) */}
+        <div className="flex md:hidden items-center justify-between px-6 py-4 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-850 shrink-0">
+          <div className="flex items-center gap-2">
+            <img src={logoImg} alt="Logo" className="w-8 h-8 rounded-full object-contain" />
+            <span className="font-extrabold text-sm tracking-tight text-stone-900 dark:text-stone-50">PetSanny</span>
+          </div>
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2.5 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-850 rounded-xl transition-all cursor-pointer border border-stone-200 dark:border-stone-800"
+            title="Abrir menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Conteúdo Principal */}
+        <main className="flex-1 overflow-y-auto h-[calc(100vh-69px)] md:h-screen p-4 sm:p-6 md:p-8 lg:p-10">
              {/* Banner de Aviso de Modo Mock de Demonstração */}
         {isMock && (
           <div className="mb-6 flex items-center gap-3 p-3.5 px-5 bg-amber-50 border border-amber-200/80 rounded-2xl shadow-sm text-xs text-amber-800 animate-pulse">
@@ -161,7 +186,7 @@ function AppContent() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
             {/* Seletor Compacto de Idiomas */}
             <div className="flex items-center border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-900 p-1 shadow-sm gap-0.5">
               {(['pt', 'en', 'es'] as const).map((lang) => (
@@ -193,7 +218,7 @@ function AppContent() {
             <button
               type="button"
               onClick={() => setIsAddModalOpen(true)}
-              className="flex items-center gap-1.5 bg-olive-600 hover:bg-olive-750 text-white font-bold text-xs px-5 py-3 rounded-xl shadow-md shadow-olive-900/20 transition-all cursor-pointer hover:-translate-y-0.5"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-olive-600 hover:bg-olive-750 text-white font-bold text-xs px-5 py-3 rounded-xl shadow-md shadow-olive-900/20 transition-all cursor-pointer hover:-translate-y-0.5 min-w-[140px]"
             >
               <Plus className="w-4 h-4" />
               {t('header.new_appointment')}
@@ -247,6 +272,7 @@ function AppContent() {
         )}
 
       </main>
+      </div>
 
       {/* Modal para Agendar Atendimentos */}
       <AppointmentModal 

@@ -43,15 +43,15 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
   });
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm mb-8">
+    <div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200 dark:border-stone-800 shadow-sm mb-8">
       {/* Topo com Título e Botão Novo */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h3 className="font-bold text-lg text-stone-800 flex items-center gap-2">
-            <SlidersHorizontal className="w-5 h-5 text-olive-600" />
+          <h3 className="font-bold text-lg text-stone-800 dark:text-stone-100 flex items-center gap-2">
+            <SlidersHorizontal className="w-5 h-5 text-olive-600 dark:text-olive-450" />
             {t('operational.title')}
           </h3>
-          <p className="text-xs text-stone-500">
+          <p className="text-xs text-stone-500 dark:text-stone-400">
             {t('operational.desc')}
           </p>
         </div>
@@ -73,48 +73,51 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
             placeholder={t('operational.search_placeholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-stone-50 text-stone-800 text-xs rounded-xl pl-9 pr-4 py-3 border border-stone-200 focus:border-olive-500 focus:bg-white outline-none transition-all"
+            className="w-full bg-stone-50 dark:bg-stone-955 text-stone-800 dark:text-stone-100 text-xs rounded-xl pl-9 pr-4 py-3 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 outline-none transition-all"
           />
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-stone-400">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-stone-400 dark:text-stone-500">
             <Search className="w-4 h-4" />
           </div>
         </div>
 
         {/* Filtro Categoria */}
-        <div className="flex items-center gap-2 bg-stone-50 border border-stone-200 rounded-xl px-3 py-1.5">
-          <label className="text-[10px] text-stone-400 font-bold uppercase shrink-0">{t('operational.category_label')}</label>
+        <div className="flex items-center gap-2 bg-stone-50 dark:bg-stone-955 border border-stone-200 dark:border-stone-800 rounded-xl px-3 py-3">
+          <label className="text-[10px] text-stone-450 dark:text-stone-500 font-bold uppercase shrink-0">{t('operational.category_label')}</label>
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="w-full bg-transparent text-stone-700 text-xs font-semibold outline-none cursor-pointer"
+            className="w-full bg-transparent text-stone-700 dark:text-stone-300 text-xs font-semibold outline-none cursor-pointer"
           >
-            <option value="all">{t('operational.all_categories')}</option>
-            <option value="vet">{t('operational.vet_blue')}</option>
-            <option value="aesthetic">{t('operational.aesthetic_orange')}</option>
+            <option value="all" className="dark:bg-stone-900">{t('operational.all_categories')}</option>
+            <option value="vet" className="dark:bg-stone-900">{t('operational.vet_blue')}</option>
+            <option value="aesthetic" className="dark:bg-stone-900">{t('operational.aesthetic_orange')}</option>
           </select>
         </div>
 
         {/* Filtro Status */}
-        <div className="flex items-center gap-2 bg-stone-50 border border-stone-200 rounded-xl px-3 py-1.5">
-          <label className="text-[10px] text-stone-400 font-bold uppercase shrink-0">{t('operational.status_label')}</label>
+        <div className="flex items-center gap-2 bg-stone-50 dark:bg-stone-955 border border-stone-200 dark:border-stone-800 rounded-xl px-3 py-3">
+          <label className="text-[10px] text-stone-450 dark:text-stone-500 font-bold uppercase shrink-0">{t('operational.status_label')}</label>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full bg-transparent text-stone-700 text-xs font-semibold outline-none cursor-pointer"
+            className="w-full bg-transparent text-stone-700 dark:text-stone-300 text-xs font-semibold outline-none cursor-pointer"
           >
-            <option value="all">{t('operational.all_status')}</option>
-            <option value="pending">{t('operational.pending_plural')}</option>
-            <option value="confirmed">{t('operational.confirmed_plural')}</option>
-            <option value="completed">{t('operational.completed_plural')}</option>
+            <option value="all" className="dark:bg-stone-900">{t('operational.all_status')}</option>
+            <option value="pending" className="dark:bg-stone-900">{t('operational.pending_plural')}</option>
+            <option value="confirmed" className="dark:bg-stone-900">{t('operational.confirmed_plural')}</option>
+            <option value="completed" className="dark:bg-stone-900">{t('operational.completed_plural')}</option>
           </select>
         </div>
       </div>
 
       {/* Tabela de Agendamentos */}
-      <div className="overflow-x-auto rounded-xl border border-stone-150 shadow-inner bg-stone-50/50">
-        <table className="w-full text-left border-collapse text-xs">
+      <span className="block md:hidden text-[9px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider text-right mb-2 leading-none">
+        ↔️ Deslize para os lados para ver todas as colunas
+      </span>
+      <div className="overflow-x-auto rounded-xl border border-stone-150 dark:border-stone-800 shadow-inner bg-stone-50/50 dark:bg-stone-955/20">
+        <table className="w-full min-w-[750px] text-left border-collapse text-xs">
           <thead>
-            <tr className="bg-stone-100 text-stone-500 border-b border-stone-200 font-bold">
+            <tr className="bg-stone-100 dark:bg-stone-950 text-stone-500 dark:text-stone-400 border-b border-stone-200 dark:border-stone-800 font-bold">
               <th className="p-4">{t('operational.th_pet')}</th>
               <th className="p-4">{t('operational.th_tutor')}</th>
               <th className="p-4">{t('operational.th_service')}</th>
@@ -127,7 +130,7 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
           <tbody className="divide-y divide-stone-150">
             {filteredAppointments.length === 0 ? (
               <tr>
-                <td colSpan={7} className="p-8 text-center text-stone-450 italic bg-white">
+                <td colSpan={7} className="p-8 text-center text-stone-450 dark:text-stone-500 italic bg-white dark:bg-stone-900">
                   {t('operational.no_results')}
                 </td>
               </tr>
@@ -135,41 +138,41 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
               filteredAppointments.map((app) => {
                 const isVet = app.service_type === 'vet';
                 return (
-                  <tr key={app.id} className="bg-white hover:bg-stone-50/50 transition-colors">
+                  <tr key={app.id} className="bg-white dark:bg-stone-900 hover:bg-stone-50/50 dark:hover:bg-stone-850/50 border-b border-stone-150 dark:border-stone-800 transition-colors">
                     {/* Pet */}
-                    <td className="p-4 font-bold text-stone-800">
+                    <td className="p-4 font-bold text-stone-800 dark:text-stone-200">
                       <div>
                         {app.pet_name}
-                        <div className="text-[10px] text-stone-400 font-medium">{app.pet_species}</div>
+                        <div className="text-[10px] text-stone-400 dark:text-stone-500 font-medium">{app.pet_species}</div>
                       </div>
                     </td>
 
                     {/* Tutor */}
-                    <td className="p-4 text-stone-600 font-medium">
+                    <td className="p-4 text-stone-600 dark:text-stone-300 font-medium">
                       <div>
                         {app.tutor_name}
-                        <div className="text-[10px] text-stone-400 truncate max-w-[150px]">{app.tutor_email}</div>
+                        <div className="text-[10px] text-stone-450 dark:text-stone-500 truncate max-w-[150px]">{app.tutor_email}</div>
                       </div>
                     </td>
 
                     {/* Serviço */}
                     <td className="p-4">
-                      <div className="font-semibold text-stone-750">{app.service_name}</div>
-                      <div className="text-[10px] text-stone-500 font-bold">R$ {Number(app.price).toFixed(2)}</div>
+                      <div className="font-semibold text-stone-750 dark:text-stone-200">{app.service_name}</div>
+                      <div className="text-[10px] text-stone-500 dark:text-stone-400 font-bold">R$ {Number(app.price).toFixed(2)}</div>
                     </td>
 
                     {/* Data / Hora */}
-                    <td className="p-4 text-stone-600 font-medium">
+                    <td className="p-4 text-stone-600 dark:text-stone-300 font-medium">
                       <div>{app.appointment_date.split('-').reverse().join('/')}</div>
-                      <div className="text-[10px] text-stone-400 font-bold">{app.appointment_time}h</div>
+                      <div className="text-[10px] text-stone-400 dark:text-stone-550 font-bold">{app.appointment_time}h</div>
                     </td>
 
                     {/* Categoria */}
                     <td className="p-4">
                       <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
                         isVet 
-                          ? 'bg-blue-50 text-blue-700 border border-blue-100' 
-                          : 'bg-orange-50 text-orange-750 border border-orange-100'
+                          ? 'bg-blue-50 dark:bg-blue-955 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50' 
+                          : 'bg-orange-50 dark:bg-orange-955 text-orange-750 dark:text-orange-400 border border-orange-100 dark:border-orange-900/50'
                       }`}>
                         {isVet ? t('service.vet') : t('service.aesthetic')}
                       </span>
@@ -179,10 +182,10 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
                     <td className="p-4">
                       <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
                         app.status === 'completed'
-                          ? 'bg-stone-100 text-stone-600'
+                          ? 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'
                           : app.status === 'confirmed'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                          : 'bg-amber-50 text-amber-700 border border-amber-100'
+                          ? 'bg-emerald-50 dark:bg-emerald-955/40 text-emerald-700 dark:text-emerald-455 border border-emerald-100 dark:border-emerald-900/50'
+                          : 'bg-amber-50 dark:bg-amber-955/40 text-amber-700 dark:text-amber-455 border border-amber-100 dark:border-amber-900/50'
                       }`}>
                         {app.status === 'completed' ? t('status.completed') : app.status === 'confirmed' ? t('status.confirmed') : t('status.pending')}
                       </span>
@@ -195,7 +198,7 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
                         {app.status === 'pending' && (
                           <button
                             onClick={() => changeAppointmentStatus(app.id, 'confirmed')}
-                            className="p-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 rounded-lg transition-colors cursor-pointer"
                             title={t('action.confirm')}
                           >
                             <Check className="w-4 h-4" />
@@ -206,7 +209,7 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
                         {app.status === 'confirmed' && (
                           <button
                             onClick={() => changeAppointmentStatus(app.id, 'completed')}
-                            className="p-1.5 bg-stone-100 text-stone-600 hover:bg-stone-200 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 bg-stone-100 dark:bg-stone-850 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-750 rounded-lg transition-colors cursor-pointer"
                             title={t('action.finalize')}
                           >
                             <Check className="w-4 h-4" />
@@ -217,7 +220,7 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
                         {app.status !== 'pending' && (
                           <button
                             onClick={() => changeAppointmentStatus(app.id, 'pending')}
-                            className="p-1.5 bg-stone-100 text-stone-400 hover:bg-stone-200 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 bg-stone-100 dark:bg-stone-850 text-stone-400 dark:text-stone-500 hover:bg-stone-200 dark:hover:bg-stone-750 rounded-lg transition-colors cursor-pointer"
                             title={t('status.pending')}
                           >
                             <RefreshCw className="w-3.5 h-3.5" />
@@ -230,7 +233,7 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
                             setAppointmentToDelete({ id: app.id, petName: app.pet_name });
                             setDeleteModalOpen(true);
                           }}
-                          className="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 bg-rose-50 dark:bg-rose-955/60 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/60 rounded-lg transition-colors cursor-pointer"
                           title={t('operational.th_actions')}
                         >
                           <Trash2 className="w-4 h-4" />

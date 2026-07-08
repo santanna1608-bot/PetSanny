@@ -73,10 +73,10 @@ export const AgendaCalendar: React.FC = () => {
             {t('agenda.subtitle')}
           </p>
         </div>
-        <div className="flex bg-stone-100 dark:bg-stone-950 p-1 rounded-xl w-fit self-start">
+        <div className="flex bg-stone-100 dark:bg-stone-950 p-1 rounded-xl w-full sm:w-auto justify-between sm:justify-start">
           <button
             onClick={() => setViewMode('today')}
-            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer ${
+            className={`flex-1 sm:flex-none text-center px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer ${
               viewMode === 'today'
                 ? 'bg-white dark:bg-stone-900 text-stone-850 dark:text-stone-100 shadow-sm'
                 : 'text-stone-555 dark:text-stone-400 hover:text-stone-850 dark:hover:text-stone-200'
@@ -86,7 +86,7 @@ export const AgendaCalendar: React.FC = () => {
           </button>
           <button
             onClick={() => setViewMode('week')}
-            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer ${
+            className={`flex-1 sm:flex-none text-center px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer ${
               viewMode === 'week'
                 ? 'bg-white dark:bg-stone-900 text-stone-850 dark:text-stone-100 shadow-sm'
                 : 'text-stone-555 dark:text-stone-400 hover:text-stone-850 dark:hover:text-stone-200'
@@ -203,10 +203,10 @@ export const AgendaCalendar: React.FC = () => {
                 </div>
 
                 {/* Direita: Alertas Rápidos do Pet & Controles */}
-                <div className="flex items-center gap-3 shrink-0 flex-wrap justify-between md:justify-end border-t md:border-t-0 border-stone-150/60 dark:border-stone-800/60 pt-3 md:pt-0">
+                <div className="flex items-center gap-3 shrink-0 flex-wrap justify-between md:justify-end border-t md:border-t-0 border-stone-150/60 dark:border-stone-800/60 pt-3 md:pt-0 w-full md:w-auto">
                   {/* Observação rápida se houver */}
                   {app.critical_notes && (
-                    <div className="flex items-center gap-1 bg-rose-50 dark:bg-rose-955/30 border border-rose-100 dark:border-rose-900/40 text-rose-700 dark:text-rose-350 px-2 py-1 rounded-lg text-[10px] font-bold max-w-[180px] truncate shadow-sm">
+                    <div className="flex items-center gap-1 bg-rose-50 dark:bg-rose-955/30 border border-rose-100 dark:border-rose-900/40 text-rose-700 dark:text-rose-350 px-2 py-1 rounded-lg text-[10px] font-bold max-w-full sm:max-w-[220px] truncate shadow-sm">
                       <AlertTriangle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                       <span className="truncate">{app.critical_notes}</span>
                     </div>
