@@ -36,6 +36,12 @@
   --color-orange-955: #210903;
 
   --font-sans: 'Outfit', 'Inter', sans-serif;
+
+  /* ─── Motion Design Tokens ─── */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring:    cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-quart:  cubic-bezier(0.5, 0, 0.75, 0);
 }
 
 @layer base {
@@ -47,16 +53,333 @@
   }
 }
 
-/* Custom scrollbar para estética premium */
+/* ─────────────────────────────────────────────
+   KEYFRAMES PREMIUM
+───────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 32px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes scaleReveal {
+  from {
+    opacity: 0;
+    transform: scale3d(1.06, 1.06, 1);
+  }
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translate3d(-40px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translate3d(40px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translate3d(0, 0px, 0); }
+  50%       { transform: translate3d(0, -10px, 0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes morphBg {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  50%       { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.75; transform: scale(0.97); }
+}
+
+/* ─────────────────────────────────────────────
+   SCROLL REVEAL — controlado pelo useScrollReveal hook
+   O hook adiciona a classe .revealed ao entrar na viewport
+───────────────────────────────────────────── */
+.reveal-up {
+  opacity: 0;
+  transform: translate3d(0, 36px, 0);
+  transition:
+    opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal-up.revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translate3d(-40px, 0, 0);
+  transition:
+    opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal-left.revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translate3d(40px, 0, 0);
+  transition:
+    opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal-right.revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale3d(0.92, 0.92, 1);
+  transition:
+    opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: opacity, transform;
+}
+.reveal-scale.revealed {
+  opacity: 1;
+  transform: scale3d(1, 1, 1);
+}
+
+/* Stagger delays — aplique junto com .reveal-* */
+.stagger-1 { transition-delay: 60ms !important; }
+.stagger-2 { transition-delay: 130ms !important; }
+.stagger-3 { transition-delay: 200ms !important; }
+.stagger-4 { transition-delay: 270ms !important; }
+.stagger-5 { transition-delay: 340ms !important; }
+
+/* ─────────────────────────────────────────────
+   ANIMAÇÕES DE ENTRADA (Hero — disparam ao carregar)
+───────────────────────────────────────────── */
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-fade-in-down {
+  animation: fadeInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-scale-reveal {
+  animation: scaleReveal 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-slide-left {
+  animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-slide-right {
+  animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-float {
+  animation: floatY 4s ease-in-out infinite;
+}
+.animate-pulse-soft {
+  animation: pulseSoft 2.5s ease-in-out infinite;
+}
+
+/* Delays de entrada */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+.delay-700 { animation-delay: 700ms; }
+
+/* ─────────────────────────────────────────────
+   MICROINTERAÇÕES DE BOTÕES — Premium CTA
+───────────────────────────────────────────── */
+.btn-cta-primary {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.25s cubic-bezier(0.25, 1, 0.5, 1),
+    background-color 0.2s ease;
+}
+/* Efeito de luz deslizante */
+.btn-cta-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.14);
+  transform: translate3d(-110%, 0, 0) skewX(-15deg);
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.btn-cta-primary:hover::after {
+  transform: translate3d(110%, 0, 0) skewX(-15deg);
+}
+.btn-cta-primary:hover {
+  transform: translate3d(0, -3px, 0) scale(1.01);
+  box-shadow: 0 18px 36px -8px rgba(81,114,60,0.38);
+}
+.btn-cta-primary:active {
+  transform: scale(0.96) translate3d(0, 1px, 0) !important;
+  box-shadow: 0 4px 12px -4px rgba(81,114,60,0.25) !important;
+  transition: transform 0.08s ease, box-shadow 0.08s ease !important;
+}
+
+.btn-cta-secondary {
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+.btn-cta-secondary:hover {
+  transform: translate3d(0, -2px, 0);
+}
+.btn-cta-secondary:active {
+  transform: scale(0.97) !important;
+  transition: transform 0.08s ease !important;
+}
+
+/* Shimmer animado no número do preço */
+.price-shimmer {
+  background: linear-gradient(
+    90deg,
+    currentColor 0%,
+    currentColor 35%,
+    #8bb86c 50%,
+    currentColor 65%,
+    currentColor 100%
+  );
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3.5s linear infinite;
+}
+
+/* Fundo gradiente animado */
+.gradient-anim {
+  background-size: 200% 200%;
+  animation: gradientShift 6s ease infinite;
+}
+
+/* Orb decorativo morfológico */
+.morph-orb {
+  animation: morphBg 8s ease-in-out infinite;
+}
+
+/* Cards de feature com lift premium */
+.feature-card-hover {
+  transition:
+    transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    border-color 0.25s ease;
+  will-change: transform, box-shadow;
+}
+.feature-card-hover:hover {
+  transform: translate3d(0, -6px, 0);
+  box-shadow: 0 24px 56px -12px rgba(104,142,79,0.18);
+}
+
+/* Navbar link underline animado */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 2px;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Ícone de feature com spring no hover do card */
+.feature-icon-spring {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.feature-card-hover:hover .feature-icon-spring {
+  transform: scale(1.18) rotate(-5deg);
+}
+
+/* ─────────────────────────────────────────────
+   ACESSIBILIDADE — prefers-reduced-motion
+───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal-up,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   SCROLLBAR PREMIUM
+───────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
   @apply bg-stone-200 rounded-full hover:bg-stone-300 transition-colors;
 }
