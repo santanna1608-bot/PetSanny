@@ -361,7 +361,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
                 <li className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  Banco de dados isolado via PostgreSQL RLS
+                  Histórico e prontuário completo de cada pet
                 </li>
                 <li className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
