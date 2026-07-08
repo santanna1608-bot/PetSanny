@@ -23,6 +23,8 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({ isOpen, onCl
   const [tutorEmail, setTutorEmail] = useState('');
   const [petName, setPetName] = useState('');
   const [petSpecies, setPetSpecies] = useState('Cão (Golden Retriever)');
+  const [isCustomSpecies, setIsCustomSpecies] = useState(false);
+  const [customSpecies, setCustomSpecies] = useState('');
   const [serviceType, setServiceType] = useState<'vet' | 'aesthetic'>('aesthetic');
   const [serviceName, setServiceName] = useState('');
   const [professionalName, setProfessionalName] = useState('');
@@ -61,13 +63,14 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({ isOpen, onCl
       fetchData();
       setAppointmentDate(new Date().toISOString().split('T')[0]);
 
-      // Resetar seletores e campos
       setSelectedTutorId('custom');
       setSelectedPetId('custom');
       setTutorName('');
       setTutorEmail('');
       setPetName('');
       setPetSpecies('Cão (Golden Retriever)');
+      setIsCustomSpecies(false);
+      setCustomSpecies('');
       setCriticalNotes('');
     }
   }, [isOpen, currentTenant]);
@@ -94,12 +97,43 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({ isOpen, onCl
     if (petId === 'custom') {
       setPetName('');
       setPetSpecies('Cão (Golden Retriever)');
+      setIsCustomSpecies(false);
+      setCustomSpecies('');
     } else {
       const matched = petsList.find(p => p.id === petId);
       if (matched) {
         setPetName(matched.name);
         setPetSpecies(matched.species);
+        
+        // Verifica se a espécie já é uma das opções padrão ou se deve abrir o campo customizado
+        const standardOptions = [
+          "Cão (Golden Retriever)",
+          "Cão (Poodle)",
+          "Cão (Shih Tzu)",
+          "Cão (SRD)",
+          "Gato (Persa)",
+          "Gato (SRD)"
+        ];
+        if (standardOptions.includes(matched.species)) {
+          setIsCustomSpecies(false);
+          setCustomSpecies('');
+        } else {
+          setIsCustomSpecies(true);
+          setCustomSpecies(matched.species);
+        }
       }
+    }
+  };
+
+  const handleSelectSpeciesChange = (value: string) => {
+    if (value === 'Outros') {
+      setIsCustomSpecies(true);
+      setPetSpecies('Outros');
+      setCustomSpecies('');
+    } else {
+      setIsCustomSpecies(false);
+      setPetSpecies(value);
+      setCustomSpecies('');
     }
   };
 
@@ -114,11 +148,15 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({ isOpen, onCl
       return;
     }
 
+    const finalPetSpecies = isCustomSpecies 
+      ? (customSpecies.trim() || 'Outros') 
+      : petSpecies;
+
     await addAppointment({
       tutor_name: tutorName,
       tutor_email: tutorEmail || `${petName.toLowerCase()}@tutor.com`, // fallback de email
       pet_name: petName,
-      pet_species: petSpecies,
+      pet_species: finalPetSpecies,
       service_type: serviceType,
       service_name: serviceName,
       professional_name: professionalName,
@@ -133,6 +171,9 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({ isOpen, onCl
     setTutorName('');
     setTutorEmail('');
     setPetName('');
+    setPetSpecies('Cão (Golden Retriever)');
+    setIsCustomSpecies(false);
+    setCustomSpecies('');
     onClose();
   };
 
@@ -261,34 +302,52 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({ isOpen, onCl
             )}
 
             {selectedPetId === 'custom' ? (
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[10px] text-stone-500 dark:text-stone-400 font-bold mb-1">{t('modal.pet_name_label')}</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder={t('modal.pet_name_placeholder')}
-                    value={petName}
-                    onChange={(e) => setPetName(e.target.value)}
-                    className="w-full bg-stone-50 dark:bg-stone-955 text-stone-850 dark:text-stone-100 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 rounded-lg p-2.5 outline-none transition-all"
-                  />
+              <div className="space-y-3 animate-fade-in">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] text-stone-500 dark:text-stone-400 font-bold mb-1">{t('modal.pet_name_label')}</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder={t('modal.pet_name_placeholder')}
+                      value={petName}
+                      onChange={(e) => setPetName(e.target.value)}
+                      className="w-full bg-stone-50 dark:bg-stone-955 text-stone-850 dark:text-stone-100 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 rounded-lg p-2.5 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-stone-500 dark:text-stone-400 font-bold mb-1">{t('modal.pet_species_label')}</label>
+                    <select
+                      value={isCustomSpecies ? 'Outros' : petSpecies}
+                      onChange={(e) => handleSelectSpeciesChange(e.target.value)}
+                      className="w-full bg-stone-50 dark:bg-stone-955 text-stone-850 dark:text-stone-100 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 rounded-lg p-2.5 outline-none transition-all font-semibold cursor-pointer"
+                    >
+                      <option value="Cão (Golden Retriever)">Cão (Golden Retriever)</option>
+                      <option value="Cão (Poodle)">Cão (Poodle)</option>
+                      <option value="Cão (Shih Tzu)">Cão (Shih Tzu)</option>
+                      <option value="Cão (SRD)">Cão (Vira-lata)</option>
+                      <option value="Gato (Persa)">Gato (Persa)</option>
+                      <option value="Gato (SRD)">Gato (SRD)</option>
+                      <option value="Outros">Outros</option>
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-[10px] text-stone-500 dark:text-stone-400 font-bold mb-1">{t('modal.pet_species_label')}</label>
-                  <select
-                    value={petSpecies}
-                    onChange={(e) => setPetSpecies(e.target.value)}
-                    className="w-full bg-stone-50 dark:bg-stone-955 text-stone-850 dark:text-stone-100 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 rounded-lg p-2.5 outline-none transition-all font-semibold cursor-pointer"
-                  >
-                    <option value="Cão (Golden Retriever)">Cão (Golden Retriever)</option>
-                    <option value="Cão (Poodle)">Cão (Poodle)</option>
-                    <option value="Cão (Shih Tzu)">Cão (Shih Tzu)</option>
-                    <option value="Cão (SRD)">Cão (Vira-lata)</option>
-                    <option value="Gato (Persa)">Gato (Persa)</option>
-                    <option value="Gato (SRD)">Gato (SRD)</option>
-                    <option value="Outros">Outros</option>
-                  </select>
-                </div>
+
+                {isCustomSpecies && (
+                  <div className="animate-slide-down">
+                    <label className="block text-[10px] text-stone-500 dark:text-stone-400 font-bold mb-1">
+                      Descreva a Espécie / Raça
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ex: Cão (Pastor Alemão) ou Calopsita"
+                      value={customSpecies}
+                      onChange={(e) => setCustomSpecies(e.target.value)}
+                      className="w-full bg-stone-50 dark:bg-stone-955 text-stone-850 dark:text-stone-100 border border-stone-200 dark:border-stone-800 focus:border-olive-500 focus:bg-white dark:focus:bg-stone-900 rounded-lg p-2.5 outline-none transition-all"
+                    />
+                  </div>
+                )}
               </div>
             ) : (
               <div className="p-3 bg-stone-55/60 dark:bg-stone-950/40 border border-stone-200 dark:border-stone-800 rounded-xl flex items-center justify-between animate-fade-in">
