@@ -111,7 +111,7 @@ export const Login: React.FC<LoginProps> = ({ initialMode = 'login', onBackToLan
           <img 
             src={logoImg} 
             alt="PetSanny Logo" 
-            className="w-16 h-16 rounded-2xl object-contain shadow-lg shadow-stone-200/50 dark:shadow-stone-950/50" 
+            className="w-16 h-16 rounded-full object-contain shadow-lg shadow-stone-200/50 dark:shadow-stone-950/50" 
           />
           <div>
             <h1 className="text-2xl font-black text-stone-850 dark:text-stone-100 font-sans tracking-tight leading-none mt-2">

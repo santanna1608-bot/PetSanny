@@ -47,7 +47,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <img 
               src={logoImg} 
               alt="PetSanny Logo" 
-              className="w-7 h-7 object-contain drop-shadow animate-float" 
+              className="w-7 h-7 object-contain drop-shadow animate-float rounded-full" 
             />
             <span className="font-extrabold text-base tracking-tight text-stone-900 dark:text-stone-50">
               PetSanny
@@ -504,7 +504,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <footer className="bg-stone-50 dark:bg-stone-950 border-t border-stone-200/60 dark:border-stone-900/60 py-6 sm:py-8 transition-colors duration-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <div className="flex items-center gap-2">
-            <img src={logoImg} alt="Logo" className="w-5 h-5 object-contain" />
+            <img src={logoImg} alt="Logo" className="w-5 h-5 object-contain rounded-full" />
             <span className="font-extrabold tracking-tight text-xs text-stone-700 dark:text-stone-400">PetSanny © 2026</span>
           </div>
           <p className="text-[10px] sm:text-xs font-bold text-stone-400 dark:text-stone-500">

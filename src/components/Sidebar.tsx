@@ -41,7 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
           <img 
             src={logoImg} 
             alt="PetSanny Logo" 
-            className="w-10 h-10 rounded-xl object-contain shadow-md shadow-stone-950/50" 
+            className="w-10 h-10 rounded-full object-contain shadow-md shadow-stone-950/50" 
           />
           <div>
             <h1 className="text-lg font-bold text-stone-100 font-sans tracking-tight leading-none">PetSanny</h1>
