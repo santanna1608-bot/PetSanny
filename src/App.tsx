@@ -42,7 +42,11 @@ function AppContent() {
   });
 
   // Controla se usuário autenticado quer ver o dashboard (ignora landing salva)
-  const [forceDashboard, setForceDashboard] = useState(false);
+  // Inicializa como true quando não há hash de auth (ex: refresh dentro do dashboard)
+  const [forceDashboard, setForceDashboard] = useState(() => {
+    const hash = window.location.hash;
+    return hash !== '#auth' && hash !== '#register';
+  });
 
   const setCurrentView = (view: 'landing' | 'auth', mode: 'login' | 'register' = 'login') => {
     if (view === 'auth') {
