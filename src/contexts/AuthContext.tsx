@@ -400,16 +400,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       if (!isMockClient && realSupabase) {
-        // Logout Real
+        // Logout Real no Supabase
         const { error } = await realSupabase.auth.signOut();
-        if (error) throw error;
-      } else {
-        // Logout Simulado/Mock
-        localStorage.removeItem('petsanny_session');
-        setUser(null);
-        setSession(null);
+        if (error) {
+          console.warn('Erro reportado pelo Supabase durante signOut:', error);
+        }
       }
+    } catch (err) {
+      console.error('Exceção no logout do Supabase:', err);
     } finally {
+      // Força a limpeza dos estados locais em qualquer cenário (resiliência)
+      localStorage.removeItem('petsanny_session');
+      setUser(null);
+      setSession(null);
       setLoading(false);
     }
   };
