@@ -27,6 +27,14 @@
   --color-terracotta-900: #712618;
   --color-terracotta-950: #3e1009;
 
+  /* Cores personalizadas extras de tom 955 (muito escuro) para o Modo Escuro */
+  --color-stone-955: #060505;
+  --color-rose-955: #27020b;
+  --color-blue-955: #031122;
+  --color-amber-955: #210c01;
+  --color-emerald-955: #01140f;
+  --color-orange-955: #210903;
+
   --font-sans: 'Outfit', 'Inter', sans-serif;
 }
 
