@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import logoImg from '../assets/logo.png';
 import { 
@@ -12,10 +12,16 @@ import {
   User,
   Building,
   MapPin,
-  UserPlus
+  UserPlus,
+  ArrowLeft
 } from 'lucide-react';
 
-export const Login: React.FC = () => {
+interface LoginProps {
+  initialMode?: 'login' | 'register';
+  onBackToLanding?: () => void;
+}
+
+export const Login: React.FC<LoginProps> = ({ initialMode = 'login', onBackToLanding }) => {
   const { login, registerTenant, isMock } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,8 +30,12 @@ export const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Estados para o fluxo de Novo Cadastro
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(initialMode === 'register');
   const [name, setName] = useState('');
+
+  useEffect(() => {
+    setIsRegistering(initialMode === 'register');
+  }, [initialMode]);
   const [tenantName, setTenantName] = useState('');
   const [tenantLocation, setTenantLocation] = useState('');
   const plan = 'Gold';
@@ -84,8 +94,18 @@ export const Login: React.FC = () => {
       <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-terracotta-100/30 dark:bg-terracotta-900/10 blur-3xl -z-10" />
 
       {/* Card Principal de Login */}
-      <div className="w-full max-w-md bg-white/80 dark:bg-stone-900/80 backdrop-blur-md rounded-3xl border border-stone-200/80 dark:border-stone-800 shadow-2xl p-8 space-y-6 transition-all duration-300 hover:shadow-stone-300 dark:hover:shadow-stone-950">
+      <div className="w-full max-w-md bg-white/80 dark:bg-stone-900/80 backdrop-blur-md rounded-3xl border border-stone-200/80 dark:border-stone-800 shadow-2xl p-8 space-y-6 transition-all duration-300 hover:shadow-stone-300 dark:hover:shadow-stone-955 relative">
         
+        {onBackToLanding && (
+          <button
+            onClick={onBackToLanding}
+            className="absolute top-4 left-4 text-stone-400 dark:text-stone-500 hover:text-stone-650 dark:hover:text-stone-300 p-1.5 hover:bg-stone-100/50 dark:hover:bg-stone-850 rounded-xl cursor-pointer transition-colors"
+            title="Voltar para a página inicial"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+        )}
+
         {/* Logotipo e Cabeçalho */}
         <div className="flex flex-col items-center text-center space-y-3">
           <img 

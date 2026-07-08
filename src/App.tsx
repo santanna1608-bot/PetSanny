@@ -3,6 +3,7 @@ import { AppointmentsProvider, useAppointments } from './contexts/AppointmentsCo
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { Login } from './components/Login';
+import { LandingPage } from './components/LandingPage';
 import { CustomersAndPets } from './components/CustomersAndPets';
 import { Sidebar } from './components/Sidebar';
 import { DashboardMetrics } from './components/DashboardMetrics';
@@ -24,6 +25,8 @@ import {
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [currentView, setCurrentView] = useState<'landing' | 'auth'>('landing');
+  const [initialAuthMode, setInitialAuthMode] = useState<'login' | 'register'>('login');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const { currentTenant, isMock } = useAppointments();
   const { user, loading: authLoading } = useAuth();
@@ -58,7 +61,24 @@ function AppContent() {
   }
 
   if (!user) {
-    return <Login />;
+    if (currentView === 'landing') {
+      return (
+        <LandingPage
+          theme={theme}
+          toggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          onNavigateToAuth={(mode) => {
+            setInitialAuthMode(mode);
+            setCurrentView('auth');
+          }}
+        />
+      );
+    }
+    return (
+      <Login 
+        initialMode={initialAuthMode} 
+        onBackToLanding={() => setCurrentView('landing')} 
+      />
+    );
   }
 
   return (
