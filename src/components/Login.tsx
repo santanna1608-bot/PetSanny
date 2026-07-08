@@ -109,18 +109,14 @@ export const Login: React.FC = () => {
         </div>
 
         {/* Badge de Modo de Conexão */}
-        <div className="flex items-center justify-center">
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold border transition-colors ${
-            isMock 
-              ? 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/50 text-amber-800 dark:text-amber-300' 
-              : 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-250 dark:border-emerald-900/50 text-emerald-800 dark:text-emerald-300'
-          }`}>
-            <Database className={`w-3.5 h-3.5 ${isMock ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`} />
-            <span>
-              {isMock ? 'Modo de Conexão: Simulação (Demo)' : 'Modo de Conexão: Supabase Real'}
-            </span>
+        {isMock && (
+          <div className="flex items-center justify-center">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 transition-colors">
+              <Database className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+              <span>Modo de Conexão: Simulação (Demo)</span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Mensagem de Erro */}
         {error && (
