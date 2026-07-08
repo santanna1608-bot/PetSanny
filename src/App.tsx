@@ -43,18 +43,19 @@ function AppContent() {
   });
 
   // Controla se usuário autenticado quer ver o dashboard (ignora landing salva)
-  // Inicializa como true quando não há hash de auth (ex: refresh dentro do dashboard)
+  // Inicializa como true apenas se o hash atual for explicitamente #dashboard
   const [forceDashboard, setForceDashboard] = useState(() => {
-    const hash = window.location.hash;
-    return hash !== '#auth' && hash !== '#register';
+    return window.location.hash === '#dashboard';
   });
 
   const setCurrentView = (view: 'landing' | 'auth', mode: 'login' | 'register' = 'login') => {
     if (view === 'auth') {
       window.location.hash = mode === 'register' ? '#register' : '#auth';
     } else {
-      // Limpa o hash sem causar scroll
-      history.replaceState(null, '', window.location.pathname + window.location.search);
+      // Se não for auth e também não quisermos forçar o dashboard, limpa o hash
+      if (!forceDashboard) {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
     }
     setCurrentViewRaw(view);
   };
@@ -84,32 +85,50 @@ function AppContent() {
   // Sincroniza a view com o hash da URL (ex: usuário clica no botão voltar do browser)
   useEffect(() => {
     const handleHashChange = () => {
+      const hash = window.location.hash;
       const newView = getViewFromHash();
       setCurrentViewRaw(newView);
       if (newView === 'auth') {
-        setInitialAuthMode(window.location.hash === '#register' ? 'register' : 'login');
+        setInitialAuthMode(hash === '#register' ? 'register' : 'login');
       }
+      setForceDashboard(hash === '#dashboard');
     };
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
+  // Sincroniza a URL com o estado de forceDashboard
+  useEffect(() => {
+    if (user && !authLoading) {
+      if (forceDashboard) {
+        if (window.location.hash !== '#dashboard') {
+          window.location.hash = '#dashboard';
+        }
+      } else {
+        if (window.location.hash === '#dashboard') {
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+      }
+    }
+  }, [user, authLoading, forceDashboard]);
+
   // Quando o usuário faz logout, limpa hash e volta para a landing
   useEffect(() => {
     if (!user && !authLoading) {
-      // Apenas redireciona para landing se o hash não indicar auth
-      // (preserva a tela de auth se o usuário não está logado e está na tela de login)
       const hash = window.location.hash;
+      if (hash === '#dashboard') {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+      setForceDashboard(false);
       if (hash !== '#auth' && hash !== '#register') {
         setCurrentViewRaw('landing');
       }
     }
   }, [user, authLoading]);
 
-  // Quando user autenticado está no hash #auth/#register → limpa hash e vai ao dashboard
+  // Quando user autenticado está no fluxo de login (hash #auth/#register) → redireciona definindo forceDashboard como true
   useEffect(() => {
     if (user && !authLoading && currentView === 'auth') {
-      history.replaceState(null, '', window.location.pathname + window.location.search);
       setCurrentViewRaw('landing');
       setForceDashboard(true);
     }
