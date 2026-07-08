@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AppointmentsProvider, useAppointments } from './contexts/AppointmentsContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
@@ -62,8 +62,24 @@ function AppContent() {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const { currentTenant, isMock } = useAppointments();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
   const { t } = useLanguage();
+
+  const isFirstLoad = useRef(true);
+
+  // Se a página inicializar/atualizar nas URLs de login ou cadastro (#auth ou #register) e o usuário já estiver logado,
+  // força o logout automático para evitar que a sessão antiga redirecione o usuário para o dashboard indesejadamente.
+  useEffect(() => {
+    if (!authLoading) {
+      if (isFirstLoad.current) {
+        isFirstLoad.current = false;
+        const hash = window.location.hash;
+        if ((hash === '#auth' || hash === '#register') && user) {
+          logout();
+        }
+      }
+    }
+  }, [authLoading, user, logout]);
 
   // Gerenciamento do Tema Escuro
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
