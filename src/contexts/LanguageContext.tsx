@@ -287,7 +287,9 @@ const translations: Record<Language, Record<string, string>> = {
     'landing.pricing.plan_type': 'Plano Corporativo Completo',
     'landing.pricing.plan_title': 'Acesso Ilimitado',
     'landing.pricing.plan_desc': 'Para petshops, clínicas e profissionais independentes.',
-    'landing.pricing.monthly': 'Valor Mensual',
+    'landing.pricing.monthly': 'Valor Mensal',
+    'landing.pricing.currency': 'R$',
+    'landing.pricing.price': '97,00',
     'landing.pricing.per_month': '/mês',
     'landing.pricing.trial': 'Teste grátis por 14 dias',
     'landing.pricing.benefit1': 'Agendamentos e serviços ilimitados',
@@ -301,6 +303,7 @@ const translations: Record<Language, Record<string, string>> = {
     'landing.cta.desc': 'Junte-se a dezenas de clínicas que já modernizaram suas operações com o PetSanny.',
     'landing.cta.btn': 'Criar Clínica Agora',
     'landing.footer.text': 'Gestão PetCare Inteligente • Todos os direitos reservados.',
+    'landing.mockup.revenue_val': 'R$ 12.450,00',
   },
   en: {
     // Sidebar
@@ -581,6 +584,8 @@ const translations: Record<Language, Record<string, string>> = {
     'landing.pricing.plan_title': 'Unlimited Access',
     'landing.pricing.plan_desc': 'For petshops, clinics, and independent professionals.',
     'landing.pricing.monthly': 'Monthly Fee',
+    'landing.pricing.currency': '$',
+    'landing.pricing.price': '19.00',
     'landing.pricing.per_month': '/month',
     'landing.pricing.trial': 'Free trial for 14 days',
     'landing.pricing.benefit1': 'Unlimited appointments and services',
@@ -594,6 +599,7 @@ const translations: Record<Language, Record<string, string>> = {
     'landing.cta.desc': 'Join dozens of clinics that have already modernized their operations with PetSanny.',
     'landing.cta.btn': 'Create Clinic Now',
     'landing.footer.text': 'Smart PetCare Management • All rights reserved.',
+    'landing.mockup.revenue_val': '$ 12,450.00',
   },
   es: {
     // Sidebar
@@ -874,6 +880,8 @@ const translations: Record<Language, Record<string, string>> = {
     'landing.pricing.plan_title': 'Acceso Ilimitado',
     'landing.pricing.plan_desc': 'Para petshops, clínicas y profesionales independientes.',
     'landing.pricing.monthly': 'Valor Mensual',
+    'landing.pricing.currency': '€',
+    'landing.pricing.price': '19,00',
     'landing.pricing.per_month': '/mes',
     'landing.pricing.trial': 'Prueba gratis por 14 días',
     'landing.pricing.benefit1': 'Citas y servicios ilimitados',
@@ -887,6 +895,7 @@ const translations: Record<Language, Record<string, string>> = {
     'landing.cta.desc': 'Únase a decenas de clínicas que ya modernizaron sus operaciones con PetSanny.',
     'landing.cta.btn': 'Crear Clínica Ahora',
     'landing.footer.text': 'Gestión PetCare Inteligente • Todos los derechos reservados.',
+    'landing.mockup.revenue_val': '12.450,00 €',
   }
 };
 

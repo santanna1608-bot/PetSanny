@@ -254,7 +254,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-2.5 bg-stone-50 dark:bg-stone-950 rounded-2xl border border-stone-100 dark:border-stone-800 flex flex-col gap-1">
                   <span className="text-[7px] uppercase font-bold text-stone-400">{t('landing.mockup.revenue')}</span>
-                  <span className="text-xs font-black text-stone-800 dark:text-stone-100">R$ 12.450,00</span>
+                  <span className="text-xs font-black text-stone-800 dark:text-stone-100">{t('landing.mockup.revenue_val')}</span>
                 </div>
                 <div className="p-2.5 bg-olive-500/5 dark:bg-olive-950/10 rounded-2xl border border-olive-500/10 flex flex-col gap-1">
                   <span className="text-[7px] uppercase font-bold text-olive-600 dark:text-olive-400">{t('landing.mockup.scheduled')}</span>
@@ -445,8 +445,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="py-4 border-y border-stone-100 dark:border-stone-800 flex flex-col items-center">
                 <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">{t('landing.pricing.monthly')}</span>
                 <div className="flex items-baseline mt-1.5">
-                  <span className="text-base font-bold text-stone-400 mr-1">R$</span>
-                  <span className="text-5xl font-black text-stone-900 dark:text-stone-50 leading-none font-mono price-shimmer">97,00</span>
+                  <span className="text-base font-bold text-stone-400 mr-1">{t('landing.pricing.currency')}</span>
+                  <span className="text-5xl font-black text-stone-900 dark:text-stone-50 leading-none font-mono price-shimmer">{t('landing.pricing.price')}</span>
                   <span className="text-xs text-stone-400 ml-1.5">{t('landing.pricing.per_month')}</span>
                 </div>
                 <span className="text-[9px] font-extrabold text-emerald-600 dark:text-emerald-500 mt-2 uppercase tracking-wider">

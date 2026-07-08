@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Globe, ChevronDown, Check } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -29,7 +29,6 @@ export const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ size = 'md' 
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const current = LANGUAGES.find((l) => l.code === language) ?? LANGUAGES[0];
   const isSm = size === 'sm';
 
   return (
@@ -37,21 +36,21 @@ export const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ size = 'md' 
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-1.5 border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-850 hover:text-stone-900 dark:hover:text-stone-100 transition-all cursor-pointer shadow-sm rounded-xl font-bold uppercase tracking-wider select-none ${
-          isSm ? 'px-2.5 py-1.5 text-[10px]' : 'px-3 py-[10px] text-[11px]'
+        className={`flex items-center gap-2 border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-850 hover:text-stone-900 dark:hover:text-stone-100 transition-all cursor-pointer shadow-sm rounded-xl font-bold uppercase tracking-wider select-none focus:outline-none focus:ring-2 focus:ring-olive-500/20 ${
+          isSm ? 'px-3 py-1.5 text-[10px]' : 'px-3.5 py-[10px] text-[11px]'
         }`}
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <Globe className={isSm ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
-        <span>{current.flag} {current.code.toUpperCase()}</span>
+        <Globe className={`${isSm ? 'w-3.5 h-3.5' : 'w-4 h-4'} text-stone-400 dark:text-stone-500`} />
+        <span>{language.toUpperCase()}</span>
         <ChevronDown
-          className={`transition-transform duration-200 ${open ? 'rotate-180' : ''} ${isSm ? 'w-3 h-3' : 'w-3.5 h-3.5'}`}
+          className={`transition-transform duration-200 text-stone-400 dark:text-stone-500 ${open ? 'rotate-180' : ''} ${isSm ? 'w-3 h-3' : 'w-3.5 h-3.5'}`}
         />
       </button>
 
       <div
-        className={`absolute right-0 mt-2 w-44 z-[9999] rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-xl shadow-stone-900/10 dark:shadow-stone-950/40 overflow-hidden transition-all duration-200 origin-top-right ${
+        className={`absolute right-0 mt-2 w-48 z-[9999] rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-xl shadow-stone-900/10 dark:shadow-stone-950/40 overflow-hidden transition-all duration-200 origin-top-right ${
           open ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' : 'opacity-0 scale-95 -translate-y-1 pointer-events-none'
         }`}
         role="listbox"
@@ -68,14 +67,18 @@ export const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ size = 'md' 
                 setLanguage(lang.code as LangCode);
                 setOpen(false);
               }}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-colors cursor-pointer ${
+              className={`w-full flex items-center justify-between px-4 py-3 text-xs font-bold transition-all cursor-pointer border-none outline-none focus:outline-none ${
                 isActive
-                  ? 'bg-olive-50 dark:bg-olive-950/40 text-olive-700 dark:text-olive-400'
-                  : 'text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-850 hover:text-stone-900 dark:hover:text-stone-100'
+                  ? 'bg-olive-500/10 text-olive-700 dark:text-olive-400'
+                  : 'text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-850 hover:text-stone-900 dark:hover:text-stone-100 focus:bg-stone-50 dark:focus:bg-stone-850'
               }`}
             >
-              <span className="text-base">{lang.flag}</span>
-              <span className="flex-1 text-left">{lang.label}</span>
+              <div className="flex items-center gap-2">
+                <span className={`px-1.5 py-0.5 rounded text-[9px] uppercase font-black tracking-wider ${isActive ? 'bg-olive-500 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-450'}`}>
+                  {lang.code}
+                </span>
+                <span>{lang.label}</span>
+              </div>
               {isActive && <Check className="w-3.5 h-3.5 text-olive-600 dark:text-olive-400 shrink-0" />}
             </button>
           );
