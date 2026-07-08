@@ -28,7 +28,7 @@ export const Login: React.FC = () => {
   const [name, setName] = useState('');
   const [tenantName, setTenantName] = useState('');
   const [tenantLocation, setTenantLocation] = useState('');
-  const [plan, setPlan] = useState<'Bronze' | 'Silver' | 'Gold'>('Silver');
+  const plan = 'Gold';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -194,30 +194,17 @@ export const Login: React.FC = () => {
                 </div>
               </div>
 
-              {/* Escolha do Plano */}
-              <div className="space-y-1.5">
-                <label className="block text-[10px] text-stone-500 dark:text-stone-400 font-extrabold uppercase tracking-wider mb-1">
-                  Plano Inicial (14 dias grátis)
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(['Bronze', 'Silver', 'Gold'] as const).map((p) => (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => setPlan(p)}
-                      className={`p-2 rounded-xl text-center border transition-all cursor-pointer font-bold text-[10px] ${
-                        plan === p
-                          ? 'bg-olive-50 dark:bg-olive-950/20 border-olive-550 text-olive-850 dark:text-olive-300 shadow-sm'
-                          : 'bg-stone-50 dark:bg-stone-955 border-stone-200 dark:border-stone-800 text-stone-500 dark:text-stone-450 hover:border-stone-300 dark:hover:border-stone-700'
-                      }`}
-                    >
-                      <div>{p}</div>
-                      <div className="text-[7.5px] font-normal text-stone-450 dark:text-stone-500 mt-0.5">
-                        {p === 'Gold' ? 'R$ 299/m' : p === 'Silver' ? 'R$ 199/m' : 'R$ 149/m'}
-                      </div>
-                    </button>
-                  ))}
+              {/* Plano Único Informativo */}
+              <div className="p-4 rounded-2xl bg-olive-500/5 dark:bg-olive-950/10 border border-olive-500/10 text-center space-y-1">
+                <span className="text-[9px] uppercase font-bold text-olive-600 dark:text-olive-400 tracking-wider">
+                  Assinatura PetSanny
+                </span>
+                <div className="text-lg font-black text-stone-850 dark:text-stone-100 leading-none">
+                  R$ 97,00<span className="text-[10px] font-normal text-stone-500 dark:text-stone-450">/mês</span>
                 </div>
+                <p className="text-[9px] text-stone-450 dark:text-stone-500">
+                  Acesso total a todas as funcionalidades do sistema + 14 dias grátis de teste
+                </p>
               </div>
             </>
           )}

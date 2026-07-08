@@ -343,12 +343,22 @@ export const SaaSSubscriptions: React.FC = () => {
                   </label>
                   <select
                     value={editPlan}
-                    onChange={(e) => setEditPlan(e.target.value as any)}
+                    onChange={(e) => {
+                      const newPlan = e.target.value as any;
+                      setEditPlan(newPlan);
+                      if (newPlan === 'Gold') {
+                        setEditPrice(97.00);
+                      } else if (newPlan === 'Silver') {
+                        setEditPrice(199.90);
+                      } else if (newPlan === 'Bronze') {
+                        setEditPrice(149.90);
+                      }
+                    }}
                     className="w-full bg-stone-50 dark:bg-stone-955 text-stone-850 dark:text-stone-100 text-xs rounded-xl p-2.5 border border-stone-250 dark:border-stone-800 outline-none cursor-pointer"
                   >
-                    <option value="Bronze">Bronze (R$ 149,90/mês)</option>
-                    <option value="Silver">Silver (R$ 199,90/mês)</option>
-                    <option value="Gold">Gold (R$ 299,90/mês)</option>
+                    <option value="Gold">Assinatura PetSanny (R$ 97,00/mês)</option>
+                    <option value="Silver">Silver (Antigo R$ 199,90/mês)</option>
+                    <option value="Bronze">Bronze (Antigo R$ 149,90/mês)</option>
                   </select>
                 </div>
 
