@@ -17,12 +17,16 @@ interface LandingPageProps {
   onNavigateToAuth: (mode: 'login' | 'register') => void;
   theme: 'light' | 'dark';
   toggleTheme: () => void;
+  isLoggedIn?: boolean;
+  onGoToDashboard?: () => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ 
   onNavigateToAuth, 
   theme, 
-  toggleTheme 
+  toggleTheme,
+  isLoggedIn = false,
+  onGoToDashboard
 }) => {
   return (
     <div className="min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-850 dark:text-stone-100 transition-colors duration-300 font-sans selection:bg-olive-500 selection:text-white">
@@ -62,20 +66,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </button>
 
             {/* Botões de Ação */}
-            <button
-              onClick={() => onNavigateToAuth('login')}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-stone-650 dark:text-stone-300 hover:text-stone-850 dark:hover:text-white transition-colors cursor-pointer"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              Entrar
-            </button>
-            <button
-              onClick={() => onNavigateToAuth('register')}
-              className="flex items-center gap-1.5 px-4 py-2 bg-olive-600 hover:bg-olive-750 dark:bg-olive-600 dark:hover:bg-olive-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-olive-900/10 hover:shadow-lg cursor-pointer"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              Cadastrar Clínica
-            </button>
+            {isLoggedIn ? (
+              <button
+                onClick={onGoToDashboard}
+                className="flex items-center gap-1.5 px-4 py-2 bg-olive-600 hover:bg-olive-750 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-olive-900/10 hover:shadow-lg cursor-pointer"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                Ir ao Painel
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => onNavigateToAuth('login')}
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-stone-650 dark:text-stone-300 hover:text-stone-850 dark:hover:text-white transition-colors cursor-pointer"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  Entrar
+                </button>
+                <button
+                  onClick={() => onNavigateToAuth('register')}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-olive-600 hover:bg-olive-750 dark:bg-olive-600 dark:hover:bg-olive-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-olive-900/10 hover:shadow-lg cursor-pointer"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  Cadastrar Clínica
+                </button>
+              </>
+            )}
           </div>
         </div>
       </header>

@@ -25,7 +25,22 @@ import {
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [currentView, setCurrentView] = useState<'landing' | 'auth'>('landing');
+
+  // Persiste a view atual no sessionStorage para sobreviver ao refresh
+  const [currentView, setCurrentViewRaw] = useState<'landing' | 'auth'>(() => {
+    const saved = sessionStorage.getItem('petsanny_view');
+    if (saved === 'auth') return 'auth';
+    return 'landing';
+  });
+
+  // Controla se usuário autenticado quer ver o dashboard (ignora landing salva)
+  const [forceDashboard, setForceDashboard] = useState(false);
+
+  const setCurrentView = (view: 'landing' | 'auth') => {
+    sessionStorage.setItem('petsanny_view', view);
+    setCurrentViewRaw(view);
+  };
+
   const [initialAuthMode, setInitialAuthMode] = useState<'login' | 'register'>('login');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const { currentTenant, isMock } = useAppointments();
@@ -49,6 +64,17 @@ function AppContent() {
     localStorage.setItem('petsanny_theme', theme);
   }, [theme]);
 
+  // Quando o usuário faz logout, volta para a landing
+  useEffect(() => {
+    if (!user && !authLoading) {
+      // Se estava no dashboard sem sessão, volta pra landing
+      const saved = sessionStorage.getItem('petsanny_view');
+      if (!saved || saved === 'dashboard' as string) {
+        setCurrentView('landing');
+      }
+    }
+  }, [user, authLoading]);
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-stone-100 dark:bg-stone-950 flex items-center justify-center font-sans text-stone-900 dark:text-stone-100 transition-colors duration-200">
@@ -57,6 +83,24 @@ function AppContent() {
           <span className="text-xs text-stone-500 font-semibold uppercase tracking-wider">{t('auth.loading')}</span>
         </div>
       </div>
+    );
+  }
+
+  // Usuário autenticado, mas estava na landing page → mostra landing com botão "Ir ao Painel"
+  if (user && currentView === 'landing' && !forceDashboard) {
+    return (
+      <LandingPage
+        theme={theme}
+        toggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        onNavigateToAuth={() => {
+          // Já está logado, vai ao painel
+          setForceDashboard(true);
+        }}
+        isLoggedIn={true}
+        onGoToDashboard={() => {
+          setForceDashboard(true);
+        }}
+      />
     );
   }
 
@@ -70,6 +114,7 @@ function AppContent() {
             setInitialAuthMode(mode);
             setCurrentView('auth');
           }}
+          isLoggedIn={false}
         />
       );
     }
