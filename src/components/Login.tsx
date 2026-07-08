@@ -98,7 +98,7 @@ export const Login: React.FC = () => {
               PetSanny
             </h1>
             <span className="text-[10px] text-stone-500 dark:text-stone-400 font-bold uppercase tracking-widest mt-1 block">
-              Multi-Tenant SaaS App
+              Gestão PetCare Inteligente
             </span>
           </div>
           <p className="text-xs text-stone-500 dark:text-stone-400 max-w-[280px]">
