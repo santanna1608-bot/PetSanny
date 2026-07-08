@@ -128,7 +128,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Sem cartão de crédito no teste
               </div>
               <div className="flex items-center gap-1">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Suporte RLS Multi-Tenant
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Dados seguros e privados
               </div>
               <div className="flex items-center gap-1">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Configuração em 2 minutos
