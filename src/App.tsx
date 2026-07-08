@@ -29,22 +29,31 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Persiste a view atual no sessionStorage para sobreviver ao refresh
-  const [currentView, setCurrentViewRaw] = useState<'landing' | 'auth'>(() => {
-    const saved = sessionStorage.getItem('petsanny_view');
-    if (saved === 'auth') return 'auth';
+  // Controla a view baseada no hash da URL (persiste no refresh)
+  const getViewFromHash = (): 'landing' | 'auth' => {
+    const hash = window.location.hash;
+    if (hash === '#auth' || hash === '#register') return 'auth';
     return 'landing';
+  };
+
+  const [currentView, setCurrentViewRaw] = useState<'landing' | 'auth'>(getViewFromHash);
+  const [initialAuthMode, setInitialAuthMode] = useState<'login' | 'register'>(() => {
+    return window.location.hash === '#register' ? 'register' : 'login';
   });
 
   // Controla se usuário autenticado quer ver o dashboard (ignora landing salva)
   const [forceDashboard, setForceDashboard] = useState(false);
 
-  const setCurrentView = (view: 'landing' | 'auth') => {
-    sessionStorage.setItem('petsanny_view', view);
+  const setCurrentView = (view: 'landing' | 'auth', mode: 'login' | 'register' = 'login') => {
+    if (view === 'auth') {
+      window.location.hash = mode === 'register' ? '#register' : '#auth';
+    } else {
+      // Limpa o hash sem causar scroll
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
     setCurrentViewRaw(view);
   };
 
-  const [initialAuthMode, setInitialAuthMode] = useState<'login' | 'register'>('login');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const { currentTenant, isMock } = useAppointments();
   const { user, loading: authLoading } = useAuth();
@@ -67,16 +76,39 @@ function AppContent() {
     localStorage.setItem('petsanny_theme', theme);
   }, [theme]);
 
-  // Quando o usuário faz logout, volta para a landing
+  // Sincroniza a view com o hash da URL (ex: usuário clica no botão voltar do browser)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const newView = getViewFromHash();
+      setCurrentViewRaw(newView);
+      if (newView === 'auth') {
+        setInitialAuthMode(window.location.hash === '#register' ? 'register' : 'login');
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Quando o usuário faz logout, limpa hash e volta para a landing
   useEffect(() => {
     if (!user && !authLoading) {
-      // Se estava no dashboard sem sessão, volta pra landing
-      const saved = sessionStorage.getItem('petsanny_view');
-      if (!saved || saved === 'dashboard' as string) {
-        setCurrentView('landing');
+      // Apenas redireciona para landing se o hash não indicar auth
+      // (preserva a tela de auth se o usuário não está logado e está na tela de login)
+      const hash = window.location.hash;
+      if (hash !== '#auth' && hash !== '#register') {
+        setCurrentViewRaw('landing');
       }
     }
   }, [user, authLoading]);
+
+  // Quando user autenticado está no hash #auth/#register → limpa hash e vai ao dashboard
+  useEffect(() => {
+    if (user && !authLoading && currentView === 'auth') {
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+      setCurrentViewRaw('landing');
+      setForceDashboard(true);
+    }
+  }, [user, authLoading, currentView]);
 
   if (authLoading) {
     return (
@@ -115,7 +147,7 @@ function AppContent() {
           toggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           onNavigateToAuth={(mode) => {
             setInitialAuthMode(mode);
-            setCurrentView('auth');
+            setCurrentView('auth', mode);
           }}
           isLoggedIn={false}
         />
