@@ -84,6 +84,7 @@ interface AppointmentsContextType {
   isMock: boolean;
   tenants: Tenant[];
   updateTenantSubscription: (tenantId: string, updates: Partial<Tenant>) => Promise<void>;
+  deleteTenantSubscription: (tenantId: string) => Promise<void>;
 }
 
 const AppointmentsContext = createContext<AppointmentsContextType | undefined>(undefined);
@@ -323,6 +324,35 @@ export const AppointmentsProvider: React.FC<{ children: React.ReactNode }> = ({ 
     addToast('Assinatura Atualizada', `O plano/status da clínica foi atualizado com sucesso.`, 'success');
   };
 
+  const deleteTenantSubscription = async (tenantId: string) => {
+    try {
+      if (!isMockClient && realSupabase) {
+        const { error } = await realSupabase
+          .from('tenants')
+          .delete()
+          .eq('id', tenantId);
+        
+        if (error) throw error;
+      }
+
+      const updatedTenants = tenants.filter(t => t.id !== tenantId);
+      setTenants(updatedTenants);
+      localStorage.setItem('petsanny_tenants', JSON.stringify(updatedTenants));
+
+      // Se a clínica deletada for a ativa, muda para a primeira disponível
+      if (currentTenant.id === tenantId) {
+        if (updatedTenants.length > 0) {
+          setCurrentTenantState(updatedTenants[0]);
+        }
+      }
+
+      addToast('Clínica Excluída', 'A assinatura e cadastro da clínica foram removidos.', 'info');
+    } catch (err) {
+      console.error('Erro ao excluir tenant:', err);
+      addToast('Erro ao Excluir', 'Não foi possível remover a clínica do sistema.', 'warning');
+    }
+  };
+
   return (
     <AppointmentsContext.Provider
       value={{
@@ -339,8 +369,9 @@ export const AppointmentsProvider: React.FC<{ children: React.ReactNode }> = ({ 
         addToast,
         removeToast,
         isMock: isMockClient,
-        tenants,
-        updateTenantSubscription
+        tenants: tenants,
+        updateTenantSubscription,
+        deleteTenantSubscription
       }}
     >
       {children}

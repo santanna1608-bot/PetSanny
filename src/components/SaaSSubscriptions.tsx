@@ -12,13 +12,17 @@ import {
   XCircle, 
   Search,
   Sliders,
-  X
+  X,
+  Trash2
 } from 'lucide-react';
+import { ConfirmModal } from './ConfirmModal';
 
 export const SaaSSubscriptions: React.FC = () => {
-  const { tenants, updateTenantSubscription, addToast, setCurrentTenant } = useAppointments();
+  const { tenants, updateTenantSubscription, deleteTenantSubscription, addToast, setCurrentTenant } = useAppointments();
   const [searchTerm, setSearchTerm] = useState('');
   const [editingTenant, setEditingTenant] = useState<Tenant | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [tenantToDelete, setTenantToDelete] = useState<Tenant | null>(null);
 
   // Estados do formulário de edição
   const [editPlan, setEditPlan] = useState<'Bronze' | 'Silver' | 'Gold'>('Silver');
@@ -295,9 +299,19 @@ export const SaaSSubscriptions: React.FC = () => {
                         <button
                           onClick={() => handleOpenEdit(tenant)}
                           title="Ajustar Assinatura"
-                          className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-950 text-stone-700 hover:text-stone-900 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-stone-200 dark:hover:border-stone-800"
+                          className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-955 text-stone-700 hover:text-stone-900 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-stone-200 dark:hover:border-stone-800"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setTenantToDelete(tenant);
+                            setDeleteModalOpen(true);
+                          }}
+                          title="Excluir Assinatura"
+                          className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-955/35 text-rose-650 hover:text-rose-850 dark:hover:text-rose-455 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-rose-200 dark:hover:border-rose-900/40"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </td>
@@ -453,6 +467,25 @@ export const SaaSSubscriptions: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Modal de Confirmação Customizado para Deletar Assinatura */}
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        title="Excluir Assinatura"
+        message={`Tem certeza de que deseja remover permanentemente a clínica "${tenantToDelete?.name}"? Esta ação removerá o faturamento e assinatura do sistema.`}
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        onConfirm={() => {
+          if (tenantToDelete) {
+            deleteTenantSubscription(tenantToDelete.id);
+          }
+        }}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setTenantToDelete(null);
+        }}
+        isDanger={true}
+      />
     </div>
   );
 };
