@@ -3,14 +3,14 @@ import logoImg from '../assets/logo.png';
 import { 
   Sparkles, 
   Calendar, 
-  ShieldCheck, 
   TrendingUp, 
   ArrowRight,
   Sun,
   Moon,
   UserPlus,
   LogIn,
-  CheckCircle2
+  CheckCircle2,
+  Heart
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -228,13 +228,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Feature 2 */}
             <div className="p-6 rounded-3xl bg-stone-50 dark:bg-stone-955 border border-stone-200/60 dark:border-stone-800/80 hover:border-olive-500/40 dark:hover:border-olive-500/30 hover:shadow-xl hover:shadow-stone-200/10 dark:hover:shadow-stone-950/20 transition-all group">
               <div className="w-10 h-10 rounded-2xl bg-olive-500/10 dark:bg-olive-950/30 text-olive-650 dark:text-olive-400 flex items-center justify-center mb-4 transition-transform group-hover:scale-110">
-                <ShieldCheck className="w-5 h-5" />
+                <Heart className="w-5 h-5" />
               </div>
               <h3 className="font-extrabold text-base text-stone-850 dark:text-stone-100 group-hover:text-olive-650 dark:group-hover:text-olive-450 transition-colors">
-                Segurança RLS Multi-Tenant
+                Histórico Completo do Pet
               </h3>
               <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed mt-2 font-medium">
-                Cada clínica possui isolamento lógico de banco de dados por políticas RLS (Row Level Security) do PostgreSQL. Garantia absoluta de privacidade e segurança para os dados dos seus clientes e finanças.
+                Mantenha o prontuário atualizado de cada animal: vacinas, serviços realizados, observações clínicas e data de nascimento. Tudo num só lugar para um atendimento mais humano e personalizado.
               </p>
             </div>
 
