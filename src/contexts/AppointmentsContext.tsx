@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { Appointment } from '../lib/supabaseClient';
-import { appointmentsService, isMockClient } from '../lib/supabaseClient';
+import realSupabase, { appointmentsService, isMockClient } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 
 export interface Tenant {
@@ -141,13 +141,72 @@ export const AppointmentsProvider: React.FC<{ children: React.ReactNode }> = ({ 
   useEffect(() => {
     if (user) {
       const tenantId = user.user_metadata.tenant_id;
-      const matchedTenant = tenants.find(t => t.id === tenantId) || {
-        id: tenantId,
-        name: user.user_metadata.name || 'Minha Clínica',
-        location: 'Clínica Registrada',
-        primaryColor: 'olive'
-      };
-      setCurrentTenantState(matchedTenant);
+      const matchedTenant = tenants.find(t => t.id === tenantId);
+      
+      if (matchedTenant) {
+        setCurrentTenantState(matchedTenant);
+      } else {
+        // Fallback temporário enquanto carrega do Supabase
+        const fallbackTenant: Tenant = {
+          id: tenantId,
+          name: 'Carregando clínica...',
+          location: 'Carregando endereço...',
+          primaryColor: 'olive'
+        };
+        setCurrentTenantState(fallbackTenant);
+
+        if (!isMockClient && realSupabase) {
+          realSupabase
+            .from('tenants')
+            .select('*')
+            .eq('id', tenantId)
+            .single()
+            .then(({ data, error }) => {
+              if (error) {
+                console.error('Erro ao buscar dados do tenant no Supabase:', error);
+                // Fallback persistente em caso de erro
+                setCurrentTenantState({
+                  id: tenantId,
+                  name: 'Minha Clínica',
+                  location: 'Clínica Registrada',
+                  primaryColor: 'olive'
+                });
+              } else if (data) {
+                const fetchedTenant: Tenant = {
+                  id: data.id,
+                  name: data.name,
+                  location: data.location || 'Sem endereço cadastrado',
+                  primaryColor: data.primary_color || 'olive',
+                  plan: data.plan,
+                  status: data.status,
+                  price: data.price,
+                  renewalDate: data.renewal_date,
+                  paymentMethod: data.payment_method,
+                  ownerName: data.owner_name,
+                  ownerEmail: data.owner_email
+                };
+
+                // Adiciona na lista local de tenants e define como ativo
+                setTenants((prev) => {
+                  const exists = prev.some(t => t.id === fetchedTenant.id);
+                  if (!exists) {
+                    return [...prev, fetchedTenant];
+                  }
+                  return prev;
+                });
+                setCurrentTenantState(fetchedTenant);
+              }
+            });
+        } else {
+          // No modo de simulação mock local, usa os dados do usuário para o fallback
+          setCurrentTenantState({
+            id: tenantId,
+            name: user.user_metadata.name || 'Minha Clínica',
+            location: 'Clínica Registrada',
+            primaryColor: 'olive'
+          });
+        }
+      }
     } else {
       setAppointments([]);
     }
