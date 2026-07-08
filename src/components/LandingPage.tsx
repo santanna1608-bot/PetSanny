@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import logoImg from '../assets/logo.png';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { LanguageDropdown } from './LanguageDropdown';
+import { useLanguage } from '../contexts/LanguageContext';
 import { 
   Sparkles, 
   Calendar, 
@@ -34,6 +35,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 }) => {
   const pageRef = useScrollReveal(0.12, '0px 0px -50px 0px');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useLanguage();
 
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
@@ -57,9 +59,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-stone-500 dark:text-stone-400">
-            <a href="#features" className="nav-link hover:text-olive-650 dark:hover:text-olive-400 transition-colors">Recursos</a>
-            <a href="#workflow" className="nav-link hover:text-olive-650 dark:hover:text-olive-400 transition-colors">Como Funciona</a>
-            <a href="#pricing" className="nav-link hover:text-olive-650 dark:hover:text-olive-400 transition-colors">Preço</a>
+            <a href="#features" className="nav-link hover:text-olive-650 dark:hover:text-olive-400 transition-colors">{t('landing.nav.features')}</a>
+            <a href="#workflow" className="nav-link hover:text-olive-650 dark:hover:text-olive-400 transition-colors">{t('landing.nav.workflow')}</a>
+            <a href="#pricing" className="nav-link hover:text-olive-650 dark:hover:text-olive-400 transition-colors">{t('landing.nav.pricing')}</a>
           </nav>
 
           {/* Desktop Actions */}
@@ -81,7 +83,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 className="btn-cta-primary flex items-center gap-1.5 px-4 py-2 bg-olive-600 text-white text-xs font-bold rounded-xl shadow-md shadow-olive-900/10 cursor-pointer"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                Ir ao Painel
+                {t('landing.nav.dashboard')}
               </button>
             ) : (
               <>
@@ -90,14 +92,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   className="btn-cta-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white transition-colors cursor-pointer"
                 >
                   <LogIn className="w-3.5 h-3.5" />
-                  Entrar
+                  {t('landing.nav.login')}
                 </button>
                 <button
                   onClick={() => onNavigateToAuth('register')}
                   className="btn-cta-primary flex items-center gap-1.5 px-4 py-2 bg-olive-600 text-white text-xs font-bold rounded-xl shadow-md shadow-olive-900/10 cursor-pointer"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
-                  Cadastrar
+                  {t('landing.nav.register')}
                 </button>
               </>
             )}
@@ -133,9 +135,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="px-4 pb-4 pt-2 flex flex-col gap-3 border-t border-stone-100 dark:border-stone-900">
             <nav className="flex flex-col gap-1">
               {[
-                { href: '#features', label: 'Recursos' },
-                { href: '#workflow', label: 'Como Funciona' },
-                { href: '#pricing', label: 'Preço' },
+                { href: '#features', label: t('landing.nav.features') },
+                { href: '#workflow', label: t('landing.nav.workflow') },
+                { href: '#pricing', label: t('landing.nav.pricing') },
               ].map(({ href, label }) => (
                 <a
                   key={href}
@@ -154,7 +156,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   className="btn-cta-primary w-full flex items-center justify-center gap-2 py-3 bg-olive-600 text-white text-sm font-bold rounded-xl cursor-pointer"
                 >
                   <LogIn className="w-4 h-4" />
-                  Ir ao Painel
+                  {t('landing.nav.dashboard')}
                 </button>
               ) : (
                 <>
@@ -163,14 +165,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     className="w-full flex items-center justify-center gap-2 py-3 border border-stone-200 dark:border-stone-800 text-sm font-bold text-stone-600 dark:text-stone-300 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-900 transition-all cursor-pointer"
                   >
                     <LogIn className="w-4 h-4" />
-                    Entrar na Conta
+                    {t('landing.nav.login_mobile')}
                   </button>
                   <button
                     onClick={() => { closeMobileMenu(); onNavigateToAuth('register'); }}
                     className="btn-cta-primary w-full flex items-center justify-center gap-2 py-3 bg-olive-600 text-white text-sm font-bold rounded-xl cursor-pointer"
                   >
                     <UserPlus className="w-4 h-4" />
-                    Cadastrar Clínica Grátis
+                    {t('landing.nav.register_mobile')}
                   </button>
                 </>
               )}
@@ -190,18 +192,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
             <div className="animate-fade-in-up inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-olive-500/10 text-olive-700 dark:text-olive-400 text-[10px] sm:text-xs font-black uppercase tracking-wider">
               <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
-              Gestão PetCare Inteligente
+              {t('landing.hero.tagline')}
             </div>
 
             <h1 className="animate-fade-in-up delay-100 text-[2rem] sm:text-5xl font-black tracking-tight leading-[1.1] text-stone-900 dark:text-stone-50">
-              O ecossistema completo para gerenciar seu{' '}
+              {t('landing.hero.title1')}{' '}
               <span className="bg-gradient-to-r from-olive-600 to-emerald-600 dark:from-olive-400 dark:to-emerald-500 bg-clip-text text-transparent">
-                Petshop ou Clínica
+                {t('landing.hero.title2')}
               </span>
             </h1>
 
             <p className="animate-fade-in-up delay-200 text-sm sm:text-base text-stone-500 dark:text-stone-400 leading-relaxed max-w-xl mx-auto lg:mx-0 font-medium">
-              Unifique agendamentos, fichas de clientes e histórico de pets em uma plataforma inteligente. Esqueça planilhas confusas — gerencie tudo com agilidade e segurança.
+              {t('landing.hero.desc')}
             </p>
 
             {/* CTAs */}
@@ -210,23 +212,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 onClick={() => onNavigateToAuth('register')}
                 className="btn-cta-primary flex items-center justify-center gap-2 px-6 py-3.5 bg-olive-600 text-white font-bold text-sm rounded-2xl shadow-lg shadow-olive-900/15 cursor-pointer"
               >
-                Experimentar 14 Dias Grátis
+                {t('landing.hero.trial_btn')}
                 <ArrowRight className="w-4 h-4 shrink-0" />
               </button>
               <a
                 href="#features"
                 className="btn-cta-secondary flex items-center justify-center gap-2 px-6 py-3.5 border border-stone-200 dark:border-stone-800 hover:bg-stone-100 dark:hover:bg-stone-900 font-bold text-sm rounded-2xl cursor-pointer text-stone-600 dark:text-stone-300"
               >
-                Conhecer Recursos
+                {t('landing.hero.features_btn')}
               </a>
             </div>
 
             {/* Micro Benefícios */}
             <div className="animate-fade-in-up delay-400 flex flex-col xs:flex-row flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-[10px] sm:text-xs font-bold text-stone-400 dark:text-stone-500 pt-2">
               {[
-                'Sem cartão de crédito',
-                'Dados seguros',
-                'Configuração em 2 min',
+                t('landing.hero.no_credit'),
+                t('landing.hero.secure_data'),
+                t('landing.hero.fast_setup'),
               ].map((benefit) => (
                 <div key={benefit} className="flex items-center gap-1.5 whitespace-nowrap">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> {benefit}
@@ -251,18 +253,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {/* Metric Cards */}
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-2.5 bg-stone-50 dark:bg-stone-950 rounded-2xl border border-stone-100 dark:border-stone-800 flex flex-col gap-1">
-                  <span className="text-[7px] uppercase font-bold text-stone-400">Total Faturamento</span>
+                  <span className="text-[7px] uppercase font-bold text-stone-400">{t('landing.mockup.revenue')}</span>
                   <span className="text-xs font-black text-stone-800 dark:text-stone-100">R$ 12.450,00</span>
                 </div>
                 <div className="p-2.5 bg-olive-500/5 dark:bg-olive-950/10 rounded-2xl border border-olive-500/10 flex flex-col gap-1">
-                  <span className="text-[7px] uppercase font-bold text-olive-600 dark:text-olive-400">Agendados Hoje</span>
-                  <span className="text-xs font-black text-olive-700 dark:text-olive-400">8 Pets</span>
+                  <span className="text-[7px] uppercase font-bold text-olive-600 dark:text-olive-400">{t('landing.mockup.scheduled')}</span>
+                  <span className="text-xs font-black text-olive-700 dark:text-olive-400">{t('landing.mockup.pets')}</span>
                 </div>
               </div>
 
               {/* Appointment Row */}
               <div className="space-y-1.5">
-                <span className="text-[7px] uppercase font-bold text-stone-400">Próximos Atendimentos</span>
+                <span className="text-[7px] uppercase font-bold text-stone-400">{t('landing.mockup.next')}</span>
                 <div className="p-2.5 bg-stone-50 dark:bg-stone-950 rounded-xl border border-stone-100 dark:border-stone-800 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <div className="w-6 h-6 rounded bg-olive-500/10 flex items-center justify-center text-[11px] shrink-0">
@@ -270,7 +272,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     </div>
                     <div className="min-w-0">
                       <h6 className="text-[8px] font-black text-stone-800 dark:text-stone-200 truncate">Mel (Golden Retriever)</h6>
-                      <span className="text-[7px] text-stone-400 font-medium">Banho &amp; Tosa • Ed Gama</span>
+                      <span className="text-[7px] text-stone-400 font-medium">{t('landing.mockup.service')}</span>
                     </div>
                   </div>
                   <span className="text-[7px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shrink-0">
@@ -281,7 +283,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
               {/* Status Bar */}
               <div className="flex items-center justify-between pt-2 border-t border-stone-100 dark:border-stone-800 text-[7px] text-stone-400 font-bold">
-                <span>Ao Vivo • PetSanny Dashboard</span>
+                <span>{t('landing.mockup.live')}</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
               </div>
             </div>
@@ -294,13 +296,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-xl mx-auto space-y-3 mb-12 sm:mb-16">
             <span className="reveal-up text-[9px] sm:text-xs font-black uppercase text-olive-600 dark:text-olive-400 tracking-wider block">
-              Recursos de Alta Performance
+              {t('landing.features.tagline')}
             </span>
             <h2 className="reveal-up stagger-1 text-2xl sm:text-4xl font-black text-stone-900 dark:text-stone-50 leading-tight">
-              Tudo o que sua clínica precisa em um único lugar
+              {t('landing.features.title')}
             </h2>
             <p className="reveal-up stagger-2 text-xs sm:text-sm text-stone-500 dark:text-stone-400 leading-relaxed font-semibold">
-              Menos cliques para realizar as tarefas e mais tempo para cuidar dos pets.
+              {t('landing.features.desc')}
             </p>
           </div>
 
@@ -308,20 +310,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {[
               {
                 icon: <Calendar className="w-5 h-5" />,
-                title: 'Agenda Inteligente',
-                desc: 'Visualize e agende serviços com calendários coloridos e filtros instantâneos. Alertas automáticos evitam conflitos de horários.',
+                title: t('landing.features.item1.title'),
+                desc: t('landing.features.item1.desc'),
                 stagger: 'stagger-1',
               },
               {
                 icon: <Heart className="w-5 h-5" />,
-                title: 'Histórico Completo do Pet',
-                desc: 'Prontuário atualizado de cada animal: vacinas, serviços e data de nascimento. Um atendimento mais humano e personalizado.',
+                title: t('landing.features.item2.title'),
+                desc: t('landing.features.item2.desc'),
                 stagger: 'stagger-2',
               },
               {
                 icon: <TrendingUp className="w-5 h-5" />,
-                title: 'Controle Operacional',
-                desc: 'Status de atendimentos de ponta a ponta. Confirme, penda ou conclua cada serviço com cobranças integradas.',
+                title: t('landing.features.item3.title'),
+                desc: t('landing.features.item3.desc'),
                 stagger: 'stagger-3',
               },
             ].map(({ icon, title, desc, stagger }) => (
@@ -349,10 +351,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="text-center max-w-xl mx-auto space-y-3 mb-12 sm:mb-16">
             <span className="reveal-up text-[9px] sm:text-xs font-black uppercase text-olive-600 dark:text-olive-400 tracking-wider block">
-              Simples e Prático
+              {t('landing.workflow.tagline')}
             </span>
             <h2 className="reveal-up stagger-1 text-2xl sm:text-4xl font-black text-stone-900 dark:text-stone-50 leading-tight">
-              Sua clínica rodando em 3 passos simples
+              {t('landing.workflow.title')}
             </h2>
           </div>
 
@@ -370,18 +372,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {[
               {
                 n: 1,
-                title: 'Registre sua clínica',
-                desc: 'Cadastre o nome da sua clínica, proprietário e localização no formulário simplificado.',
+                title: t('landing.workflow.step1.title'),
+                desc: t('landing.workflow.step1.desc'),
               },
               {
                 n: 2,
-                title: 'Cadastre clientes e pets',
-                desc: 'Registre tutores com contatos e seus pets especificando espécie e raça.',
+                title: t('landing.workflow.step2.title'),
+                desc: t('landing.workflow.step2.desc'),
               },
               {
                 n: 3,
-                title: 'Organize os agendamentos',
-                desc: 'Abra agendamentos em um clique, atualize o status e envie alertas automáticos.',
+                title: t('landing.workflow.step3.title'),
+                desc: t('landing.workflow.step3.desc'),
               },
             ].map(({ n, title, desc }, i) => (
               <div
@@ -420,10 +422,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-xl mx-auto space-y-3 mb-10 sm:mb-12">
             <span className="reveal-up text-[9px] sm:text-xs font-black uppercase text-olive-600 dark:text-olive-400 tracking-wider block">
-              Plano de Assinatura Único
+              {t('landing.pricing.tagline')}
             </span>
             <h2 className="reveal-up stagger-1 text-2xl sm:text-4xl font-black text-stone-900 dark:text-stone-50 leading-tight">
-              Preço transparente, sem pegadinhas
+              {t('landing.pricing.title')}
             </h2>
           </div>
 
@@ -431,34 +433,34 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Glow */}
             <div className="absolute inset-0 bg-olive-500/15 rounded-3xl blur-2xl -translate-y-3 scale-95 opacity-60 dark:opacity-30 pointer-events-none" />
 
-            <div className="relative bg-white dark:bg-stone-950 border border-stone-200 dark:border-stone-800 shadow-xl rounded-3xl p-6 sm:p-8 flex flex-col gap-6 text-center">
+            <div className="relative bg-white dark:bg-stone-950 border border-stone-200/60 dark:border-stone-800 shadow-xl rounded-3xl p-6 sm:p-8 flex flex-col gap-6 text-center">
               <div className="space-y-2">
                 <span className="px-3 py-1 bg-olive-500/10 text-olive-700 dark:text-olive-400 text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-full">
-                  Plano Corporativo Completo
+                  {t('landing.pricing.plan_type')}
                 </span>
-                <h3 className="font-extrabold text-lg text-stone-900 dark:text-stone-100 pt-1">Acesso Ilimitado</h3>
-                <p className="text-xs text-stone-400 dark:text-stone-500 font-semibold">Para petshops, clínicas e profissionais independentes.</p>
+                <h3 className="font-extrabold text-lg text-stone-900 dark:text-stone-100 pt-1">{t('landing.pricing.plan_title')}</h3>
+                <p className="text-xs text-stone-400 dark:text-stone-500 font-semibold">{t('landing.pricing.plan_desc')}</p>
               </div>
 
               <div className="py-4 border-y border-stone-100 dark:border-stone-800 flex flex-col items-center">
-                <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">Valor Mensal</span>
+                <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">{t('landing.pricing.monthly')}</span>
                 <div className="flex items-baseline mt-1.5">
                   <span className="text-base font-bold text-stone-400 mr-1">R$</span>
                   <span className="text-5xl font-black text-stone-900 dark:text-stone-50 leading-none font-mono price-shimmer">97,00</span>
-                  <span className="text-xs text-stone-400 ml-1.5">/mês</span>
+                  <span className="text-xs text-stone-400 ml-1.5">{t('landing.pricing.per_month')}</span>
                 </div>
                 <span className="text-[9px] font-extrabold text-emerald-600 dark:text-emerald-500 mt-2 uppercase tracking-wider">
-                  Teste grátis por 14 dias
+                  {t('landing.pricing.trial')}
                 </span>
               </div>
 
               <ul className="text-left space-y-3 text-sm text-stone-600 dark:text-stone-300 font-semibold">
                 {[
-                  'Agendamentos e serviços ilimitados',
-                  'Cadastro ilimitado de tutores e pets',
-                  'Dashboard de métricas em tempo real',
-                  'Histórico e prontuário completo de cada pet',
-                  'Suporte por e-mail e WhatsApp',
+                  t('landing.pricing.benefit1'),
+                  t('landing.pricing.benefit2'),
+                  t('landing.pricing.benefit3'),
+                  t('landing.pricing.benefit4'),
+                  t('landing.pricing.benefit5'),
                 ].map((benefit) => (
                   <li key={benefit} className="flex items-start gap-2.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
@@ -471,11 +473,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 onClick={() => onNavigateToAuth('register')}
                 className="btn-cta-primary w-full py-4 bg-olive-600 text-white font-black text-sm rounded-2xl shadow-md shadow-olive-900/15 cursor-pointer"
               >
-                Criar Minha Conta e Testar Grátis
+                {t('landing.pricing.cta')}
               </button>
 
               <span className="text-[9px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider">
-                Cancele quando quiser • Sem fidelidade
+                {t('landing.pricing.cancel')}
               </span>
             </div>
           </div>
@@ -488,17 +490,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         
         <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10 text-center space-y-5">
           <h2 className="reveal-up text-2xl sm:text-4xl font-black text-stone-900 dark:text-stone-50 tracking-tight">
-            Pronto para revolucionar a gestão da sua clínica?
+            {t('landing.cta.title')}
           </h2>
           <p className="reveal-up stagger-1 text-sm text-stone-500 dark:text-stone-400 leading-relaxed max-w-lg mx-auto font-semibold">
-            Junte-se a dezenas de clínicas que já modernizaram suas operações com o PetSanny.
+            {t('landing.cta.desc')}
           </p>
           <div className="reveal-up stagger-2 pt-2">
             <button
               onClick={() => onNavigateToAuth('register')}
               className="btn-cta-primary w-full sm:w-auto px-8 py-4 bg-olive-600 text-white font-black text-sm rounded-2xl shadow-lg shadow-olive-900/15 cursor-pointer inline-flex items-center justify-center gap-2"
             >
-              Criar Clínica Agora
+              {t('landing.cta.btn')}
               <ArrowRight className="w-4 h-4 shrink-0" />
             </button>
           </div>
@@ -513,7 +515,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <span className="font-extrabold tracking-tight text-xs text-stone-700 dark:text-stone-400">PetSanny © 2026</span>
           </div>
           <p className="text-[10px] sm:text-xs font-bold text-stone-400 dark:text-stone-500">
-            Gestão PetCare Inteligente • Todos os direitos reservados.
+            {t('landing.footer.text')}
           </p>
         </div>
       </footer>
