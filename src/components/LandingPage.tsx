@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import logoImg from '../assets/logo.png';
 import { useScrollReveal } from '../hooks/useScrollReveal';
-import { useLanguage } from '../contexts/LanguageContext';
+import { LanguageDropdown } from './LanguageDropdown';
 import { 
   Sparkles, 
   Calendar, 
@@ -34,7 +34,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 }) => {
   const pageRef = useScrollReveal(0.12, '0px 0px -50px 0px');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { language, setLanguage } = useLanguage();
 
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
@@ -65,23 +64,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
-            {/* Seletor de Idiomas */}
-            <div className="flex items-center border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-900 p-1 shadow-sm gap-0.5">
-              {(['pt', 'en', 'es'] as const).map((lang) => (
-                <button
-                  key={lang}
-                  type="button"
-                  onClick={() => setLanguage(lang)}
-                  className={`px-2.5 py-1.5 rounded-lg text-[9px] font-extrabold uppercase transition-all cursor-pointer ${
-                    language === lang
-                      ? 'bg-olive-600 text-white shadow-sm'
-                      : 'text-stone-500 dark:text-stone-400 hover:text-stone-750 dark:hover:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-850'
-                  }`}
-                >
-                  {lang}
-                </button>
-              ))}
-            </div>
+            {/* Seletor de Idiomas (dropdown) */}
+            <LanguageDropdown size="sm" />
 
             <button
               onClick={toggleTheme}
@@ -119,8 +103,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             )}
           </div>
 
-          {/* Mobile: tema + hambúrguer */}
+          {/* Mobile: idioma + tema + hambúrguer */}
           <div className="flex md:hidden items-center gap-2">
+            <LanguageDropdown size="sm" />
             <button
               onClick={toggleTheme}
               className="p-2 text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-900 rounded-xl transition-all cursor-pointer"
@@ -163,26 +148,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               ))}
             </nav>
             <div className="flex flex-col gap-2 pt-2 border-t border-stone-100 dark:border-stone-800">
-              {/* Seletor de Idiomas no Mobile */}
-              <div className="flex items-center justify-between px-1">
-                <span className="text-[9px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider">Idioma</span>
-                <div className="flex items-center border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-900 p-1 gap-0.5">
-                  {(['pt', 'en', 'es'] as const).map((lang) => (
-                    <button
-                      key={lang}
-                      type="button"
-                      onClick={() => setLanguage(lang)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${
-                        language === lang
-                          ? 'bg-olive-600 text-white shadow-sm'
-                          : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-850'
-                      }`}
-                    >
-                      {lang}
-                    </button>
-                  ))}
-                </div>
-              </div>
               {isLoggedIn ? (
                 <button
                   onClick={() => { closeMobileMenu(); onGoToDashboard?.(); }}

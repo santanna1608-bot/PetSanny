@@ -14,6 +14,7 @@ import { AppointmentModal } from './components/AppointmentModal';
 import { ToastContainer } from './components/ToastContainer';
 import { SaaSSubscriptions } from './components/SaaSSubscriptions';
 import { Settings } from './components/Settings';
+import { LanguageDropdown } from './components/LanguageDropdown';
 import logoImg from './assets/logo.png';
 import { 
   Plus, 
@@ -61,7 +62,7 @@ function AppContent() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const { currentTenant, isMock } = useAppointments();
   const { user, loading: authLoading } = useAuth();
-  const { t, language, setLanguage } = useLanguage();
+  const { t } = useLanguage();
 
   // Gerenciamento do Tema Escuro
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -223,23 +224,8 @@ function AppContent() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-            {/* Seletor Compacto de Idiomas */}
-            <div className="flex items-center border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-900 p-1 shadow-sm gap-0.5">
-              {(['pt', 'en', 'es'] as const).map((lang) => (
-                <button
-                  key={lang}
-                  type="button"
-                  onClick={() => setLanguage(lang)}
-                  className={`px-2.5 py-1.5 rounded-lg text-[9px] font-extrabold uppercase transition-all cursor-pointer ${
-                    language === lang
-                      ? 'bg-olive-600 text-white shadow-sm'
-                      : 'text-stone-500 dark:text-stone-400 hover:text-stone-750 dark:hover:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-850'
-                  }`}
-                >
-                  {lang}
-                </button>
-              ))}
-            </div>
+            {/* Seletor de Idiomas (dropdown) */}
+            <LanguageDropdown size="md" />
 
             {/* Botão de Tema (Sol/Lua) */}
             <button
