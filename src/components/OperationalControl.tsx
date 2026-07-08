@@ -9,6 +9,7 @@ import {
   RefreshCw,
   Plus
 } from 'lucide-react';
+import { ConfirmModal } from './ConfirmModal';
 
 interface OperationalControlProps {
   onOpenAddModal: () => void;
@@ -20,6 +21,8 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [appointmentToDelete, setAppointmentToDelete] = useState<{ id: string; petName: string } | null>(null);
 
   // Filtragem dos dados
   const filteredAppointments = appointments.filter((app) => {
@@ -224,9 +227,8 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
                         {/* Ação: Excluir */}
                         <button
                           onClick={() => {
-                            if (confirm(t('operational.confirm_delete').replace('{pet_name}', app.pet_name))) {
-                              deleteAppointment(app.id);
-                            }
+                            setAppointmentToDelete({ id: app.id, petName: app.pet_name });
+                            setDeleteModalOpen(true);
                           }}
                           className="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg transition-colors cursor-pointer"
                           title={t('operational.th_actions')}
@@ -242,6 +244,25 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
           </tbody>
         </table>
       </div>
+
+      {/* Diálogo de Confirmação de Remoção de Agendamento */}
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        title="Remover Agendamento"
+        message={t('operational.confirm_delete').replace('{pet_name}', appointmentToDelete?.petName || '')}
+        confirmText="Remover"
+        cancelText="Cancelar"
+        onConfirm={() => {
+          if (appointmentToDelete) {
+            deleteAppointment(appointmentToDelete.id);
+          }
+        }}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setAppointmentToDelete(null);
+        }}
+        isDanger={true}
+      />
     </div>
   );
 };

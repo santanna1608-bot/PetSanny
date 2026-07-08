@@ -15,6 +15,7 @@ import {
   Calendar, 
   UserPlus
 } from 'lucide-react';
+import { ConfirmModal } from './ConfirmModal';
 
 export const CustomersAndPets: React.FC = () => {
   const { currentTenant, addToast } = useAppointments();
@@ -36,6 +37,14 @@ export const CustomersAndPets: React.FC = () => {
   const [petSpecies, setPetSpecies] = useState('Cão (Golden Retriever)');
   const [petBreed, setPetBreed] = useState('');
   const [petBirthDate, setPetBirthDate] = useState('');
+
+  // Estados do Modal de Confirmação
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [confirmModalConfig, setConfirmModalConfig] = useState<{
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  } | null>(null);
 
   const loadData = async () => {
     try {
@@ -112,11 +121,7 @@ export const CustomersAndPets: React.FC = () => {
     }
   };
 
-  const handleDeleteTutor = async (id: string, name: string) => {
-    if (!confirm(t('customers.alert_delete_tutor').replace('{name}', name))) {
-      return;
-    }
-
+  const executeDeleteTutor = async (id: string) => {
     try {
       await tutorsService.delete(id);
       setTutors((prev) => prev.filter((t) => t.id !== id));
@@ -129,11 +134,16 @@ export const CustomersAndPets: React.FC = () => {
     }
   };
 
-  const handleDeletePet = async (id: string, name: string) => {
-    if (!confirm(t('customers.alert_delete_pet').replace('{name}', name))) {
-      return;
-    }
+  const handleDeleteTutor = (id: string, name: string) => {
+    setConfirmModalConfig({
+      title: 'Excluir Tutor',
+      message: t('customers.alert_delete_tutor').replace('{name}', name),
+      onConfirm: () => executeDeleteTutor(id)
+    });
+    setConfirmModalOpen(true);
+  };
 
+  const executeDeletePet = async (id: string, name: string) => {
     try {
       await petsService.delete(id);
       setPets((prev) => prev.filter((p) => p.id !== id));
@@ -142,6 +152,15 @@ export const CustomersAndPets: React.FC = () => {
       console.error('Erro ao excluir pet:', err);
       addToast(t('customers.toast_error'), t('customers.toast_error_delete_pet'), 'warning');
     }
+  };
+
+  const handleDeletePet = (id: string, name: string) => {
+    setConfirmModalConfig({
+      title: 'Excluir Pet',
+      message: t('customers.alert_delete_pet').replace('{name}', name),
+      onConfirm: () => executeDeletePet(id, name)
+    });
+    setConfirmModalOpen(true);
   };
 
   const toggleExpandTutor = (tutorId: string) => {
@@ -434,6 +453,21 @@ export const CustomersAndPets: React.FC = () => {
           })}
         </div>
       )}
+
+      {/* Modal de Confirmação Customizado */}
+      <ConfirmModal
+        isOpen={confirmModalOpen}
+        title={confirmModalConfig?.title || 'Confirmação'}
+        message={confirmModalConfig?.message || ''}
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        onConfirm={confirmModalConfig?.onConfirm || (() => {})}
+        onClose={() => {
+          setConfirmModalOpen(false);
+          setConfirmModalConfig(null);
+        }}
+        isDanger={true}
+      />
     </div>
   );
 };
