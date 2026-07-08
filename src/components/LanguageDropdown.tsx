@@ -19,6 +19,7 @@ export const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ size = 'md' 
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  // Fecha ao clicar fora
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -36,7 +37,7 @@ export const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ size = 'md' 
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-2 border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-850 hover:text-stone-900 dark:hover:text-stone-100 transition-all cursor-pointer shadow-sm rounded-xl font-bold uppercase tracking-wider select-none focus:outline-none focus:ring-2 focus:ring-olive-500/20 ${
+        className={`lang-trigger flex items-center gap-2 border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-300 transition-all cursor-pointer shadow-sm rounded-xl font-bold uppercase tracking-wider select-none focus:outline-none focus:ring-2 focus:ring-olive-500/20 ${
           isSm ? 'px-3 py-1.5 text-[10px]' : 'px-3.5 py-[10px] text-[11px]'
         }`}
         aria-haspopup="listbox"
@@ -49,9 +50,12 @@ export const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ size = 'md' 
         />
       </button>
 
+      {/* Dropdown: abre sempre para a direita (left-0), nunca sai pelo lado esquerdo */}
       <div
-        className={`absolute right-0 mt-2 w-48 z-[9999] rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-xl shadow-stone-900/10 dark:shadow-stone-950/40 overflow-hidden transition-all duration-200 origin-top-right ${
-          open ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' : 'opacity-0 scale-95 -translate-y-1 pointer-events-none'
+        className={`absolute left-0 top-full mt-2 w-48 z-[9999] rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-xl shadow-stone-900/10 dark:shadow-stone-950/40 overflow-hidden transition-all duration-200 origin-top-left ${
+          open
+            ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
+            : 'opacity-0 scale-95 -translate-y-1 pointer-events-none'
         }`}
         role="listbox"
       >
@@ -67,14 +71,18 @@ export const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ size = 'md' 
                 setLanguage(lang.code as LangCode);
                 setOpen(false);
               }}
-              className={`w-full flex items-center justify-between px-4 py-3 text-xs font-bold transition-all cursor-pointer border-none outline-none focus:outline-none ${
+              className={`lang-option w-full flex items-center justify-between px-4 py-3 text-xs font-bold transition-colors cursor-pointer border-none outline-none focus:outline-none ${
                 isActive
-                  ? 'bg-olive-500/10 text-olive-700 dark:text-olive-400'
-                  : 'text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-850 hover:text-stone-900 dark:hover:text-stone-100 focus:bg-stone-50 dark:focus:bg-stone-850'
+                  ? 'lang-option--active bg-olive-500/10 text-olive-700 dark:text-olive-400'
+                  : 'text-stone-700 dark:text-stone-300'
               }`}
             >
               <div className="flex items-center gap-2">
-                <span className={`px-1.5 py-0.5 rounded text-[9px] uppercase font-black tracking-wider ${isActive ? 'bg-olive-500 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-450'}`}>
+                <span className={`px-1.5 py-0.5 rounded text-[9px] uppercase font-black tracking-wider ${
+                  isActive
+                    ? 'bg-olive-500 text-white'
+                    : 'bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300'
+                }`}>
                   {lang.code}
                 </span>
                 <span>{lang.label}</span>
