@@ -416,6 +416,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       // Força a limpeza completa do localStorage (incluindo tokens do Supabase e mocks)
       localStorage.clear();
+
+      // Limpa todas as bases de dados do IndexedDB para remover sessões ocultas do Supabase
+      if (window.indexedDB && typeof window.indexedDB.databases === 'function') {
+        window.indexedDB.databases().then((dbs) => {
+          dbs.forEach((db) => {
+            if (db.name) {
+              window.indexedDB.deleteDatabase(db.name);
+            }
+          });
+        }).catch((err) => console.error('Erro ao limpar IndexedDB:', err));
+      }
+
       setUser(null);
       setSession(null);
       setLoading(false);
