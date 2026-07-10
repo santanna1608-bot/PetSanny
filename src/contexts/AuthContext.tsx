@@ -409,11 +409,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err) {
       console.error('Exceção no logout do Supabase:', err);
     } finally {
-      // Força a limpeza dos estados locais em qualquer cenário (resiliência)
-      localStorage.removeItem('petsanny_session');
+      // Força a limpeza completa do localStorage (incluindo tokens do Supabase e mocks)
+      localStorage.clear();
       setUser(null);
       setSession(null);
       setLoading(false);
+      // Recarrega a página para reiniciar todos os estados do zero
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     }
   };
 
