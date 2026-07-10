@@ -4,6 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
+const isUUID = (id: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
 // Tipo para os agendamentos correspondente ao banco
 export interface Appointment {
   id: string;
@@ -254,7 +256,7 @@ const saveLocalPets = (pets: Pet[]) => {
 // Interface unificada para acessar os dados (Client Wrapper ou Mock)
 export const appointmentsService = {
   async list(tenantId: string): Promise<Appointment[]> {
-    if (!isMockClient && realSupabase) {
+    if (!isMockClient && realSupabase && isUUID(tenantId)) {
       const { data, error } = await realSupabase
         .from('appointments')
         .select('*')
@@ -280,7 +282,7 @@ export const appointmentsService = {
       created_at: new Date().toISOString()
     };
 
-    if (!isMockClient && realSupabase) {
+    if (!isMockClient && realSupabase && isUUID(newApp.tenant_id)) {
       const { data, error } = await realSupabase
         .from('appointments')
         .insert([newApp])
@@ -304,7 +306,7 @@ export const appointmentsService = {
   async updateStatus(id: string, status: 'pending' | 'confirmed' | 'completed'): Promise<Appointment> {
     const confirmed_at = status === 'confirmed' ? new Date().toISOString() : null;
 
-    if (!isMockClient && realSupabase) {
+    if (!isMockClient && realSupabase && isUUID(id)) {
       const { data, error } = await realSupabase
         .from('appointments')
         .update({ status, confirmed_at })
@@ -331,7 +333,7 @@ export const appointmentsService = {
   },
 
   async delete(id: string): Promise<boolean> {
-    if (!isMockClient && realSupabase) {
+    if (!isMockClient && realSupabase && isUUID(id)) {
       const { error } = await realSupabase
         .from('appointments')
         .delete()
@@ -354,7 +356,7 @@ export const appointmentsService = {
 
 export const tutorsService = {
   async list(tenantId: string): Promise<Tutor[]> {
-    if (!isMockClient && realSupabase) {
+    if (!isMockClient && realSupabase && isUUID(tenantId)) {
       const { data, error } = await realSupabase
         .from('tutors')
         .select('*')
@@ -376,7 +378,7 @@ export const tutorsService = {
       created_at: new Date().toISOString()
     };
 
-    if (!isMockClient && realSupabase) {
+    if (!isMockClient && realSupabase && isUUID(newTutor.tenant_id)) {
       const { data, error } = await realSupabase
         .from('tutors')
         .insert([newTutor])
@@ -396,7 +398,7 @@ export const tutorsService = {
   },
 
   async delete(id: string): Promise<boolean> {
-    if (!isMockClient && realSupabase) {
+    if (!isMockClient && realSupabase && isUUID(id)) {
       const { error } = await realSupabase
         .from('tutors')
         .delete()
@@ -422,7 +424,7 @@ export const tutorsService = {
 
 export const petsService = {
   async list(tenantId: string): Promise<Pet[]> {
-    if (!isMockClient && realSupabase) {
+    if (!isMockClient && realSupabase && isUUID(tenantId)) {
       const { data, error } = await realSupabase
         .from('pets')
         .select('*')
@@ -444,7 +446,7 @@ export const petsService = {
       created_at: new Date().toISOString()
     };
 
-    if (!isMockClient && realSupabase) {
+    if (!isMockClient && realSupabase && isUUID(newPet.tenant_id)) {
       const { data, error } = await realSupabase
         .from('pets')
         .insert([newPet])
@@ -464,7 +466,7 @@ export const petsService = {
   },
 
   async delete(id: string): Promise<boolean> {
-    if (!isMockClient && realSupabase) {
+    if (!isMockClient && realSupabase && isUUID(id)) {
       const { error } = await realSupabase
         .from('pets')
         .delete()
