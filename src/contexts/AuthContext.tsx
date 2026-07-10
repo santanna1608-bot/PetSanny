@@ -188,6 +188,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!tenantId) {
           console.warn('Usuário autenticado sem tenant_id associado nos metadados.');
         }
+
+        // Recarrega a página para inicializar o app com a nova sessão limpa
+        setTimeout(() => {
+          window.location.reload();
+        }, 100);
       } else {
         // Login Simulado/Mock
         const accounts = getMockAccounts();
