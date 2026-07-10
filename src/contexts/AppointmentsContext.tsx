@@ -87,6 +87,8 @@ interface AppointmentsContextType {
   deleteTenantSubscription: (tenantId: string) => Promise<void>;
 }
 
+const isUUID = (id: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
 const AppointmentsContext = createContext<AppointmentsContextType | undefined>(undefined);
 
 export const AppointmentsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -219,6 +221,36 @@ export const AppointmentsProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, [currentTenant, user]);
 
+  // Carrega todos os tenants caso seja Super Admin no modo Supabase Real
+  useEffect(() => {
+    if (user && user.user_metadata?.is_super_admin && !isMockClient && realSupabase) {
+      realSupabase
+        .from('tenants')
+        .select('*')
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('Erro ao buscar todos os tenants no Supabase:', error);
+          } else if (data) {
+            const fetchedTenants: Tenant[] = data.map((t: any) => ({
+              id: t.id,
+              name: t.name,
+              location: t.location || 'Sem endereço cadastrado',
+              primaryColor: t.primary_color || 'olive',
+              plan: t.plan,
+              status: t.status,
+              price: t.price,
+              renewalDate: t.renewal_date,
+              paymentMethod: t.payment_method,
+              ownerName: t.owner_name,
+              ownerEmail: t.owner_email
+            }));
+            setTenants(fetchedTenants);
+            localStorage.setItem('petsanny_tenants', JSON.stringify(fetchedTenants));
+          }
+        });
+    }
+  }, [user]);
+
   const setCurrentTenant = (tenant: Tenant) => {
     // No modo Supabase Real, o tenant é fixo pelo login do usuário (RLS), a menos que seja Super Admin
     const isSuperAdmin = user?.user_metadata?.is_super_admin;
@@ -307,26 +339,48 @@ export const AppointmentsProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const updateTenantSubscription = async (tenantId: string, updates: Partial<Tenant>) => {
-    const updatedTenants = tenants.map(t => {
-      if (t.id === tenantId) {
-        return { ...t, ...updates };
-      }
-      return t;
-    });
-    setTenants(updatedTenants);
-    localStorage.setItem('petsanny_tenants', JSON.stringify(updatedTenants));
+    try {
+      if (!isMockClient && realSupabase && isUUID(tenantId)) {
+        const { error } = await realSupabase
+          .from('tenants')
+          .update({
+            plan: updates.plan,
+            status: updates.status,
+            price: updates.price,
+            renewal_date: updates.renewalDate,
+            payment_method: updates.paymentMethod,
+            owner_name: updates.ownerName,
+            owner_email: updates.ownerEmail
+          })
+          .eq('id', tenantId);
 
-    if (currentTenant.id === tenantId) {
-      const target = updatedTenants.find(t => t.id === tenantId);
-      if (target) setCurrentTenantState(target);
+        if (error) throw error;
+      }
+
+      const updatedTenants = tenants.map(t => {
+        if (t.id === tenantId) {
+          return { ...t, ...updates };
+        }
+        return t;
+      });
+      setTenants(updatedTenants);
+      localStorage.setItem('petsanny_tenants', JSON.stringify(updatedTenants));
+
+      if (currentTenant.id === tenantId) {
+        const target = updatedTenants.find(t => t.id === tenantId);
+        if (target) setCurrentTenantState(target);
+      }
+      
+      addToast('Assinatura Atualizada', `O plano/status da clínica foi atualizado com sucesso.`, 'success');
+    } catch (err) {
+      console.error('Erro ao atualizar tenant no Supabase:', err);
+      addToast('Erro ao Atualizar', 'Não foi possível salvar as alterações de assinatura no banco de dados.', 'warning');
     }
-    
-    addToast('Assinatura Atualizada', `O plano/status da clínica foi atualizado com sucesso.`, 'success');
   };
 
   const deleteTenantSubscription = async (tenantId: string) => {
     try {
-      if (!isMockClient && realSupabase) {
+      if (!isMockClient && realSupabase && isUUID(tenantId)) {
         const { error } = await realSupabase
           .from('tenants')
           .delete()
