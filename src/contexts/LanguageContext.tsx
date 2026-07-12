@@ -156,6 +156,7 @@ const translations: Record<Language, Record<string, string>> = {
     'operational.th_actions': 'Ações',
     'operational.no_results': 'Nenhum agendamento encontrado para os filtros selecionados.',
     'operational.confirm_delete': 'Tem certeza de que deseja remover o agendamento de {pet_name}?',
+    'operational.swipe_desc': '↔️ Deslize para os lados para ver todas as colunas',
 
     // Modal Appointment
     'modal.new_title': 'Agendar Novo Atendimento',
@@ -492,6 +493,7 @@ const translations: Record<Language, Record<string, string>> = {
     'operational.th_actions': 'Actions',
     'operational.no_results': 'No appointments found for the selected filters.',
     'operational.confirm_delete': 'Are you sure you want to remove the appointment for {pet_name}?',
+    'operational.swipe_desc': '↔️ Swipe horizontally to view all columns',
 
     // Modal Appointment
     'modal.new_title': 'Schedule New Appointment',
@@ -828,6 +830,7 @@ const translations: Record<Language, Record<string, string>> = {
     'operational.th_actions': 'Acciones',
     'operational.no_results': 'No se encontraron citas para los filtros seleccionados.',
     'operational.confirm_delete': '¿Está seguro de que desea eliminar la cita de {pet_name}?',
+    'operational.swipe_desc': '↔️ Deslice hacia los lados para ver todas las columnas',
 
     // Modal Appointment
     'modal.new_title': 'Agendar Nueva Cita',

@@ -112,7 +112,7 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
 
       {/* Tabela de Agendamentos */}
       <span className="block md:hidden text-[9px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider text-right mb-2 leading-none">
-        ↔️ Deslize para os lados para ver todas as colunas
+        {t('operational.swipe_desc')}
       </span>
       <div className="overflow-x-auto rounded-xl border border-stone-150 dark:border-stone-800 shadow-inner bg-stone-50/50 dark:bg-stone-955/20">
         <table className="w-full min-w-[750px] text-left border-collapse text-xs">
