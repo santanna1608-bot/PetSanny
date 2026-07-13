@@ -254,31 +254,31 @@ export const CRMControl: React.FC = () => {
       {/* 1. Painel de Indicadores de Desempenho do CRM */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs">
-          <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">{t('crm.stats_sent')}</span>
+          <span className="text-[9px] text-stone-450 dark:text-stone-350 font-bold uppercase block mb-1">{t('crm.stats_sent')}</span>
           <span className="text-lg font-black text-stone-800 dark:text-stone-100">{sentCount}</span>
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs">
-          <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">{t('crm.stats_delivered')}</span>
+          <span className="text-[9px] text-stone-450 dark:text-stone-350 font-bold uppercase block mb-1">{t('crm.stats_delivered')}</span>
           <span className="text-lg font-black text-stone-800 dark:text-stone-100">{deliveredCount}</span>
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs">
-          <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">{t('crm.stats_read')}</span>
+          <span className="text-[9px] text-stone-450 dark:text-stone-350 font-bold uppercase block mb-1">{t('crm.stats_read')}</span>
           <span className="text-lg font-black text-stone-800 dark:text-stone-100">{readCount}</span>
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs">
-          <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">{t('crm.stats_replied')}</span>
+          <span className="text-[9px] text-stone-450 dark:text-stone-350 font-bold uppercase block mb-1">{t('crm.stats_replied')}</span>
           <span className="text-lg font-black text-stone-800 dark:text-stone-100">{replyCount}</span>
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs flex items-center justify-between">
           <div>
-            <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">{t('crm.stats_conversion')}</span>
+            <span className="text-[9px] text-stone-450 dark:text-stone-350 font-bold uppercase block mb-1">{t('crm.stats_conversion')}</span>
             <span className="text-lg font-black text-emerald-600 dark:text-emerald-450">{conversionRate}%</span>
           </div>
           <Percent className="w-5 h-5 text-emerald-500 opacity-60" />
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200/85 dark:border-stone-800 p-4 rounded-xl shadow-xs flex items-center justify-between">
           <div>
-            <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">{t('crm.stats_revenue')}</span>
+            <span className="text-[9px] text-stone-450 dark:text-stone-350 font-bold uppercase block mb-1">{t('crm.stats_revenue')}</span>
             <span className="text-lg font-black text-olive-650 dark:text-olive-400">R$ {revenueGenerated.toFixed(0)}</span>
           </div>
           <TrendingUp className="w-5 h-5 text-olive-500 opacity-60" />
@@ -340,7 +340,7 @@ export const CRMControl: React.FC = () => {
         <div className="xl:col-span-2 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden flex flex-col h-[550px]">
           
           {/* Header do WhatsApp */}
-          <div className="p-4 bg-stone-50 dark:bg-stone-955 border-b border-stone-150 dark:border-stone-850 flex items-center justify-between shrink-0">
+          <div className="p-4 bg-stone-50 dark:bg-stone-955 border-b border-stone-150 dark:border-stone-850 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-olive-500/10 dark:bg-olive-950 text-olive-650 dark:text-olive-400 flex items-center justify-center font-bold border dark:border-stone-850 shadow-inner">
                 {selectedTutorId ? tutors.find(t => t.id === selectedTutorId)?.name[0].toUpperCase() : 'W'}
@@ -349,31 +349,31 @@ export const CRMControl: React.FC = () => {
                 <h5 className="font-extrabold text-stone-805 dark:text-stone-100 leading-tight">
                   {selectedTutorId ? tutors.find(t => t.id === selectedTutorId)?.name : t('crm.select_tutor')}
                 </h5>
-                <span className="text-[9px] text-stone-450 font-bold uppercase tracking-wider flex items-center gap-1">
+                <span className="text-[9px] text-stone-450 dark:text-stone-400 font-bold uppercase tracking-wider flex items-center gap-1">
                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
                   {t('crm.sim_active')}
                 </span>
               </div>
             </div>
  
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 sm:pb-0 scrollbar-none">
               <button
                 onClick={() => handleTriggerCampaign('confirm')}
-                className="inline-flex items-center gap-1 text-[9px] bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-olive-550 font-extrabold px-2.5 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 cursor-pointer"
+                className="inline-flex items-center gap-1 text-[9px] bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-olive-550 font-extrabold px-2.5 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 cursor-pointer whitespace-nowrap"
               >
                 <CheckCheck className="w-3 h-3 text-emerald-500" />
                 {t('crm.btn_reminder')}
               </button>
               <button
                 onClick={() => handleTriggerCampaign('vaccine')}
-                className="inline-flex items-center gap-1 text-[9px] bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-olive-550 font-extrabold px-2.5 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 cursor-pointer"
+                className="inline-flex items-center gap-1 text-[9px] bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-olive-550 font-extrabold px-2.5 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 cursor-pointer whitespace-nowrap"
               >
                 <Zap className="w-3.5 h-3.5 text-amber-500" />
                 {t('crm.btn_vaccine')}
               </button>
               <button
                 onClick={() => handleTriggerCampaign('promo')}
-                className="inline-flex items-center gap-1 text-[9px] bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-olive-550 font-extrabold px-2.5 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 cursor-pointer"
+                className="inline-flex items-center gap-1 text-[9px] bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-olive-550 font-extrabold px-2.5 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 cursor-pointer whitespace-nowrap"
               >
                 <Sparkles className="w-3 h-3 text-purple-500" />
                 {t('crm.btn_coupon')}

@@ -199,7 +199,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isOpe
         </button>
 
         <div className="text-center pt-1.5">
-          <span className="text-[9px] text-stone-600 font-semibold uppercase tracking-wider block">
+          <span className="text-[9px] text-stone-550 dark:text-stone-500 font-semibold uppercase tracking-wider block">
             PetSanny SaaS v1.0.0
           </span>
         </div>

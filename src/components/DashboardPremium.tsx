@@ -136,28 +136,26 @@ export const DashboardPremium: React.FC = () => {
             <p className="text-xs md:text-sm text-stone-500 dark:text-stone-400 max-w-xl font-medium">
               {t('dashboard.welcome_desc')}
             </p>
-          </div>
-
-          {/* Mini Indicadores Inline */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:items-center gap-4 bg-stone-100/50 dark:bg-stone-950/30 p-4 rounded-2xl border border-stone-200/80 dark:border-stone-800/40">
+           {/* Mini Indicadores Inline */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:items-center gap-4 bg-stone-100/50 dark:bg-stone-955/30 p-4 rounded-2xl border border-stone-200/80 dark:border-stone-800/40">
             <div className="px-3 py-1 border-r border-stone-200 dark:border-stone-800 flex flex-col">
-              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">{t('dashboard.pets_today')}</span>
+              <span className="text-[10px] text-stone-500 dark:text-stone-400 font-bold uppercase">{t('dashboard.pets_today')}</span>
               <span className="text-sm font-extrabold text-stone-800 dark:text-stone-200">{totalPetsScheduledToday} {t('dashboard.scheduled')}</span>
             </div>
             <div className="px-3 py-1 border-r border-stone-200 dark:border-stone-800 flex flex-col">
-              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">{t('dashboard.forecasted_revenue')}</span>
+              <span className="text-[10px] text-stone-500 dark:text-stone-400 font-bold uppercase">{t('dashboard.forecasted_revenue')}</span>
               <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">{formatCurrency(revenueExpectedToday)}</span>
             </div>
             <div className="px-3 py-1 border-r border-stone-200 dark:border-stone-800 flex flex-col">
-              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">{t('dashboard.occupancy_agenda')}</span>
+              <span className="text-[10px] text-stone-500 dark:text-stone-400 font-bold uppercase">{t('dashboard.occupancy_agenda')}</span>
               <span className="text-sm font-extrabold text-amber-600 dark:text-amber-500">{occupancyRate}%</span>
             </div>
             <div className="px-3 py-1 flex flex-col">
-              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">{t('dashboard.alerts')}</span>
+              <span className="text-[10px] text-stone-500 dark:text-stone-400 font-bold uppercase">{t('dashboard.alerts')}</span>
               <span className={`text-sm font-extrabold ${criticalAlertsToday > 0 ? 'text-rose-500 dark:text-rose-400 animate-pulse' : 'text-stone-750 dark:text-stone-300'}`}>
                 {criticalAlertsToday} {criticalAlertsToday === 1 ? t('dashboard.critical_singular') : t('dashboard.critical_plural')}
               </span>
-            </div>
+            </div>           </div>
           </div>
         </div>
 
@@ -197,22 +195,22 @@ export const DashboardPremium: React.FC = () => {
         <div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200/80 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
           <div className="flex justify-between items-start">
             <div>
-              <span className="text-[10px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider block mb-1">
+              <span className="text-[10px] text-stone-400 dark:text-stone-400 font-bold uppercase tracking-wider block mb-1">
                 {t('dashboard.revenue_est')}
               </span>
               <h3 className="text-2xl font-black text-stone-855 dark:text-stone-100 tracking-tight">
                 {formatCurrency(revenueTotal)}
               </h3>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-550/20 text-emerald-600 dark:text-emerald-450 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-555/20 text-emerald-600 dark:text-emerald-450 flex items-center justify-center group-hover:scale-105 transition-transform">
               <DollarSign className="w-5 h-5" />
             </div>
           </div>
           <div className="flex items-center justify-between mt-4">
-            <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-650 dark:text-emerald-500">
+            <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-655 dark:text-emerald-500">
               <TrendingUp className="w-3.5 h-3.5" />
               <span>+14.8%</span>
-              <span className="text-stone-400 font-medium">{t('dashboard.vs_previous_month')}</span>
+              <span className="text-stone-400 dark:text-stone-400 font-medium">{t('dashboard.vs_previous_month')}</span>
             </div>
           </div>
         </div>
@@ -221,14 +219,14 @@ export const DashboardPremium: React.FC = () => {
         <div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200/80 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
           <div className="flex justify-between items-start">
             <div>
-              <span className="text-[10px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider block mb-1">
+              <span className="text-[10px] text-stone-400 dark:text-stone-400 font-bold uppercase tracking-wider block mb-1">
                 {t('dashboard.forecasted_revenue')}
               </span>
               <h3 className="text-2xl font-black text-stone-850 dark:text-stone-100 tracking-tight">
                 {formatCurrency(revenueForecast)}
               </h3>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 dark:bg-amber-550/20 text-amber-600 dark:text-amber-450 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 dark:bg-amber-555/20 text-amber-600 dark:text-amber-450 flex items-center justify-center group-hover:scale-105 transition-transform">
               <Clock className="w-5 h-5" />
             </div>
           </div>
@@ -236,7 +234,7 @@ export const DashboardPremium: React.FC = () => {
             <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-655 dark:text-emerald-500">
               <TrendingUp className="w-3.5 h-3.5" />
               <span>+23.1%</span>
-              <span className="text-stone-400 font-medium">{t('dashboard.vs_previous_week')}</span>
+              <span className="text-stone-400 dark:text-stone-400 font-medium">{t('dashboard.vs_previous_week')}</span>
             </div>
           </div>
         </div>
@@ -245,7 +243,7 @@ export const DashboardPremium: React.FC = () => {
         <div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200/80 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
           <div className="flex justify-between items-start">
             <div>
-              <span className="text-[10px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider block mb-1">
+              <span className="text-[10px] text-stone-400 dark:text-stone-400 font-bold uppercase tracking-wider block mb-1">
                 {t('dashboard.arpu')}
               </span>
               <h3 className="text-2xl font-black text-stone-850 dark:text-stone-100 tracking-tight">
@@ -260,7 +258,7 @@ export const DashboardPremium: React.FC = () => {
             <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-655 dark:text-emerald-500">
               <TrendingUp className="w-3.5 h-3.5" />
               <span>+3.2%</span>
-              <span className="text-stone-400 font-medium">{t('dashboard.vs_yesterday')}</span>
+              <span className="text-stone-400 dark:text-stone-400 font-medium">{t('dashboard.vs_yesterday')}</span>
             </div>
           </div>
         </div>
@@ -269,7 +267,7 @@ export const DashboardPremium: React.FC = () => {
         <div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200/80 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
           <div className="flex justify-between items-start">
             <div>
-              <span className="text-[10px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider block mb-1">
+              <span className="text-[10px] text-stone-400 dark:text-stone-400 font-bold uppercase tracking-wider block mb-1">
                 {t('dashboard.active_clients')}
               </span>
               <h3 className="text-2xl font-black text-stone-855 dark:text-stone-100 tracking-tight">
@@ -410,7 +408,7 @@ export const DashboardPremium: React.FC = () => {
               <circle cx="18" cy="18" r="15.915" fill="none" stroke="#7c3aed" strokeWidth="4.2" strokeDasharray="15 85" strokeDashoffset="15" />
             </svg>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-              <span className="text-[10px] text-stone-450 dark:text-stone-500 block font-bold leading-none">{t('dashboard.total')}</span>
+              <span className="text-[10px] text-stone-450 dark:text-stone-300 block font-bold leading-none">{t('dashboard.total')}</span>
               <span className="text-lg font-black text-stone-800 dark:text-stone-100 leading-none">428</span>
             </div>
           </div>
@@ -475,7 +473,7 @@ export const DashboardPremium: React.FC = () => {
                     {item.val}
                   </span>
                 </div>
-                <span className="text-[9px] font-bold text-stone-500 dark:text-stone-450">{item.day}</span>
+                <span className="text-[9px] font-bold text-stone-500 dark:text-stone-300">{item.day}</span>
               </div>
             ))}
           </div>
@@ -512,7 +510,7 @@ export const DashboardPremium: React.FC = () => {
               ].map((pt, i) => (
                 <g key={i}>
                   <circle cx={pt.x} cy={pt.y} r="3" fill="#7c3aed" stroke="#ffffff" strokeWidth="1" />
-                  <text x={pt.x} y="100" textAnchor="middle" className="text-[8px] fill-stone-450 dark:fill-stone-500 font-bold font-sans">{pt.label}</text>
+                  <text x={pt.x} y="100" textAnchor="middle" className="text-[8px] fill-stone-450 dark:fill-stone-300 font-bold font-sans">{pt.label}</text>
                 </g>
               ))}
               <defs>
@@ -555,7 +553,7 @@ export const DashboardPremium: React.FC = () => {
               ].map((pt, i) => (
                 <g key={i}>
                   <circle cx={pt.x} cy={pt.y} r="3" fill="#d97706" stroke="#ffffff" strokeWidth="1" />
-                  <text x={pt.x} y="100" textAnchor="middle" className="text-[8px] fill-stone-450 dark:fill-stone-500 font-bold font-sans">{pt.label}</text>
+                  <text x={pt.x} y="100" textAnchor="middle" className="text-[8px] fill-stone-450 dark:fill-stone-300 font-bold font-sans">{pt.label}</text>
                 </g>
               ))}
               <defs>

@@ -166,7 +166,7 @@ export const AutomationsCenter: React.FC = () => {
               <div className="flex justify-between items-start gap-4">
                 <div>
                   <h4 className="font-extrabold text-stone-800 dark:text-stone-100 text-sm leading-tight">{t(rule.name)}</h4>
-                  <p className="text-[10px] text-stone-450 dark:text-stone-500 mt-1">{t(rule.description)}</p>
+                  <p className="text-[10px] text-stone-450 dark:text-stone-400 mt-1">{t(rule.description)}</p>
                 </div>
                 
                 {/* Switch Toggle */}
@@ -184,7 +184,7 @@ export const AutomationsCenter: React.FC = () => {
               </div>
 
               {/* Evento de Gatilho (Trigger) */}
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-stone-100 dark:bg-stone-950 border dark:border-stone-850 text-stone-550 dark:text-stone-450 text-[9px] font-bold rounded-lg uppercase tracking-wider">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-stone-100 dark:bg-stone-950 border dark:border-stone-850 text-stone-550 dark:text-stone-300 text-[9px] font-bold rounded-lg uppercase tracking-wider">
                 <AlertCircle className="w-3.5 h-3.5 text-olive-650" />
                 <span>{t('automations.trigger_prefix')}: {t(rule.trigger)}</span>
               </div>
@@ -192,7 +192,7 @@ export const AutomationsCenter: React.FC = () => {
 
             {/* Ações Encadeadas (Visual Workflow) */}
             <div className="space-y-2">
-              <span className="text-[9px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest block">{t('automations.actions_chain')}</span>
+              <span className="text-[9px] font-bold text-stone-400 dark:text-stone-400 uppercase tracking-widest block">{t('automations.actions_chain')}</span>
               <div className="flex flex-wrap items-center gap-2">
                 {rule.actions.map((act, index) => (
                   <React.Fragment key={index}>
