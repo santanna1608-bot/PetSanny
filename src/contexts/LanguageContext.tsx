@@ -31,6 +31,7 @@ const translations: Record<Language, Record<string, string>> = {
     'header.visual_demo': 'Modo de Conexão: Simulação (Demo)',
     'header.supabase_real': 'Modo de Conexão: Supabase Real',
     'header.hello': 'Olá',
+    'header.welcome': 'Seja bem-vindo(a)!',
     'header.subtitle': 'Aqui está o panorama completo dos agendamentos de estética pet e da clínica veterinária de hoje.',
     'header.new_appointment': 'Novo Atendimento',
     'demo.title': 'Modo Demo Ativado:',
@@ -371,6 +372,7 @@ const translations: Record<Language, Record<string, string>> = {
     'header.visual_demo': 'Connection Mode: Simulation (Demo)',
     'header.supabase_real': 'Connection Mode: Supabase Real',
     'header.hello': 'Hello',
+    'header.welcome': 'Welcome!',
     'header.subtitle': "Here is the complete overview of today's pet aesthetics and veterinary appointments.",
     'header.new_appointment': 'New Appointment',
     'demo.title': 'Demo Mode Enabled:',
@@ -709,6 +711,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Header
     'header.hello': 'Hola',
+    'header.welcome': '¡Bienvenido(a)!',
     'header.subtitle': 'Aquí está el panorama completo de las citas de estética pet y de la clínica veterinaria de hoy.',
     'header.new_appointment': 'Nueva Cita',
     'demo.title': 'Modo Demo Activado:',

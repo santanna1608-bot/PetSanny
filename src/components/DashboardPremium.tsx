@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppointments } from '../contexts/AppointmentsContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useAuth } from '../contexts/AuthContext';
 import { tutorsService, petsService } from '../lib/supabaseClient';
 import { 
   DollarSign, 
@@ -18,8 +17,8 @@ import {
 
 export const DashboardPremium: React.FC = () => {
   const { appointments, currentTenant } = useAppointments();
-  const { language } = useLanguage();
-  const { user } = useAuth();
+  const { t, language } = useLanguage();
+  
   
   const [loading, setLoading] = useState(true);
   const [tutorCount, setTutorCount] = useState(0);
@@ -47,8 +46,6 @@ export const DashboardPremium: React.FC = () => {
 
     return () => clearTimeout(timer);
   }, [currentTenant]);
-
-  const userName = user?.user_metadata?.name || 'Gestor Sanny';
 
   // Processamento de dados reais de agendamento do Tenant Ativo
   const todayStr = new Date().toISOString().split('T')[0];
@@ -134,7 +131,7 @@ export const DashboardPremium: React.FC = () => {
               Painel Premium Ativo
             </div>
             <h3 className="text-xl md:text-2xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
-              Bom dia, {userName}!
+              {t('header.welcome')}
             </h3>
             <p className="text-xs md:text-sm text-stone-500 dark:text-stone-400 max-w-xl font-medium">
               Sua clínica está operando com alta performance hoje. Veja o resumo rápido das operações e agendamentos deste dia.
