@@ -122,42 +122,42 @@ export const DashboardPremium: React.FC = () => {
     <div className="space-y-8 animate-fade-in text-stone-850 dark:text-stone-150">
       
       {/* 1. Painel Inicial de Boas Vindas */}
-      <div className="relative bg-gradient-to-br from-stone-900 via-stone-900 to-stone-950 text-white p-6 md:p-8 rounded-3xl border border-stone-800 shadow-xl overflow-hidden group">
+      <div className="relative bg-gradient-to-br from-white via-stone-50/80 to-stone-100 dark:from-stone-900 dark:via-stone-900 dark:to-stone-950 text-stone-800 dark:text-white p-6 md:p-8 rounded-3xl border border-stone-200 dark:border-stone-800 shadow-sm dark:shadow-xl overflow-hidden group transition-all duration-300">
         {/* Detalhes de Background Modernos */}
-        <div className="absolute right-0 top-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/20 transition-colors duration-500" />
+        <div className="absolute right-0 top-0 w-80 h-80 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/10 dark:group-hover:bg-emerald-500/20 transition-colors duration-500" />
         <div className="absolute left-1/3 bottom-0 w-60 h-60 bg-amber-500/5 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               Painel Premium Ativo
             </div>
-            <h3 className="text-xl md:text-2xl font-black text-stone-100 tracking-tight">
+            <h3 className="text-xl md:text-2xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
               Bom dia, {userName}!
             </h3>
-            <p className="text-xs md:text-sm text-stone-400 max-w-xl font-medium">
+            <p className="text-xs md:text-sm text-stone-500 dark:text-stone-400 max-w-xl font-medium">
               Sua clínica está operando com alta performance hoje. Veja o resumo rápido das operações e agendamentos deste dia.
             </p>
           </div>
 
           {/* Mini Indicadores Inline */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:items-center gap-4 bg-stone-950/30 p-4 rounded-2xl border border-stone-800/40">
-            <div className="px-3 py-1 border-r border-stone-850 flex flex-col">
-              <span className="text-[10px] text-stone-500 font-bold uppercase">Pets Hoje</span>
-              <span className="text-sm font-extrabold text-stone-255">{totalPetsScheduledToday} agendados</span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:items-center gap-4 bg-stone-100/50 dark:bg-stone-950/30 p-4 rounded-2xl border border-stone-200 dark:border-stone-800/40">
+            <div className="px-3 py-1 border-r border-stone-200 dark:border-stone-800 flex flex-col">
+              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">Pets Hoje</span>
+              <span className="text-sm font-extrabold text-stone-800 dark:text-stone-200">{totalPetsScheduledToday} agendados</span>
             </div>
-            <div className="px-3 py-1 border-r border-stone-855 flex flex-col">
-              <span className="text-[10px] text-stone-500 font-bold uppercase">Faturamento Previsto</span>
-              <span className="text-sm font-extrabold text-emerald-400">{formatCurrency(revenueExpectedToday)}</span>
+            <div className="px-3 py-1 border-r border-stone-200 dark:border-stone-800 flex flex-col">
+              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">Faturamento Previsto</span>
+              <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">{formatCurrency(revenueExpectedToday)}</span>
             </div>
-            <div className="px-3 py-1 border-r border-stone-855 flex flex-col">
-              <span className="text-[10px] text-stone-500 font-bold uppercase">Ocupação Agenda</span>
-              <span className="text-sm font-extrabold text-amber-450">{occupancyRate}%</span>
+            <div className="px-3 py-1 border-r border-stone-200 dark:border-stone-800 flex flex-col">
+              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">Ocupação Agenda</span>
+              <span className="text-sm font-extrabold text-amber-600 dark:text-amber-500">{occupancyRate}%</span>
             </div>
             <div className="px-3 py-1 flex flex-col">
-              <span className="text-[10px] text-stone-500 font-bold uppercase">Alertas</span>
-              <span className={`text-sm font-extrabold ${criticalAlertsToday > 0 ? 'text-rose-400 animate-pulse' : 'text-stone-300'}`}>
+              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">Alertas</span>
+              <span className={`text-sm font-extrabold ${criticalAlertsToday > 0 ? 'text-rose-500 dark:text-rose-400 animate-pulse' : 'text-stone-750 dark:text-stone-300'}`}>
                 {criticalAlertsToday} crítico{criticalAlertsToday !== 1 && 's'}
               </span>
             </div>
@@ -165,29 +165,29 @@ export const DashboardPremium: React.FC = () => {
         </div>
 
         {/* Linha de Status Operacional Hoje */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-6 pt-5 border-t border-stone-800/45 text-[10px] font-bold text-stone-400 tracking-wider">
-          <div className="flex items-center gap-2 bg-stone-950/20 p-2.5 rounded-xl border border-stone-850">
-            <Stethoscope className="w-4 h-4 text-blue-400" />
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-6 pt-5 border-t border-stone-200 dark:border-stone-800/45 text-[10px] font-bold text-stone-600 dark:text-stone-400 tracking-wider">
+          <div className="flex items-center gap-2 bg-white dark:bg-stone-950/20 p-2.5 rounded-xl border border-stone-200 dark:border-stone-800">
+            <Stethoscope className="w-4 h-4 text-blue-550 dark:text-blue-400" />
             <span>{todayVet} CONSULTAS</span>
           </div>
-          <div className="flex items-center gap-2 bg-stone-950/20 p-2.5 rounded-xl border border-stone-850">
-            <Scissors className="w-4 h-4 text-orange-400" />
+          <div className="flex items-center gap-2 bg-white dark:bg-stone-950/20 p-2.5 rounded-xl border border-stone-200 dark:border-stone-800">
+            <Scissors className="w-4 h-4 text-orange-500 dark:text-orange-400" />
             <span>{todayBanhos} BANHOS</span>
           </div>
-          <div className="flex items-center gap-2 bg-stone-950/20 p-2.5 rounded-xl border border-stone-850">
-            <Scissors className="w-4 h-4 text-amber-400" />
+          <div className="flex items-center gap-2 bg-white dark:bg-stone-950/20 p-2.5 rounded-xl border border-stone-200 dark:border-stone-800">
+            <Scissors className="w-4 h-4 text-amber-650 dark:text-amber-400" />
             <span>{todayTosas} TOSAS</span>
           </div>
-          <div className="flex items-center gap-2 bg-stone-950/20 p-2.5 rounded-xl border border-stone-850">
-            <Syringe className="w-4 h-4 text-purple-400" />
+          <div className="flex items-center gap-2 bg-white dark:bg-stone-950/20 p-2.5 rounded-xl border border-stone-200 dark:border-stone-800">
+            <Syringe className="w-4 h-4 text-purple-550 dark:text-purple-400" />
             <span>{todayVacinas} VACINAS</span>
           </div>
-          <div className="flex items-center gap-2 bg-stone-950/20 p-2.5 rounded-xl border border-stone-850">
-            <Activity className="w-4 h-4 text-red-450" />
+          <div className="flex items-center gap-2 bg-white dark:bg-stone-950/20 p-2.5 rounded-xl border border-stone-200 dark:border-stone-800">
+            <Activity className="w-4 h-4 text-rose-550 dark:text-rose-400" />
             <span>{todayCirurgias} CIRURGIAS</span>
           </div>
-          <div className="flex items-center gap-2 bg-stone-950/20 p-2.5 rounded-xl border border-stone-850">
-            <AlertCircle className="w-4 h-4 text-rose-400" />
+          <div className="flex items-center gap-2 bg-white dark:bg-stone-950/20 p-2.5 rounded-xl border border-stone-200 dark:border-stone-800">
+            <AlertCircle className="w-4 h-4 text-rose-550 dark:text-rose-400" />
             <span>{criticalAlertsToday} RESTRIÇÕES</span>
           </div>
         </div>
