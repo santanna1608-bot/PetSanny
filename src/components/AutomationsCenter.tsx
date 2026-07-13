@@ -7,8 +7,6 @@ import {
   Smile, 
   ChevronRight, 
   Clock, 
-  Play, 
-  FileText,
   AlertCircle
 } from 'lucide-react';
 

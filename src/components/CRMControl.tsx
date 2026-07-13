@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAppointments } from '../contexts/AppointmentsContext';
-import { tutorsService, Tutor } from '../lib/supabaseClient';
+import { tutorsService } from '../lib/supabaseClient';
+import type { Tutor } from '../lib/supabaseClient';
 import { 
-  Users, 
-  MessageSquare, 
   Send, 
   CheckCheck, 
   FileText, 
@@ -11,13 +10,8 @@ import {
   Sparkles, 
   TrendingUp,
   Percent,
-  Play,
-  Mail,
-  MoreVertical,
   UserCheck,
-  Zap,
-  ArrowRight,
-  Plus
+  Zap
 } from 'lucide-react';
 
 interface PipelineLead {

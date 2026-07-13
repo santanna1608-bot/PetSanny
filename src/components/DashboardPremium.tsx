@@ -2,27 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useAppointments } from '../contexts/AppointmentsContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
-import { tutorsService, petsService, Appointment } from '../lib/supabaseClient';
+import { tutorsService, petsService } from '../lib/supabaseClient';
 import { 
   DollarSign, 
   TrendingUp, 
-  TrendingDown, 
   Users, 
-  Smile, 
-  Calendar, 
   Scissors, 
   Stethoscope, 
   Syringe, 
   Activity, 
   AlertCircle,
   Clock,
-  Sparkles,
-  ArrowRight
+  Sparkles
 } from 'lucide-react';
 
 export const DashboardPremium: React.FC = () => {
-  const { appointments, currentTenant, isMock } = useAppointments();
-  const { t, language } = useLanguage();
+  const { appointments, currentTenant } = useAppointments();
+  const { language } = useLanguage();
   const { user } = useAuth();
   
   const [loading, setLoading] = useState(true);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Pet, Tutor } from '../lib/supabaseClient';
+import type { Pet, Tutor } from '../lib/supabaseClient';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAppointments } from '../contexts/AppointmentsContext';
 import { 
@@ -7,16 +7,12 @@ import {
   Smile, 
   User, 
   Phone, 
-  Calendar, 
   Scale, 
   FileText, 
-  ShieldAlert, 
   Clock, 
-  Plus, 
   Upload, 
   Check, 
   Trash2,
-  DollarSign,
   Scissors,
   Stethoscope,
   Syringe,
@@ -61,8 +57,19 @@ interface PetReminder {
 }
 
 export const PetProfile: React.FC<PetProfileProps> = ({ pet, tutor, onBack }) => {
-  const { t } = useLanguage();
+  const { language } = useLanguage();
   const { addToast } = useAppointments();
+  
+  const formatCurrency = (val: number) => {
+    if (language === 'en') {
+      return `$ ${val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    if (language === 'es') {
+      return `€ ${val.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    return `R$ ${val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
   const [activeTab, setActiveTab] = useState<'summary' | 'medical' | 'aesthetics' | 'financial' | 'docs' | 'notes'>('summary');
   
   // Estados para gerenciar registros médicos

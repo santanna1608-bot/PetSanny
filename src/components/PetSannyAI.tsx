@@ -1,17 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAppointments } from '../contexts/AppointmentsContext';
-import { tutorsService, petsService, Appointment } from '../lib/supabaseClient';
 import { 
   Sparkles, 
   X, 
   Send, 
-  Bot, 
-  User, 
-  MessageSquare, 
-  ArrowRight,
-  Zap,
-  Play,
-  Loader,
+  Loader, 
   BrainCircuit
 } from 'lucide-react';
 

@@ -3,15 +3,12 @@ import { useAppointments } from '../contexts/AppointmentsContext';
 import { 
   Package, 
   DollarSign, 
-  TrendingUp, 
   AlertTriangle, 
   Plus, 
   ArrowUpRight, 
   ArrowDownRight, 
   Calculator,
   Search,
-  Filter,
-  CheckCircle2,
   AlertCircle
 } from 'lucide-react';
 
@@ -41,7 +38,7 @@ interface FinancialTransaction {
 }
 
 export const InventoryAndFinance: React.FC = () => {
-  const { currentTenant, addToast, appointments } = useAppointments();
+  const { currentTenant, addToast } = useAppointments();
   
   const [activeSubTab, setActiveSubTab] = useState<'inventory' | 'finance'>('inventory');
   
@@ -64,10 +61,9 @@ export const InventoryAndFinance: React.FC = () => {
 
   // Estados Financeiros
   const [transactions, setTransactions] = useState<FinancialTransaction[]>([]);
-  const [isAddTxOpen, setIsAddTxOpen] = useState(false);
   const [txDesc, setTxDesc] = useState('');
   const [txType, setTxType] = useState<'revenue' | 'expense'>('revenue');
-  const [txCategory, setTxCategory] = useState('Serviços');
+  const txCategory = 'Serviços';
   const [txVal, setTxVal] = useState('');
   const [txMethod, setTxMethod] = useState<FinancialTransaction['paymentMethod']>('pix');
 
@@ -209,7 +205,6 @@ export const InventoryAndFinance: React.FC = () => {
 
     const updated = [newTransaction, ...transactions];
     saveTx(updated);
-    setIsAddTxOpen(false);
 
     setTxDesc('');
     setTxVal('');
@@ -508,7 +503,7 @@ export const InventoryAndFinance: React.FC = () => {
                               {item.qty}
                             </span>
                             <span className="text-[9px] text-stone-400 font-semibold">/ {item.minQty}</span>
-                            {alertState === 'qty_critical' && <AlertTriangle className="w-3.5 h-3.5 text-rose-500" title="Estoque abaixo do mínimo!" />}
+                            {alertState === 'qty_critical' && <span title="Estoque abaixo do mínimo!"><AlertTriangle className="w-3.5 h-3.5 text-rose-500" /></span>}
                           </div>
                         </td>
                         <td className="py-3 px-3">
@@ -522,8 +517,8 @@ export const InventoryAndFinance: React.FC = () => {
                             }`}>
                               {item.expiryDate.split('-').reverse().join('/')}
                             </span>
-                            {alertState === 'expiry_expired' && <AlertCircle className="w-3.5 h-3.5 text-red-500" title="Item Vencido!" />}
-                            {alertState === 'expiry_warning' && <AlertTriangle className="w-3.5 h-3.5 text-amber-500" title="Validade próxima!" />}
+                            {alertState === 'expiry_expired' && <span title="Item Vencido!"><AlertCircle className="w-3.5 h-3.5 text-red-500" /></span>}
+                            {alertState === 'expiry_warning' && <span title="Validade próxima!"><AlertTriangle className="w-3.5 h-3.5 text-amber-500" /></span>}
                           </div>
                         </td>
                         <td className="py-3 px-3 text-right">
