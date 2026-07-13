@@ -16,6 +16,7 @@ import {
   UserPlus
 } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
+import { PetProfile } from './PetProfile';
 
 export const CustomersAndPets: React.FC = () => {
   const { currentTenant, addToast } = useAppointments();
@@ -23,6 +24,10 @@ export const CustomersAndPets: React.FC = () => {
   const [tutors, setTutors] = useState<Tutor[]>([]);
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Estados de seleção de Pet
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+  const [selectedTutorForPet, setSelectedTutorForPet] = useState<Tutor | null>(null);
 
   // Estados dos formulários
   const [isTutorFormOpen, setIsTutorFormOpen] = useState(false);
@@ -172,6 +177,20 @@ export const CustomersAndPets: React.FC = () => {
       setIsPetFormOpen(false);
     }
   };
+
+  // Se houver um pet selecionado, exibe o prontuário ao invés da listagem
+  if (selectedPet && selectedTutorForPet) {
+    return (
+      <PetProfile 
+        pet={selectedPet} 
+        tutor={selectedTutorForPet} 
+        onBack={() => {
+          setSelectedPet(null);
+          setSelectedTutorForPet(null);
+        }} 
+      />
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200 dark:border-stone-800 shadow-sm space-y-6 text-xs text-stone-850 dark:text-stone-100">
@@ -418,12 +437,18 @@ export const CustomersAndPets: React.FC = () => {
                             key={pet.id} 
                             className="flex items-center justify-between p-3 border border-stone-150 dark:border-stone-800 hover:border-stone-250 dark:hover:border-stone-700 bg-stone-50/30 dark:bg-stone-950/20 hover:bg-white dark:hover:bg-stone-900 rounded-xl transition-all"
                           >
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="w-8 h-8 rounded-lg bg-olive-500/10 dark:bg-olive-950/40 text-olive-650 dark:text-olive-400 flex items-center justify-center shrink-0">
+                            <div 
+                              onClick={() => {
+                                setSelectedPet(pet);
+                                setSelectedTutorForPet(tutor);
+                              }}
+                              className="flex items-center gap-2.5 min-w-0 cursor-pointer group/pet"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-olive-500/10 dark:bg-olive-950/40 text-olive-650 dark:text-olive-400 flex items-center justify-center shrink-0 group-hover/pet:scale-105 transition-transform">
                                 <Smile className="w-4 h-4" />
                               </div>
                               <div className="min-w-0">
-                                <h6 className="font-extrabold text-stone-800 dark:text-stone-200 text-[11px] leading-tight">{pet.name}</h6>
+                                <h6 className="font-extrabold text-stone-800 dark:text-stone-200 text-[11px] leading-tight group-hover/pet:text-olive-600 dark:group-hover/pet:text-olive-400 group-hover/pet:underline">{pet.name}</h6>
                                 <p className="text-[9px] text-stone-450 dark:text-stone-500 mt-0.5 truncate font-medium">
                                   {pet.species} {pet.breed ? `• ${pet.breed}` : ''}
                                 </p>

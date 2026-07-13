@@ -10,6 +10,9 @@ import {
   Building2, 
   LogOut,
   Users,
+  MessageSquare,
+  Package,
+  Zap,
   CreditCard,
   Settings as SettingsIcon,
   X
@@ -32,6 +35,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isOpe
     { id: 'dashboard', label: t('menu.dashboard'), icon: LayoutDashboard },
     { id: 'agenda', label: t('menu.agenda'), icon: Calendar },
     { id: 'customers', label: t('menu.customers'), icon: Users },
+    { id: 'crm', label: t('menu.crm'), icon: MessageSquare },
+    { id: 'inventory', label: t('menu.inventory'), icon: Package },
+    { id: 'automations', label: t('menu.automations'), icon: Zap },
     ...(isSuperAdmin ? [{ id: 'saas', label: t('menu.saas'), icon: CreditCard }] : []),
     { id: 'settings', label: t('menu.settings'), icon: SettingsIcon },
   ];

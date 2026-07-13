@@ -217,3 +217,147 @@ CREATE POLICY "Permite inserção pública de tenants no cadastro" ON tenants
   FOR INSERT
   TO anon, authenticated
   WITH CHECK (true);
+
+
+-- ========================================================
+-- 8. EXTENSÕES PARA O PETSANNY 2.0 (MÓDULOS PREMIUM)
+-- ========================================================
+
+-- Tabela de Histórico de Peso dos Pets
+CREATE TABLE IF NOT EXISTS pet_weights (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL,
+  pet_id UUID NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
+  weight DECIMAL(5, 2) NOT NULL,
+  recorded_date DATE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Tabela de Prontuários Médicos & Estéticos (medical_records)
+CREATE TABLE IF NOT EXISTS medical_records (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL,
+  pet_id UUID NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
+  record_date DATE NOT NULL,
+  record_type VARCHAR(50) NOT NULL CHECK (record_type IN ('consultation', 'vaccine', 'medication', 'exam', 'surgery', 'grooming', 'observation')),
+  title VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  professional VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Tabela de Lembretes dos Pets (reminders)
+CREATE TABLE IF NOT EXISTS pet_reminders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL,
+  pet_id UUID NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  reminder_date DATE NOT NULL,
+  reminder_type VARCHAR(50) NOT NULL CHECK (reminder_type IN ('vaccine', 'medication', 'exam', 'grooming')),
+  done BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Tabela de Documentos / Laudos dos Pets (documents)
+CREATE TABLE IF NOT EXISTS pet_documents (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL,
+  pet_id UUID NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  document_date DATE NOT NULL,
+  size VARCHAR(50) NOT NULL,
+  file_type VARCHAR(50) NOT NULL,
+  file_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Tabela de Insumos & Estoque (inventory)
+CREATE TABLE IF NOT EXISTS inventory (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  category VARCHAR(50) NOT NULL CHECK (category IN ('medicine', 'vaccine', 'product', 'shampoo', 'equipment')),
+  provider VARCHAR(255),
+  batch VARCHAR(100),
+  barcode VARCHAR(100),
+  qty INTEGER NOT NULL DEFAULT 0,
+  min_qty INTEGER NOT NULL DEFAULT 5,
+  max_qty INTEGER NOT NULL DEFAULT 100,
+  expiry_date DATE,
+  buy_price DECIMAL(10, 2) DEFAULT 0.00,
+  sell_price DECIMAL(10, 2) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Tabela de Transações Financeiras (financial_transactions)
+CREATE TABLE IF NOT EXISTS financial_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL,
+  transaction_date DATE NOT NULL,
+  description VARCHAR(255) NOT NULL,
+  transaction_type VARCHAR(50) NOT NULL CHECK (transaction_type IN ('revenue', 'expense')),
+  category VARCHAR(100) NOT NULL,
+  value DECIMAL(10, 2) NOT NULL,
+  payment_method VARCHAR(50) NOT NULL CHECK (payment_method IN ('pix', 'credit_card', 'cash', 'boleto')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Tabela de Automações Configuradas (automation_rules)
+CREATE TABLE IF NOT EXISTS automation_rules (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  trigger VARCHAR(255) NOT NULL,
+  actions TEXT[] NOT NULL,
+  active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Adicionar coluna de estágio do CRM (crm_stage) na tabela de Tutores
+ALTER TABLE tutors ADD COLUMN IF NOT EXISTS crm_stage VARCHAR(50) DEFAULT 'lead';
+
+-- Habilitar RLS para todas as tabelas novas
+ALTER TABLE pet_weights ENABLE ROW LEVEL SECURITY;
+ALTER TABLE medical_records ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pet_reminders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pet_documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE inventory ENABLE ROW LEVEL SECURITY;
+ALTER TABLE financial_transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE automation_rules ENABLE ROW LEVEL SECURITY;
+
+-- Políticas de RLS para novas tabelas (Multi-Tenant)
+CREATE POLICY "RLS Select para pet_weights" ON pet_weights FOR SELECT TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Insert para pet_weights" ON pet_weights FOR INSERT TO authenticated WITH CHECK (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Update para pet_weights" ON pet_weights FOR UPDATE TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Delete para pet_weights" ON pet_weights FOR DELETE TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+
+CREATE POLICY "RLS Select para medical_records" ON medical_records FOR SELECT TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Insert para medical_records" ON medical_records FOR INSERT TO authenticated WITH CHECK (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Update para medical_records" ON medical_records FOR UPDATE TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Delete para medical_records" ON medical_records FOR DELETE TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+
+CREATE POLICY "RLS Select para pet_reminders" ON pet_reminders FOR SELECT TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Insert para pet_reminders" ON pet_reminders FOR INSERT TO authenticated WITH CHECK (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Update para pet_reminders" ON pet_reminders FOR UPDATE TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Delete para pet_reminders" ON pet_reminders FOR DELETE TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+
+CREATE POLICY "RLS Select para pet_documents" ON pet_documents FOR SELECT TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Insert para pet_documents" ON pet_documents FOR INSERT TO authenticated WITH CHECK (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Update para pet_documents" ON pet_documents FOR UPDATE TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Delete para pet_documents" ON pet_documents FOR DELETE TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+
+CREATE POLICY "RLS Select para inventory" ON inventory FOR SELECT TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Insert para inventory" ON inventory FOR INSERT TO authenticated WITH CHECK (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Update para inventory" ON inventory FOR UPDATE TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Delete para inventory" ON inventory FOR DELETE TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+
+CREATE POLICY "RLS Select para financial_transactions" ON financial_transactions FOR SELECT TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Insert para financial_transactions" ON financial_transactions FOR INSERT TO authenticated WITH CHECK (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Update para financial_transactions" ON financial_transactions FOR UPDATE TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Delete para financial_transactions" ON financial_transactions FOR DELETE TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+
+CREATE POLICY "RLS Select para automation_rules" ON automation_rules FOR SELECT TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Insert para automation_rules" ON automation_rules FOR INSERT TO authenticated WITH CHECK (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Update para automation_rules" ON automation_rules FOR UPDATE TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);
+CREATE POLICY "RLS Delete para automation_rules" ON automation_rules FOR DELETE TO authenticated USING (tenant_id = (auth.jwt() -> 'user_metadata' ->> 'tenant_id')::uuid);

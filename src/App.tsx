@@ -6,7 +6,7 @@ import { Login } from './components/Login';
 import { LandingPage } from './components/LandingPage';
 import { CustomersAndPets } from './components/CustomersAndPets';
 import { Sidebar } from './components/Sidebar';
-import { DashboardMetrics } from './components/DashboardMetrics';
+import { DashboardPremium } from './components/DashboardPremium';
 import { AgendaCalendar } from './components/AgendaCalendar';
 import { OperationalControl } from './components/OperationalControl';
 import { CriticalAlerts } from './components/CriticalAlerts';
@@ -15,6 +15,10 @@ import { ToastContainer } from './components/ToastContainer';
 import { SaaSSubscriptions } from './components/SaaSSubscriptions';
 import { Settings } from './components/Settings';
 import { LanguageDropdown } from './components/LanguageDropdown';
+import { CRMControl } from './components/CRMControl';
+import { InventoryAndFinance } from './components/InventoryAndFinance';
+import { AutomationsCenter } from './components/AutomationsCenter';
+import { PetSannyAI } from './components/PetSannyAI';
 import logoImg from './assets/logo.png';
 import { 
   Plus, 
@@ -286,8 +290,8 @@ function AppContent() {
         {/* Área Condicional Conforme Aba Selecionada */}
         {activeTab === 'dashboard' && (
           <div className="space-y-8">
-            {/* Cards de Métricas */}
-            <DashboardMetrics />
+            {/* Novo Dashboard Premium 2.0 */}
+            <DashboardPremium />
 
             {/* Grid Principal do Dashboard: Agenda Simplificada + Alertas Críticos */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -302,6 +306,18 @@ function AppContent() {
               </div>
             </div>
           </div>
+        )}
+
+        {activeTab === 'crm' && (
+          <CRMControl />
+        )}
+
+        {activeTab === 'inventory' && (
+          <InventoryAndFinance />
+        )}
+
+        {activeTab === 'automations' && (
+          <AutomationsCenter />
         )}
 
         {activeTab === 'agenda' && (
@@ -336,6 +352,9 @@ function AppContent() {
         isOpen={isAddModalOpen} 
         onClose={() => setIsAddModalOpen(false)} 
       />
+
+      {/* Assistente Virtual Inteligente Flutuante */}
+      <PetSannyAI />
 
       {/* Container de Toasts Globais */}
       <ToastContainer />
