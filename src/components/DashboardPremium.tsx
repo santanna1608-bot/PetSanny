@@ -128,34 +128,34 @@ export const DashboardPremium: React.FC = () => {
           <div className="space-y-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              Painel Premium Ativo
+              {t('dashboard.premium_active')}
             </div>
             <h3 className="text-xl md:text-2xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
               {t('header.welcome')}
             </h3>
             <p className="text-xs md:text-sm text-stone-500 dark:text-stone-400 max-w-xl font-medium">
-              Sua clínica está operando com alta performance hoje. Veja o resumo rápido das operações e agendamentos deste dia.
+              {t('dashboard.welcome_desc')}
             </p>
           </div>
 
           {/* Mini Indicadores Inline */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:items-center gap-4 bg-stone-100/50 dark:bg-stone-950/30 p-4 rounded-2xl border border-stone-200 dark:border-stone-800/40">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:items-center gap-4 bg-stone-100/50 dark:bg-stone-950/30 p-4 rounded-2xl border border-stone-200/80 dark:border-stone-800/40">
             <div className="px-3 py-1 border-r border-stone-200 dark:border-stone-800 flex flex-col">
-              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">Pets Hoje</span>
-              <span className="text-sm font-extrabold text-stone-800 dark:text-stone-200">{totalPetsScheduledToday} agendados</span>
+              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">{t('dashboard.pets_today')}</span>
+              <span className="text-sm font-extrabold text-stone-800 dark:text-stone-200">{totalPetsScheduledToday} {t('dashboard.scheduled')}</span>
             </div>
             <div className="px-3 py-1 border-r border-stone-200 dark:border-stone-800 flex flex-col">
-              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">Faturamento Previsto</span>
+              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">{t('dashboard.forecasted_revenue')}</span>
               <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">{formatCurrency(revenueExpectedToday)}</span>
             </div>
             <div className="px-3 py-1 border-r border-stone-200 dark:border-stone-800 flex flex-col">
-              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">Ocupação Agenda</span>
+              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">{t('dashboard.occupancy_agenda')}</span>
               <span className="text-sm font-extrabold text-amber-600 dark:text-amber-500">{occupancyRate}%</span>
             </div>
             <div className="px-3 py-1 flex flex-col">
-              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">Alertas</span>
+              <span className="text-[10px] text-stone-500 dark:text-stone-500 font-bold uppercase">{t('dashboard.alerts')}</span>
               <span className={`text-sm font-extrabold ${criticalAlertsToday > 0 ? 'text-rose-500 dark:text-rose-400 animate-pulse' : 'text-stone-750 dark:text-stone-300'}`}>
-                {criticalAlertsToday} crítico{criticalAlertsToday !== 1 && 's'}
+                {criticalAlertsToday} {criticalAlertsToday === 1 ? t('dashboard.critical_singular') : t('dashboard.critical_plural')}
               </span>
             </div>
           </div>
@@ -165,27 +165,27 @@ export const DashboardPremium: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-6 pt-5 border-t border-stone-200 dark:border-stone-800/45 text-[10px] font-bold text-stone-600 dark:text-stone-400 tracking-wider">
           <div className="flex items-center gap-2 bg-white dark:bg-stone-950/20 p-2.5 rounded-xl border border-stone-200 dark:border-stone-800">
             <Stethoscope className="w-4 h-4 text-blue-550 dark:text-blue-400" />
-            <span>{todayVet} CONSULTAS</span>
+            <span>{todayVet} {t('dashboard.vet_consultations')}</span>
           </div>
           <div className="flex items-center gap-2 bg-white dark:bg-stone-950/20 p-2.5 rounded-xl border border-stone-200 dark:border-stone-800">
             <Scissors className="w-4 h-4 text-orange-500 dark:text-orange-400" />
-            <span>{todayBanhos} BANHOS</span>
+            <span>{todayBanhos} {t('dashboard.baths')}</span>
           </div>
           <div className="flex items-center gap-2 bg-white dark:bg-stone-950/20 p-2.5 rounded-xl border border-stone-200 dark:border-stone-800">
-            <Scissors className="w-4 h-4 text-amber-650 dark:text-amber-400" />
-            <span>{todayTosas} TOSAS</span>
+            <Scissors className="w-4 h-4 text-amber-655 dark:text-amber-400" />
+            <span>{todayTosas} {t('dashboard.haircuts')}</span>
           </div>
           <div className="flex items-center gap-2 bg-white dark:bg-stone-950/20 p-2.5 rounded-xl border border-stone-200 dark:border-stone-800">
-            <Syringe className="w-4 h-4 text-purple-550 dark:text-purple-400" />
-            <span>{todayVacinas} VACINAS</span>
+            <Syringe className="w-4 h-4 text-purple-555 dark:text-purple-400" />
+            <span>{todayVacinas} {t('dashboard.vaccines')}</span>
           </div>
           <div className="flex items-center gap-2 bg-white dark:bg-stone-950/20 p-2.5 rounded-xl border border-stone-200 dark:border-stone-800">
-            <Activity className="w-4 h-4 text-rose-550 dark:text-rose-400" />
-            <span>{todayCirurgias} CIRURGIAS</span>
+            <Activity className="w-4 h-4 text-rose-555 dark:text-rose-400" />
+            <span>{todayCirurgias} {t('dashboard.surgeries')}</span>
           </div>
           <div className="flex items-center gap-2 bg-white dark:bg-stone-950/20 p-2.5 rounded-xl border border-stone-200 dark:border-stone-800">
-            <AlertCircle className="w-4 h-4 text-rose-550 dark:text-rose-400" />
-            <span>{criticalAlertsToday} RESTRIÇÕES</span>
+            <AlertCircle className="w-4 h-4 text-rose-555 dark:text-rose-400" />
+            <span>{criticalAlertsToday} {t('dashboard.restrictions')}</span>
           </div>
         </div>
       </div>
@@ -198,9 +198,9 @@ export const DashboardPremium: React.FC = () => {
           <div className="flex justify-between items-start">
             <div>
               <span className="text-[10px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider block mb-1">
-                Faturamento Realizado (Mês)
+                {t('dashboard.revenue_est')}
               </span>
-              <h3 className="text-2xl font-black text-stone-850 dark:text-stone-100 tracking-tight">
+              <h3 className="text-2xl font-black text-stone-855 dark:text-stone-100 tracking-tight">
                 {formatCurrency(revenueTotal)}
               </h3>
             </div>
@@ -212,7 +212,7 @@ export const DashboardPremium: React.FC = () => {
             <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-650 dark:text-emerald-500">
               <TrendingUp className="w-3.5 h-3.5" />
               <span>+14.8%</span>
-              <span className="text-stone-400 font-medium">vs mês anterior</span>
+              <span className="text-stone-400 font-medium">{t('dashboard.vs_previous_month')}</span>
             </div>
           </div>
         </div>
@@ -222,7 +222,7 @@ export const DashboardPremium: React.FC = () => {
           <div className="flex justify-between items-start">
             <div>
               <span className="text-[10px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider block mb-1">
-                Receita Prevista Geral
+                {t('dashboard.forecasted_revenue')}
               </span>
               <h3 className="text-2xl font-black text-stone-850 dark:text-stone-100 tracking-tight">
                 {formatCurrency(revenueForecast)}
@@ -236,7 +236,7 @@ export const DashboardPremium: React.FC = () => {
             <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-655 dark:text-emerald-500">
               <TrendingUp className="w-3.5 h-3.5" />
               <span>+23.1%</span>
-              <span className="text-stone-400 font-medium">vs semana anterior</span>
+              <span className="text-stone-400 font-medium">{t('dashboard.vs_previous_week')}</span>
             </div>
           </div>
         </div>
@@ -246,13 +246,13 @@ export const DashboardPremium: React.FC = () => {
           <div className="flex justify-between items-start">
             <div>
               <span className="text-[10px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider block mb-1">
-                Ticket Médio
+                {t('dashboard.arpu')}
               </span>
               <h3 className="text-2xl font-black text-stone-850 dark:text-stone-100 tracking-tight">
                 {formatCurrency(averageTicket)}
               </h3>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-550/20 text-blue-600 dark:text-blue-450 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-555/20 text-blue-600 dark:text-blue-450 flex items-center justify-center group-hover:scale-105 transition-transform">
               <Activity className="w-5 h-5" />
             </div>
           </div>
@@ -260,7 +260,7 @@ export const DashboardPremium: React.FC = () => {
             <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-655 dark:text-emerald-500">
               <TrendingUp className="w-3.5 h-3.5" />
               <span>+3.2%</span>
-              <span className="text-stone-400 font-medium">vs ontem</span>
+              <span className="text-stone-400 font-medium">{t('dashboard.vs_yesterday')}</span>
             </div>
           </div>
         </div>
@@ -270,7 +270,7 @@ export const DashboardPremium: React.FC = () => {
           <div className="flex justify-between items-start">
             <div>
               <span className="text-[10px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider block mb-1">
-                Clientes & Pets Ativos
+                {t('dashboard.active_clients')}
               </span>
               <h3 className="text-2xl font-black text-stone-855 dark:text-stone-100 tracking-tight">
                 {tutorCount} / {petCount}
@@ -283,7 +283,7 @@ export const DashboardPremium: React.FC = () => {
           <div className="flex items-center justify-between mt-4">
             <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-655 dark:text-emerald-500">
               <TrendingUp className="w-3.5 h-3.5" />
-              <span>+2 novos hoje</span>
+              <span>{t('dashboard.new_today_desc')}</span>
             </div>
           </div>
         </div>
@@ -297,17 +297,17 @@ export const DashboardPremium: React.FC = () => {
         <div className="lg:col-span-2 bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200/85 dark:border-stone-800 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h4 className="font-extrabold text-sm text-stone-850 dark:text-stone-100">Faturamento Diário</h4>
-              <p className="text-[10px] text-stone-500 dark:text-stone-400">Evolução financeira dos últimos 30 dias na clínica</p>
+              <h4 className="font-extrabold text-sm text-stone-850 dark:text-stone-100">{t('dashboard.daily_revenue')}</h4>
+              <p className="text-[10px] text-stone-500 dark:text-stone-400">{t('dashboard.daily_revenue_desc')}</p>
             </div>
             <div className="flex items-center gap-2">
               <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-450">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
-                Estética Pet
+                {t('dashboard.aesthetic_pet_label')}
               </span>
               <span className="flex items-center gap-1 text-[10px] font-bold text-blue-605 dark:text-blue-400">
                 <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
-                Veterinária
+                {t('dashboard.vet_care')}
               </span>
             </div>
           </div>
@@ -367,11 +367,11 @@ export const DashboardPremium: React.FC = () => {
               <circle cx="410" cy="40" r="5" fill="#2563eb" stroke="#ffffff" strokeWidth="1.5" className="hover:scale-150 transition-all cursor-pointer" />
 
               {/* Rótulos Eixo X */}
-              <text x="40" y="190" textAnchor="middle" className="text-[9px] fill-stone-450 dark:fill-stone-500 font-bold font-sans">Dia 01</text>
-              <text x="150" y="190" textAnchor="middle" className="text-[9px] fill-stone-450 dark:fill-stone-500 font-bold font-sans">Dia 08</text>
-              <text x="260" y="190" textAnchor="middle" className="text-[9px] fill-stone-450 dark:fill-stone-500 font-bold font-sans">Dia 15</text>
-              <text x="370" y="190" textAnchor="middle" className="text-[9px] fill-stone-450 dark:fill-stone-500 font-bold font-sans">Dia 22</text>
-              <text x="480" y="190" textAnchor="middle" className="text-[9px] fill-stone-450 dark:fill-stone-500 font-bold font-sans">Dia 30</text>
+              <text x="40" y="190" textAnchor="middle" className="text-[9px] fill-stone-450 dark:fill-stone-500 font-bold font-sans">{language === 'en' ? 'Day 01' : language === 'es' ? 'Día 01' : 'Dia 01'}</text>
+              <text x="150" y="190" textAnchor="middle" className="text-[9px] fill-stone-450 dark:fill-stone-500 font-bold font-sans">{language === 'en' ? 'Day 08' : language === 'es' ? 'Día 08' : 'Dia 08'}</text>
+              <text x="260" y="190" textAnchor="middle" className="text-[9px] fill-stone-450 dark:fill-stone-500 font-bold font-sans">{language === 'en' ? 'Day 15' : language === 'es' ? 'Día 15' : 'Dia 15'}</text>
+              <text x="370" y="190" textAnchor="middle" className="text-[9px] fill-stone-450 dark:fill-stone-500 font-bold font-sans">{language === 'en' ? 'Day 22' : language === 'es' ? 'Día 22' : 'Dia 22'}</text>
+              <text x="480" y="190" textAnchor="middle" className="text-[9px] fill-stone-450 dark:fill-stone-500 font-bold font-sans">{language === 'en' ? 'Day 30' : language === 'es' ? 'Día 30' : 'Dia 30'}</text>
 
               {/* Definições de Gradientes */}
               <defs>
@@ -391,8 +391,8 @@ export const DashboardPremium: React.FC = () => {
         {/* GRÁFICO 2: DISTRIBUIÇÃO DOS SERVIÇOS */}
         <div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200/85 dark:border-stone-800 shadow-sm flex flex-col justify-between">
           <div>
-            <h4 className="font-extrabold text-sm text-stone-850 dark:text-stone-100 mb-1">Distribuição de Serviços</h4>
-            <p className="text-[10px] text-stone-500 dark:text-stone-400">Serviços executados por tipo no período</p>
+            <h4 className="font-extrabold text-sm text-stone-850 dark:text-stone-100 mb-1">{t('dashboard.service_distribution')}</h4>
+            <p className="text-[10px] text-stone-500 dark:text-stone-400">{t('dashboard.service_distribution_desc')}</p>
           </div>
 
           <div className="flex justify-center my-4 relative">
@@ -410,7 +410,7 @@ export const DashboardPremium: React.FC = () => {
               <circle cx="18" cy="18" r="15.915" fill="none" stroke="#7c3aed" strokeWidth="4.2" strokeDasharray="15 85" strokeDashoffset="15" />
             </svg>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-              <span className="text-[10px] text-stone-450 dark:text-stone-500 block font-bold leading-none">TOTAL</span>
+              <span className="text-[10px] text-stone-450 dark:text-stone-500 block font-bold leading-none">{t('dashboard.total')}</span>
               <span className="text-lg font-black text-stone-800 dark:text-stone-100 leading-none">428</span>
             </div>
           </div>
@@ -419,25 +419,25 @@ export const DashboardPremium: React.FC = () => {
           <div className="space-y-1.5 text-[10px] font-bold">
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1.5 text-stone-600 dark:text-stone-300">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" /> Banho
+                <span className="w-2 h-2 rounded-full bg-emerald-500" /> {t('dashboard.bath')}
               </span>
               <span>40% (171)</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1.5 text-stone-600 dark:text-stone-300">
-                <span className="w-2 h-2 rounded-full bg-amber-650" /> Tosa
+                <span className="w-2 h-2 rounded-full bg-amber-650" /> {t('dashboard.haircut')}
               </span>
               <span>25% (107)</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1.5 text-stone-600 dark:text-stone-300">
-                <span className="w-2 h-2 rounded-full bg-blue-600" /> Consultas
+                <span className="w-2 h-2 rounded-full bg-blue-600" /> {t('dashboard.consultations')}
               </span>
               <span>20% (85)</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1.5 text-stone-600 dark:text-stone-300">
-                <span className="w-2 h-2 rounded-full bg-purple-650" /> Vacinas / Outros
+                <span className="w-2 h-2 rounded-full bg-purple-650" /> {t('dashboard.vaccines_others')}
               </span>
               <span>15% (65)</span>
             </div>
@@ -451,18 +451,18 @@ export const DashboardPremium: React.FC = () => {
         {/* GRÁFICO 3: DIAS MAIS MOVIMENTADOS */}
         <div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200/85 dark:border-stone-800 shadow-sm flex flex-col justify-between">
           <div>
-            <h4 className="font-extrabold text-sm text-stone-850 dark:text-stone-100 mb-1">Dias Mais Movimentados</h4>
-            <p className="text-[10px] text-stone-500 dark:text-stone-400">Total de agendamentos no decorrer da semana</p>
+            <h4 className="font-extrabold text-sm text-stone-850 dark:text-stone-100 mb-1">{t('dashboard.busy_days')}</h4>
+            <p className="text-[10px] text-stone-500 dark:text-stone-400">{t('dashboard.busy_days_desc')}</p>
           </div>
 
           <div className="h-44 flex items-end justify-between pt-6 px-2">
             {[
-              { day: 'Seg', val: 32, max: 100, color: 'bg-stone-300 dark:bg-stone-800' },
-              { day: 'Ter', val: 55, max: 100, color: 'bg-stone-300 dark:bg-stone-800' },
-              { day: 'Qua', val: 80, max: 100, color: 'bg-stone-400 dark:bg-stone-700' },
-              { day: 'Qui', val: 65, max: 100, color: 'bg-stone-400 dark:bg-stone-700' },
-              { day: 'Sex', val: 95, max: 100, color: 'bg-emerald-600 dark:bg-emerald-500' },
-              { day: 'Sáb', val: 100, max: 100, color: 'bg-emerald-700 dark:bg-emerald-600' }
+              { day: t('day.mon'), val: 32, max: 100, color: 'bg-stone-300 dark:bg-stone-800' },
+              { day: t('day.tue'), val: 55, max: 100, color: 'bg-stone-300 dark:bg-stone-800' },
+              { day: t('day.wed'), val: 80, max: 100, color: 'bg-stone-400 dark:bg-stone-700' },
+              { day: t('day.thu'), val: 65, max: 100, color: 'bg-stone-400 dark:bg-stone-700' },
+              { day: t('day.fri'), val: 95, max: 100, color: 'bg-emerald-600 dark:bg-emerald-500' },
+              { day: t('day.sat'), val: 100, max: 100, color: 'bg-emerald-700 dark:bg-emerald-600' }
             ].map((item, idx) => (
               <div key={idx} className="flex flex-col items-center gap-2 group w-full">
                 <div className="relative w-7 bg-stone-100 dark:bg-stone-950 rounded-t-lg h-32 flex items-end">
@@ -484,8 +484,8 @@ export const DashboardPremium: React.FC = () => {
         {/* GRÁFICO 4: NOVOS CLIENTES */}
         <div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200/85 dark:border-stone-800 shadow-sm flex flex-col justify-between">
           <div>
-            <h4 className="font-extrabold text-sm text-stone-850 dark:text-stone-100 mb-1">Novos Tutores</h4>
-            <p className="text-[10px] text-stone-500 dark:text-stone-400">Total de novos cadastros nos últimos 6 meses</p>
+            <h4 className="font-extrabold text-sm text-stone-850 dark:text-stone-100 mb-1">{t('dashboard.new_tutors')}</h4>
+            <p className="text-[10px] text-stone-500 dark:text-stone-400">{t('dashboard.new_tutors_desc')}</p>
           </div>
 
           <div className="relative w-full h-32 mt-4">
@@ -503,12 +503,12 @@ export const DashboardPremium: React.FC = () => {
                 opacity="0.08"
               />
               {[
-                { x: 10, y: 90, label: 'Jan' },
-                { x: 45, y: 75, label: 'Fev' },
-                { x: 80, y: 50, label: 'Mar' },
-                { x: 115, y: 65, label: 'Abr' },
-                { x: 150, y: 40, label: 'Mai' },
-                { x: 190, y: 20, label: 'Jun' }
+                { x: 10, y: 90, label: t('month.jan') },
+                { x: 45, y: 75, label: t('month.feb') },
+                { x: 80, y: 50, label: t('month.mar') },
+                { x: 115, y: 65, label: t('month.apr') },
+                { x: 150, y: 40, label: t('month.may') },
+                { x: 190, y: 20, label: t('month.jun') }
               ].map((pt, i) => (
                 <g key={i}>
                   <circle cx={pt.x} cy={pt.y} r="3" fill="#7c3aed" stroke="#ffffff" strokeWidth="1" />
@@ -528,8 +528,8 @@ export const DashboardPremium: React.FC = () => {
         {/* GRÁFICO 5: RETORNO DE CLIENTES */}
         <div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200/85 dark:border-stone-800 shadow-sm flex flex-col justify-between">
           <div>
-            <h4 className="font-extrabold text-sm text-stone-850 dark:text-stone-100 mb-1">Fidelização e Retornos</h4>
-            <p className="text-[10px] text-stone-500 dark:text-stone-400">Porcentagem de clientes recorrentes</p>
+            <h4 className="font-extrabold text-sm text-stone-850 dark:text-stone-100 mb-1">{t('dashboard.loyalty_returns')}</h4>
+            <p className="text-[10px] text-stone-500 dark:text-stone-400">{t('dashboard.loyalty_returns_desc')}</p>
           </div>
 
           <div className="relative w-full h-32 mt-4">

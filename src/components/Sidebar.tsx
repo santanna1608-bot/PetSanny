@@ -76,7 +76,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isOpe
               <button
                 onClick={onClose}
                 className="md:hidden p-2 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-xl transition-all cursor-pointer"
-                title="Fechar menu"
+                title={t('menu.close')}
               >
                 <X className="w-5 h-5" />
               </button>

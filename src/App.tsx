@@ -226,7 +226,7 @@ function AppContent() {
           <button
             onClick={() => setIsSidebarOpen(true)}
             className="p-2.5 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-850 rounded-xl transition-all cursor-pointer border border-stone-200 dark:border-stone-800"
-            title="Abrir menu"
+            title={t('menu.open')}
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -249,7 +249,7 @@ function AppContent() {
           <div>
             <div className="flex items-center gap-2 text-stone-400 dark:text-stone-500 text-xs font-semibold uppercase tracking-wider mb-1">
               <Building className="w-3.5 h-3.5" />
-              <span>SaaS Dashboard</span>
+              <span>{t('header.saas_dashboard')}</span>
               <span>•</span>
               <span className="text-stone-550 dark:text-stone-400 font-bold">{currentTenant.name}</span>
             </div>
