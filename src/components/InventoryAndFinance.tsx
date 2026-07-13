@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppointments } from '../contexts/AppointmentsContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { 
   Package, 
   DollarSign, 
@@ -39,6 +40,7 @@ interface FinancialTransaction {
 
 export const InventoryAndFinance: React.FC = () => {
   const { currentTenant, addToast } = useAppointments();
+  const { t } = useLanguage();
   
   const [activeSubTab, setActiveSubTab] = useState<'inventory' | 'finance'>('inventory');
   
@@ -185,7 +187,7 @@ export const InventoryAndFinance: React.FC = () => {
     setNewItemBuyPrice('');
     setNewItemSellPrice('');
 
-    addToast('Item de Estoque Adicionado', `O item "${newItemName}" foi cadastrado com sucesso.`, 'success');
+    addToast(t('inventory.toast_add_title'), t('inventory.toast_add_desc').replace('{name}', newItemName), 'success');
   };
 
   // Cadastra Lançamento Financeiro
@@ -208,14 +210,14 @@ export const InventoryAndFinance: React.FC = () => {
 
     setTxDesc('');
     setTxVal('');
-    addToast('Transação Registrada', 'O lançamento de fluxo de caixa foi gravado com sucesso.', 'success');
+    addToast(t('inventory.toast_tx_title'), t('inventory.toast_tx_desc'), 'success');
   };
 
   // Excluir do Estoque
   const handleDeleteStock = (id: string, name: string) => {
     const updated = stock.filter(item => item.id !== id);
     saveStock(updated);
-    addToast('Item Excluído', `"${name}" foi removido do inventário.`, 'info');
+    addToast(t('inventory.toast_del_title'), t('inventory.toast_del_desc').replace('{name}', name), 'info');
   };
 
   // Cálculos Financeiros
@@ -247,19 +249,18 @@ export const InventoryAndFinance: React.FC = () => {
 
   const getCategoryLabel = (cat: StockItem['category']) => {
     switch (cat) {
-      case 'medicine': return 'Medicamento';
-      case 'vaccine': return 'Vacina';
-      case 'product': return 'Produto Geral';
-      case 'shampoo': return 'Shampoo/Estética';
-      case 'equipment': return 'Equipamento';
+      case 'medicine': return t('inventory.cat_medicine');
+      case 'vaccine': return t('inventory.cat_vaccine');
+      case 'product': return t('inventory.cat_product');
+      case 'shampoo': return t('inventory.cat_shampoo');
+      case 'equipment': return t('inventory.cat_equipment');
     }
   };
 
   return (
     <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm text-xs text-stone-850 dark:text-stone-150 overflow-hidden animate-fade-in">
       
-      {/* Sub Menu de Navegação Superior */}
-      <div className="flex border-b border-stone-150 dark:border-stone-850 bg-stone-50/50 dark:bg-stone-950/20 px-6 pt-3">
+      <div className="flex border-b border-stone-150 dark:border-stone-850 bg-stone-50/50 dark:bg-stone-955/20 px-6 pt-3">
         <button
           onClick={() => setActiveSubTab('inventory')}
           className={`flex items-center gap-2 px-5 py-3 font-extrabold text-[10px] uppercase border-b-2 transition-all cursor-pointer ${
@@ -269,7 +270,7 @@ export const InventoryAndFinance: React.FC = () => {
           }`}
         >
           <Package className="w-4 h-4" />
-          Controle de Estoque & Vacinas
+          {t('inventory.tab_stock')}
         </button>
         <button
           onClick={() => setActiveSubTab('finance')}
@@ -280,7 +281,7 @@ export const InventoryAndFinance: React.FC = () => {
           }`}
         >
           <DollarSign className="w-4 h-4" />
-          Fluxo de Caixa & Faturamento
+          {t('inventory.tab_finance')}
         </button>
       </div>
 
@@ -300,7 +301,7 @@ export const InventoryAndFinance: React.FC = () => {
                 <div className="relative flex-1 max-w-sm">
                   <input
                     type="text"
-                    placeholder="Buscar por insumo, fornecedor ou código..."
+                    placeholder={t('inventory.search_placeholder')}
                     value={searchStock}
                     onChange={(e) => setSearchStock(e.target.value)}
                     className="w-full bg-stone-50 dark:bg-stone-950 text-stone-800 dark:text-stone-100 text-xs rounded-xl pl-9 pr-4 py-2.5 border border-stone-200 dark:border-stone-800 focus:border-olive-500 outline-none transition-all"
@@ -315,12 +316,12 @@ export const InventoryAndFinance: React.FC = () => {
                     onChange={(e) => setFilterCategory(e.target.value)}
                     className="bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-stone-800 dark:text-stone-200 font-semibold rounded-xl px-4 py-2.5 outline-none cursor-pointer text-xs"
                   >
-                    <option value="all">Todas Categorias</option>
-                    <option value="medicine">Medicamentos</option>
-                    <option value="vaccine">Vacinas</option>
-                    <option value="product">Produtos Gerais</option>
-                    <option value="shampoo">Shampoos/Acessórios</option>
-                    <option value="equipment">Equipamentos</option>
+                    <option value="all">{t('inventory.all_categories')}</option>
+                    <option value="medicine">{t('inventory.cat_medicine')}</option>
+                    <option value="vaccine">{t('inventory.cat_vaccine')}</option>
+                    <option value="product">{t('inventory.cat_product')}</option>
+                    <option value="shampoo">{t('inventory.cat_shampoo')}</option>
+                    <option value="equipment">{t('inventory.cat_equipment')}</option>
                   </select>
                 </div>
 
@@ -331,17 +332,17 @@ export const InventoryAndFinance: React.FC = () => {
                 className="flex items-center justify-center gap-1.5 bg-olive-600 hover:bg-olive-750 text-white font-bold px-4 py-2.5 rounded-xl shadow-md shadow-olive-900/10 transition-all cursor-pointer self-start md:self-center"
               >
                 <Plus className="w-4 h-4" />
-                <span>Adicionar Mercadoria</span>
+                <span>{t('inventory.add_item')}</span>
               </button>
             </div>
 
             {/* Formulário de Novo Item de Estoque */}
             {isAddStockOpen && (
               <form onSubmit={handleAddStockItem} className="p-5 rounded-2xl bg-stone-50 dark:bg-stone-955 border border-stone-200 dark:border-stone-800 space-y-4 animate-fade-in">
-                <h4 className="font-bold text-sm text-stone-800 dark:text-stone-200">Cadastrar Insumo / Medicamento</h4>
+                <h4 className="font-bold text-sm text-stone-800 dark:text-stone-200">{t('inventory.form_title')}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-1">
-                    <label className="block text-[9px] text-stone-550 font-bold uppercase">Nome do Insumo *</label>
+                    <label className="block text-[9px] text-stone-550 font-bold uppercase">{t('inventory.lbl_name')}</label>
                     <input
                       type="text"
                       required
@@ -352,21 +353,21 @@ export const InventoryAndFinance: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-[9px] text-stone-550 font-bold uppercase">Categoria</label>
+                    <label className="block text-[9px] text-stone-550 font-bold uppercase">{t('inventory.lbl_category')}</label>
                     <select
                       value={newItemCategory}
                       onChange={(e) => setNewItemCategory(e.target.value as any)}
                       className="w-full bg-white dark:bg-stone-900 text-stone-850 dark:text-stone-100 rounded-xl px-3 py-2.5 border border-stone-250 dark:border-stone-800 outline-none"
                     >
-                      <option value="product">Produto Geral</option>
-                      <option value="medicine">Medicamento</option>
-                      <option value="vaccine">Vacina</option>
-                      <option value="shampoo">Shampoo/Acessório</option>
-                      <option value="equipment">Equipamento</option>
+                      <option value="product">{t('inventory.cat_product')}</option>
+                      <option value="medicine">{t('inventory.cat_medicine')}</option>
+                      <option value="vaccine">{t('inventory.cat_vaccine')}</option>
+                      <option value="shampoo">{t('inventory.cat_shampoo')}</option>
+                      <option value="equipment">{t('inventory.cat_equipment')}</option>
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-[9px] text-stone-550 font-bold uppercase">Fornecedor</label>
+                    <label className="block text-[9px] text-stone-550 font-bold uppercase">{t('inventory.lbl_provider')}</label>
                     <input
                       type="text"
                       placeholder="Ex: Zoetis Brasil"
@@ -376,7 +377,7 @@ export const InventoryAndFinance: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-[9px] text-stone-550 font-bold uppercase">Nº do Lote</label>
+                    <label className="block text-[9px] text-stone-550 font-bold uppercase">{t('inventory.lbl_batch')}</label>
                     <input
                       type="text"
                       placeholder="Ex: L-992200"
@@ -386,7 +387,7 @@ export const InventoryAndFinance: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-[9px] text-stone-550 font-bold uppercase">Validade</label>
+                    <label className="block text-[9px] text-stone-550 font-bold uppercase">{t('inventory.lbl_expiry')}</label>
                     <input
                       type="date"
                       value={newItemExpiry}
@@ -395,7 +396,7 @@ export const InventoryAndFinance: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-[9px] text-stone-550 font-bold uppercase">Quantidade Inicial *</label>
+                    <label className="block text-[9px] text-stone-550 font-bold uppercase">{t('inventory.lbl_qty_initial')}</label>
                     <input
                       type="number"
                       required
@@ -406,7 +407,7 @@ export const InventoryAndFinance: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-[9px] text-stone-550 font-bold uppercase">Estoque Mínimo (Alerta)</label>
+                    <label className="block text-[9px] text-stone-550 font-bold uppercase">{t('inventory.lbl_qty_min')}</label>
                     <input
                       type="number"
                       placeholder="Ex: 5"
@@ -416,7 +417,7 @@ export const InventoryAndFinance: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-[9px] text-stone-550 font-bold uppercase">Preço de Compra (Custo R$)</label>
+                    <label className="block text-[9px] text-stone-550 font-bold uppercase">{t('inventory.lbl_price_buy')}</label>
                     <input
                       type="number"
                       step="0.01"
@@ -427,7 +428,7 @@ export const InventoryAndFinance: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-[9px] text-stone-550 font-bold uppercase">Preço de Venda (Saída R$) *</label>
+                    <label className="block text-[9px] text-stone-550 font-bold uppercase">{t('inventory.lbl_price_sell')}</label>
                     <input
                       type="number"
                       step="0.01"
@@ -445,13 +446,13 @@ export const InventoryAndFinance: React.FC = () => {
                     onClick={() => setIsAddStockOpen(false)}
                     className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 font-bold px-4 py-2 rounded-xl"
                   >
-                    Cancelar
+                    {t('inventory.btn_cancel')}
                   </button>
                   <button
                     type="submit"
                     className="bg-olive-650 hover:bg-olive-750 text-white font-bold px-4 py-2 rounded-xl"
                   >
-                    Cadastrar Insumo
+                    {t('inventory.btn_submit')}
                   </button>
                 </div>
               </form>
@@ -461,15 +462,15 @@ export const InventoryAndFinance: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-stone-150 dark:border-stone-800 text-[10px] text-stone-500 uppercase font-bold bg-stone-50/50 dark:bg-stone-950/20">
-                    <th className="py-3 px-3">Código/Insumo</th>
-                    <th className="py-3 px-3">Categoria</th>
-                    <th className="py-3 px-3">Fornecedor</th>
-                    <th className="py-3 px-3">Lote</th>
-                    <th className="py-3 px-3">Qtd / Mín</th>
-                    <th className="py-3 px-3">Validade</th>
-                    <th className="py-3 px-3 text-right">Compra / Venda</th>
-                    <th className="py-3 px-3 text-right">Ações</th>
+                  <tr className="border-b border-stone-150 dark:border-stone-800 text-[10px] text-stone-500 uppercase font-bold bg-stone-50/50 dark:bg-stone-955/20">
+                    <th className="py-3 px-3">{t('inventory.th_name')}</th>
+                    <th className="py-3 px-3">{t('inventory.lbl_category')}</th>
+                    <th className="py-3 px-3">{t('inventory.lbl_provider')}</th>
+                    <th className="py-3 px-3">{t('inventory.lbl_batch')}</th>
+                    <th className="py-3 px-3">{t('inventory.th_qty')}</th>
+                    <th className="py-3 px-3">{t('inventory.lbl_expiry')}</th>
+                    <th className="py-3 px-3 text-right">{t('inventory.th_price')}</th>
+                    <th className="py-3 px-3 text-right">{t('saas.th_actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-150 dark:divide-stone-850 font-medium">
@@ -495,7 +496,7 @@ export const InventoryAndFinance: React.FC = () => {
                             {getCategoryLabel(item.category)}
                           </span>
                         </td>
-                        <td className="py-3 px-3 text-stone-500">{item.provider}</td>
+                        <td className="py-3 px-3 text-stone-500">{item.provider || t('inventory.not_informed')}</td>
                         <td className="py-3 px-3 font-mono">{item.batch}</td>
                         <td className="py-3 px-3">
                           <div className="flex items-center gap-1.5 font-bold">
@@ -503,7 +504,7 @@ export const InventoryAndFinance: React.FC = () => {
                               {item.qty}
                             </span>
                             <span className="text-[9px] text-stone-400 font-semibold">/ {item.minQty}</span>
-                            {alertState === 'qty_critical' && <span title="Estoque abaixo do mínimo!"><AlertTriangle className="w-3.5 h-3.5 text-rose-500" /></span>}
+                            {alertState === 'qty_critical' && <span title={t('inventory.alert_min')}><AlertTriangle className="w-3.5 h-3.5 text-rose-500" /></span>}
                           </div>
                         </td>
                         <td className="py-3 px-3">
@@ -517,21 +518,21 @@ export const InventoryAndFinance: React.FC = () => {
                             }`}>
                               {item.expiryDate.split('-').reverse().join('/')}
                             </span>
-                            {alertState === 'expiry_expired' && <span title="Item Vencido!"><AlertCircle className="w-3.5 h-3.5 text-red-500" /></span>}
-                            {alertState === 'expiry_warning' && <span title="Validade próxima!"><AlertTriangle className="w-3.5 h-3.5 text-amber-500" /></span>}
+                            {alertState === 'expiry_expired' && <span title={t('inventory.alert_expired')}><AlertCircle className="w-3.5 h-3.5 text-red-500" /></span>}
+                            {alertState === 'expiry_warning' && <span title={t('inventory.alert_near_expiry')}><AlertTriangle className="w-3.5 h-3.5 text-amber-500" /></span>}
                           </div>
                         </td>
                         <td className="py-3 px-3 text-right">
-                          <div className="text-[10px] text-stone-400 font-medium">Custo: R$ {item.buyPrice.toFixed(0)}</div>
+                          <div className="text-[10px] text-stone-400 font-medium">{t('inventory.lbl_cost')} R$ {item.buyPrice.toFixed(0)}</div>
                           <div className="font-extrabold text-stone-800 dark:text-stone-100">R$ {item.sellPrice.toFixed(0)}</div>
                         </td>
                         <td className="py-3 px-3 text-right">
                           <button
                             onClick={() => handleDeleteStock(item.id, item.name)}
-                            className="p-1 hover:bg-rose-50 dark:hover:bg-rose-955/20 text-stone-400 hover:text-rose-600 rounded transition-colors cursor-pointer"
-                            title="Remover insumo"
+                            className="p-1 hover:bg-rose-50 dark:hover:bg-rose-955/20 text-stone-440 hover:text-rose-600 rounded transition-colors cursor-pointer"
+                            title={t('inventory.btn_delete_title')}
                           >
-                            Excluir
+                            {t('inventory.btn_delete')}
                           </button>
                         </td>
                       </tr>
@@ -556,7 +557,7 @@ export const InventoryAndFinance: React.FC = () => {
               {/* Card 1: Receitas */}
               <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-5 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] text-emerald-650 dark:text-emerald-500 font-bold uppercase tracking-wider block mb-1">Entradas (Receitas)</span>
+                  <span className="text-[10px] text-emerald-650 dark:text-emerald-500 font-bold uppercase tracking-wider block mb-1">{t('inventory.lbl_revenues')}</span>
                   <h4 className="text-2xl font-black text-stone-800 dark:text-stone-100 tracking-tight">R$ {totalRevenue.toFixed(2)}</h4>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
@@ -567,7 +568,7 @@ export const InventoryAndFinance: React.FC = () => {
               {/* Card 2: Despesas */}
               <div className="bg-rose-500/5 border border-rose-500/10 rounded-2xl p-5 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] text-rose-650 dark:text-rose-500 font-bold uppercase tracking-wider block mb-1">Saídas (Despesas)</span>
+                  <span className="text-[10px] text-rose-650 dark:text-rose-500 font-bold uppercase tracking-wider block mb-1">{t('inventory.lbl_expenses')}</span>
                   <h4 className="text-2xl font-black text-stone-800 dark:text-stone-100 tracking-tight">R$ {totalExpense.toFixed(2)}</h4>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 flex items-center justify-center">
@@ -582,7 +583,7 @@ export const InventoryAndFinance: React.FC = () => {
                   : 'bg-rose-500/5 border-rose-500/10 text-rose-650'
               }`}>
                 <div>
-                  <span className="text-[10px] text-stone-500 dark:text-stone-400 font-bold uppercase tracking-wider block mb-1">Lucro Líquido</span>
+                  <span className="text-[10px] text-stone-500 dark:text-stone-400 font-bold uppercase tracking-wider block mb-1">{t('inventory.lbl_net_profit')}</span>
                   <h4 className="text-2xl font-black text-stone-800 dark:text-stone-100 tracking-tight">R$ {netProfit.toFixed(2)}</h4>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-olive-500/10 text-olive-650 flex items-center justify-center">
@@ -593,43 +594,42 @@ export const InventoryAndFinance: React.FC = () => {
             </div>
 
             {/* DRE Simplificado + Lançamento Rápido */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
+            <div className="grid grid-cols-3 gap-6">
               {/* DRE Simplificado */}
               <div className="lg:col-span-2 bg-stone-50/50 dark:bg-stone-950/20 border border-stone-150 dark:border-stone-800 rounded-2xl p-5 space-y-4">
                 <h4 className="font-extrabold text-sm text-stone-850 dark:text-stone-100 pb-2 border-b border-stone-150 dark:border-stone-800">
-                  DRE Simplificado (Demonstração do Resultado do Exercício)
+                  {t('inventory.dre_title')}
                 </h4>
-
+ 
                 <div className="space-y-2 text-[11px] font-bold">
                   <div className="flex items-center justify-between py-1 border-b border-stone-150/60 dark:border-stone-800/40">
-                    <span className="text-stone-600 dark:text-stone-300">Receita Operacional Bruta (Venda de Serviços/Produtos)</span>
+                    <span className="text-stone-600 dark:text-stone-300">{t('inventory.dre_gross_revenue')}</span>
                     <span className="text-stone-800 dark:text-stone-100">R$ {totalRevenue.toFixed(2)}</span>
                   </div>
                   <div className="flex items-center justify-between py-1 border-b border-stone-150/60 dark:border-stone-800/40 text-rose-600 dark:text-rose-455">
-                    <span>(-) Custos Variáveis (Mercadoria/Insumos)</span>
+                    <span>{t('inventory.dre_variable_costs')}</span>
                     <span>- R$ {(totalRevenue * 0.25).toFixed(2)}</span>
                   </div>
                   <div className="flex items-center justify-between py-1 border-b border-stone-150/60 dark:border-stone-800/40 text-emerald-600 dark:text-emerald-500">
-                    <span>(=) Margem de Contribuição</span>
+                    <span>{t('inventory.dre_contribution_margin')}</span>
                     <span>R$ {(totalRevenue * 0.75).toFixed(2)}</span>
                   </div>
                   <div className="flex items-center justify-between py-1 border-b border-stone-150/60 dark:border-stone-800/40 text-rose-650 dark:text-rose-455">
-                    <span>(-) Despesas Fixas (Aluguel, Equipe, Software)</span>
+                    <span>{t('inventory.dre_fixed_expenses')}</span>
                     <span>- R$ {totalExpense.toFixed(2)}</span>
                   </div>
                   <div className="flex items-center justify-between pt-3 text-sm font-black border-t border-dashed border-stone-250">
-                    <span className="text-stone-800 dark:text-stone-100">(=) Lucro Líquido do Exercício</span>
+                    <span className="text-stone-800 dark:text-stone-100">{t('inventory.dre_net_income')}</span>
                     <span className={netProfit >= 0 ? 'text-emerald-605 dark:text-emerald-555' : 'text-rose-600'}>
                       R$ {(totalRevenue * 0.75 - totalExpense).toFixed(2)}
                     </span>
                   </div>
                 </div>
               </div>
-
+ 
               {/* Lançamento Rápido */}
               <div className="lg:col-span-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-850 rounded-2xl p-5 space-y-4">
-                <h4 className="font-extrabold text-sm text-stone-800 dark:text-stone-100">Novo Lançamento</h4>
+                <h4 className="font-extrabold text-sm text-stone-800 dark:text-stone-100">{t('inventory.tx_new')}</h4>
                 <form onSubmit={handleAddTransaction} className="space-y-3.5">
                   
                   <div className="grid grid-cols-2 gap-2">
@@ -642,7 +642,7 @@ export const InventoryAndFinance: React.FC = () => {
                           : 'border-stone-200 dark:border-stone-800 text-stone-500'
                       }`}
                     >
-                      Receita
+                      {t('inventory.tx_revenue')}
                     </button>
                     <button
                       type="button"
@@ -653,25 +653,25 @@ export const InventoryAndFinance: React.FC = () => {
                           : 'border-stone-200 dark:border-stone-800 text-stone-500'
                       }`}
                     >
-                      Despesa
+                      {t('inventory.tx_expense')}
                     </button>
                   </div>
-
+ 
                   <div className="space-y-1">
-                    <label className="block text-[9px] text-stone-550 font-bold uppercase">Descrição *</label>
+                    <label className="block text-[9px] text-stone-550 font-bold uppercase">{t('inventory.lbl_desc')}</label>
                     <input
                       type="text"
                       required
-                      placeholder="Ex: Consulta Veterinária Mel"
+                      placeholder={t('inventory.placeholder_desc')}
                       value={txDesc}
                       onChange={(e) => setTxDesc(e.target.value)}
-                      className="w-full bg-stone-50 dark:bg-stone-950 rounded-xl p-2.5 border border-stone-200 dark:border-stone-800 outline-none text-xs"
+                      className="w-full bg-stone-50 dark:bg-stone-955 rounded-xl p-2.5 border border-stone-200 dark:border-stone-800 outline-none text-xs"
                     />
                   </div>
-
+ 
                   <div className="grid grid-cols-2 gap-2.5">
                     <div className="space-y-1">
-                      <label className="block text-[9px] text-stone-550 font-bold uppercase">Valor (R$) *</label>
+                      <label className="block text-[9px] text-stone-550 font-bold uppercase">{t('inventory.lbl_val')}</label>
                       <input
                         type="number"
                         step="0.01"
@@ -679,15 +679,15 @@ export const InventoryAndFinance: React.FC = () => {
                         placeholder="150.00"
                         value={txVal}
                         onChange={(e) => setTxVal(e.target.value)}
-                        className="w-full bg-stone-50 dark:bg-stone-950 rounded-xl p-2.5 border border-stone-200 dark:border-stone-800 outline-none text-xs"
+                        className="w-full bg-stone-50 dark:bg-stone-955 rounded-xl p-2.5 border border-stone-200 dark:border-stone-800 outline-none text-xs"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="block text-[9px] text-stone-550 font-bold uppercase">Forma de Pago</label>
+                      <label className="block text-[9px] text-stone-550 font-bold uppercase">{t('inventory.lbl_method')}</label>
                       <select
                         value={txMethod}
                         onChange={(e) => setTxMethod(e.target.value as any)}
-                        className="w-full bg-stone-50 dark:bg-stone-950 rounded-xl p-2.5 border border-stone-200 dark:border-stone-800 outline-none text-xs font-semibold"
+                        className="w-full bg-stone-50 dark:bg-stone-955 rounded-xl p-2.5 border border-stone-200 dark:border-stone-800 outline-none text-xs font-semibold"
                       >
                         <option value="pix">Pix</option>
                         <option value="credit_card">Cartão</option>
@@ -696,45 +696,44 @@ export const InventoryAndFinance: React.FC = () => {
                       </select>
                     </div>
                   </div>
-
+ 
                   <button
                     type="submit"
                     className="w-full bg-olive-650 hover:bg-olive-750 text-white font-bold py-2 rounded-xl text-xs cursor-pointer shadow-md shadow-olive-900/10"
                   >
-                    Confirmar Lançamento
+                    {t('inventory.btn_confirm_tx')}
                   </button>
-
+ 
                 </form>
               </div>
-
             </div>
 
             {/* Listagem de Transações */}
             <div className="space-y-3 pt-4">
               <h4 className="font-extrabold text-sm text-stone-850 dark:text-stone-100 pb-2 border-b border-stone-150 dark:border-stone-800">
-                Histórico de Lançamentos do Caixa
+                {t('inventory.tx_history')}
               </h4>
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-stone-150 dark:border-stone-800 text-[10px] text-stone-500 uppercase font-bold bg-stone-50/50 dark:bg-stone-950/20">
-                      <th className="py-2.5 px-3">Data</th>
-                      <th className="py-2.5 px-3">Descrição</th>
-                      <th className="py-2.5 px-3">Categoria</th>
-                      <th className="py-2.5 px-3">Forma</th>
-                      <th className="py-2.5 px-3 text-right">Valor</th>
+                    <tr className="border-b border-stone-150 dark:border-stone-800 text-[10px] text-stone-500 uppercase font-bold bg-stone-50/50 dark:bg-stone-955/20">
+                      <th className="py-2.5 px-3">{t('inventory.th_date')}</th>
+                      <th className="py-2.5 px-3">{t('inventory.lbl_desc').replace(' *', '')}</th>
+                      <th className="py-2.5 px-3">{t('inventory.lbl_category')}</th>
+                      <th className="py-2.5 px-3">{t('inventory.lbl_method').replace(' de Pago', '')}</th>
+                      <th className="py-2.5 px-3 text-right">{t('inventory.lbl_val').replace(' (R$) *', '').replace(' ($) *', '')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-stone-150 dark:divide-stone-850 font-medium">
                     {transactions.map((tx) => (
-                      <tr key={tx.id} className="hover:bg-stone-50/30 dark:hover:bg-stone-950/10">
+                      <tr key={tx.id} className="hover:bg-stone-50/30 dark:hover:bg-stone-955/10">
                         <td className="py-3 px-3 text-[10px] text-stone-400 font-mono">{tx.date.split('-').reverse().join('/')}</td>
                         <td className="py-3 px-3">
                           <div className="font-extrabold text-stone-800 dark:text-stone-200">{tx.description}</div>
                         </td>
                         <td className="py-3 px-3">
                           <span className="text-[9px] bg-stone-100 dark:bg-stone-950 text-stone-500 px-2 py-0.5 rounded-full border dark:border-stone-800">
-                            {tx.category}
+                            {tx.category === 'Serviços' ? t('dashboard.vet_consultations').toLowerCase() : tx.category}
                           </span>
                         </td>
                         <td className="py-3 px-3">

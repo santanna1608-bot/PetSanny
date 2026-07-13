@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppointments } from '../contexts/AppointmentsContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { tutorsService } from '../lib/supabaseClient';
 import type { Tutor } from '../lib/supabaseClient';
 import { 
@@ -33,6 +34,7 @@ interface ChatMessage {
 
 export const CRMControl: React.FC = () => {
   const { currentTenant, addToast } = useAppointments();
+  const { t } = useLanguage();
   const [tutors, setTutors] = useState<Tutor[]>([]);
   const [pipeline, setPipeline] = useState<PipelineLead[]>([]);
   const [selectedTutorId, setSelectedTutorId] = useState<string | null>(null);
@@ -72,7 +74,7 @@ export const CRMControl: React.FC = () => {
             };
           });
           setPipeline(defaultPipeline);
-          localStorage.setItem(cacheKey, JSON.stringify(defaultPipeline));
+          savePipelineToStorage(defaultPipeline);
         }
 
         // Inicializa conversas padrão no WhatsApp
@@ -80,17 +82,32 @@ export const CRMControl: React.FC = () => {
         const cachedChats = localStorage.getItem(chatKey);
 
         if (cachedChats) {
-          setMessages(JSON.parse(cachedChats));
+          const parsed = JSON.parse(cachedChats);
+          // Se for cache antigo com strings em português fixas, força migração
+          const firstChatId = Object.keys(parsed)[0];
+          if (firstChatId && parsed[firstChatId].length > 0 && parsed[firstChatId][0].text.startsWith('Olá,')) {
+            const initialChats: Record<string, ChatMessage[]> = {};
+            list.forEach(tut => {
+              initialChats[tut.id] = [
+                { id: '1', sender: 'agent', text: 'crm.chat.welcome', time: '09:15' },
+                { id: '2', sender: 'tutor', text: 'crm.chat.tutor_reply', time: '09:20' }
+              ];
+            });
+            setMessages(initialChats);
+            saveChatsToStorage(initialChats);
+          } else {
+            setMessages(parsed);
+          }
         } else {
           const initialChats: Record<string, ChatMessage[]> = {};
-          list.forEach(t => {
-            initialChats[t.id] = [
-              { id: '1', sender: 'agent', text: `Olá, ${t.name}! Tudo bem com o seu pet? Gostaríamos de lembrar que já faz algum tempo desde a última visita dele conosco. Vamos agendar um retorno?`, time: '09:15' },
-              { id: '2', sender: 'tutor', text: 'Oi! Tudo bem sim. Verdade, estava pensando em agendar um banho para este sábado. Vocês têm horário?', time: '09:20' }
+          list.forEach(tut => {
+            initialChats[tut.id] = [
+              { id: '1', sender: 'agent', text: 'crm.chat.welcome', time: '09:15' },
+              { id: '2', sender: 'tutor', text: 'crm.chat.tutor_reply', time: '09:20' }
             ];
           });
           setMessages(initialChats);
-          localStorage.setItem(chatKey, JSON.stringify(initialChats));
+          saveChatsToStorage(initialChats);
         }
 
         if (list.length > 0) {
@@ -117,7 +134,7 @@ export const CRMControl: React.FC = () => {
     const updated = pipeline.map(p => p.tutorId === tutorId ? { ...p, stage: newStage } : p);
     setPipeline(updated);
     savePipelineToStorage(updated);
-    addToast('Pipeline Atualizado', 'Estágio do cliente alterado com sucesso.', 'info');
+    addToast(t('crm.toast_pipe_title'), t('crm.toast_pipe_desc'), 'info');
   };
 
   // Enviar Mensagem no WhatsApp
@@ -157,7 +174,7 @@ export const CRMControl: React.FC = () => {
       const tutorReply: ChatMessage = {
         id: Math.random().toString(36).substring(2, 9),
         sender: 'tutor',
-        text: 'Perfeito! Obrigado pelo aviso, vou verificar aqui e já te confirmo.',
+        text: 'crm.chat.auto_reply',
         time: timeStr
       };
       
@@ -174,14 +191,14 @@ export const CRMControl: React.FC = () => {
       setConversionRate(prev => Math.min(parseFloat((prev + 0.3).toFixed(1)), 100));
       setRevenueGenerated(prev => prev + 120.00);
       
-      addToast('Nova Mensagem', 'O tutor acabou de responder a sua mensagem.', 'success');
+      addToast(t('crm.toast_msg_title'), t('crm.toast_msg_desc'), 'success');
     }, 1800);
   };
 
   // Enviar Arquivos Rápidos
   const handleSendFile = (type: 'pdf' | 'image') => {
     const fileName = type === 'pdf' ? 'Receita_Veterinaria_Digital.pdf' : 'Comprovante_Agendamento.png';
-    handleSendMessage(undefined, `Enviei um arquivo para você: ${fileName}`, { name: fileName, type });
+    handleSendMessage(undefined, t('crm.chat.file_sent').replace('{name}', fileName), { name: fileName, type });
   };
 
   // Gatilhos de Automação Rápida
@@ -193,30 +210,30 @@ export const CRMControl: React.FC = () => {
     let text = '';
     switch (campaignType) {
       case 'confirm':
-        text = `Olá, ${tutor.name}! Confirmamos o atendimento do seu pet amanhã na PetSanny às 14h00. Aguardamos vocês!`;
+        text = 'crm.chat.camp_confirm';
         break;
       case 'vaccine':
-        text = `⚠️ Alerta de Saúde PetSanny: A vacina anual do seu pet está vencendo esta semana. Vamos agendar uma consulta preventiva de imunização?`;
+        text = 'crm.chat.camp_vaccine';
         break;
       case 'promo':
-        text = `🎉 Cupom Especial PetSanny! Seu pet merece um dia de rei. Use o cupom VIPPET e ganhe 15% de desconto no Banho + Hidratação nesta semana.`;
+        text = 'crm.chat.camp_promo';
         break;
     }
     
     handleSendMessage(undefined, text);
-    addToast('Campanha Disparada', `Mensagem automatizada de "${campaignType}" enviada via WhatsApp.`, 'success');
+    addToast(t('crm.toast_camp_title'), t('crm.toast_camp_desc').replace('{type}', t(`crm.btn_${campaignType === 'confirm' ? 'reminder' : campaignType}`)), 'success');
   };
 
   const getStageLabel = (stage: PipelineLead['stage']) => {
     switch (stage) {
-      case 'lead': return 'Lead / Prospecção';
-      case 'first_contact': return 'Primeiro Contato';
-      case 'first_consult': return 'Primeira Consulta';
-      case 'active': return 'Cliente Ativo';
-      case 'treatment': return 'Em Tratamento';
-      case 'return_pending': return 'Retorno Pendente';
-      case 'inactive': return 'Inativo';
-      case 'vip': return 'Fidelizado / VIP';
+      case 'lead': return t('crm.stage.lead');
+      case 'first_contact': return t('crm.stage.first_contact');
+      case 'first_consult': return t('crm.stage.first_consult');
+      case 'active': return t('crm.stage.active');
+      case 'treatment': return t('crm.stage.treatment');
+      case 'return_pending': return t('crm.stage.return_pending');
+      case 'inactive': return t('crm.stage.inactive');
+      case 'vip': return t('crm.stage.vip');
     }
   };
 
@@ -237,31 +254,31 @@ export const CRMControl: React.FC = () => {
       {/* 1. Painel de Indicadores de Desempenho do CRM */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs">
-          <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">Disparos</span>
+          <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">{t('crm.stats_sent')}</span>
           <span className="text-lg font-black text-stone-800 dark:text-stone-100">{sentCount}</span>
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs">
-          <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">Entregues</span>
+          <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">{t('crm.stats_delivered')}</span>
           <span className="text-lg font-black text-stone-800 dark:text-stone-100">{deliveredCount}</span>
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs">
-          <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">Visualizadas</span>
+          <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">{t('crm.stats_read')}</span>
           <span className="text-lg font-black text-stone-800 dark:text-stone-100">{readCount}</span>
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs">
-          <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">Respostas</span>
+          <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">{t('crm.stats_replied')}</span>
           <span className="text-lg font-black text-stone-800 dark:text-stone-100">{replyCount}</span>
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs flex items-center justify-between">
           <div>
-            <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">Conversão</span>
+            <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">{t('crm.stats_conversion')}</span>
             <span className="text-lg font-black text-emerald-600 dark:text-emerald-450">{conversionRate}%</span>
           </div>
           <Percent className="w-5 h-5 text-emerald-500 opacity-60" />
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200/85 dark:border-stone-800 p-4 rounded-xl shadow-xs flex items-center justify-between">
           <div>
-            <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">Faturamento</span>
+            <span className="text-[9px] text-stone-450 dark:text-stone-500 font-bold uppercase block mb-1">{t('crm.stats_revenue')}</span>
             <span className="text-lg font-black text-olive-650 dark:text-olive-400">R$ {revenueGenerated.toFixed(0)}</span>
           </div>
           <TrendingUp className="w-5 h-5 text-olive-500 opacity-60" />
@@ -272,12 +289,12 @@ export const CRMControl: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         
         {/* Pipeline Kanban Slim */}
-        <div className="xl:col-span-1 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-5 space-y-4">
+        <div className="xl:col-span-1 bg-white dark:bg-stone-900 rounded-2xl border border-stone-205 dark:border-stone-850 p-5 space-y-4">
           <h4 className="font-extrabold text-sm text-stone-800 dark:text-stone-100 flex items-center gap-1.5 pb-3 border-b border-stone-150 dark:border-stone-800">
             <UserCheck className="w-4 h-4 text-olive-600" />
-            CRM Pipeline de Tutores
+            {t('crm.pipeline_title')}
           </h4>
-
+ 
           <div className="space-y-3.5 max-h-[500px] overflow-y-auto pr-1">
             {pipeline.map((lead) => (
               <div 
@@ -296,7 +313,7 @@ export const CRMControl: React.FC = () => {
                     {lead.tutorName}
                   </span>
                   <span className="text-[8px] bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 font-extrabold px-2 py-0.5 rounded-full border dark:border-stone-750">
-                    Estágio
+                    {t('crm.stage_label')}
                   </span>
                 </div>
                 
@@ -323,43 +340,43 @@ export const CRMControl: React.FC = () => {
         <div className="xl:col-span-2 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden flex flex-col h-[550px]">
           
           {/* Header do WhatsApp */}
-          <div className="p-4 bg-stone-50 dark:bg-stone-950 border-b border-stone-150 dark:border-stone-850 flex items-center justify-between shrink-0">
+          <div className="p-4 bg-stone-50 dark:bg-stone-955 border-b border-stone-150 dark:border-stone-850 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-olive-500/10 dark:bg-olive-950 text-olive-650 dark:text-olive-400 flex items-center justify-center font-bold border dark:border-stone-850 shadow-inner">
                 {selectedTutorId ? tutors.find(t => t.id === selectedTutorId)?.name[0].toUpperCase() : 'W'}
               </div>
               <div>
                 <h5 className="font-extrabold text-stone-805 dark:text-stone-100 leading-tight">
-                  {selectedTutorId ? tutors.find(t => t.id === selectedTutorId)?.name : 'Selecione um tutor'}
+                  {selectedTutorId ? tutors.find(t => t.id === selectedTutorId)?.name : t('crm.select_tutor')}
                 </h5>
                 <span className="text-[9px] text-stone-450 font-bold uppercase tracking-wider flex items-center gap-1">
                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
-                  Simulador de WhatsApp Ativo
+                  {t('crm.sim_active')}
                 </span>
               </div>
             </div>
-
+ 
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handleTriggerCampaign('confirm')}
                 className="inline-flex items-center gap-1 text-[9px] bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-olive-550 font-extrabold px-2.5 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 cursor-pointer"
               >
                 <CheckCheck className="w-3 h-3 text-emerald-500" />
-                Lembrete
+                {t('crm.btn_reminder')}
               </button>
               <button
                 onClick={() => handleTriggerCampaign('vaccine')}
                 className="inline-flex items-center gap-1 text-[9px] bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-olive-550 font-extrabold px-2.5 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 cursor-pointer"
               >
                 <Zap className="w-3.5 h-3.5 text-amber-500" />
-                Vacina
+                {t('crm.btn_vaccine')}
               </button>
               <button
                 onClick={() => handleTriggerCampaign('promo')}
                 className="inline-flex items-center gap-1 text-[9px] bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-olive-550 font-extrabold px-2.5 py-1.5 rounded-lg text-stone-600 dark:text-stone-300 cursor-pointer"
               >
                 <Sparkles className="w-3 h-3 text-purple-500" />
-                Cupom
+                {t('crm.btn_coupon')}
               </button>
             </div>
           </div>
@@ -378,7 +395,11 @@ export const CRMControl: React.FC = () => {
                       ? 'bg-olive-600 text-white rounded-tr-none' 
                       : 'bg-white dark:bg-stone-850 text-stone-850 dark:text-stone-150 border border-stone-150 dark:border-stone-800 rounded-tl-none'
                   }`}>
-                    <p className="text-[11.5px] leading-relaxed font-medium">{msg.text}</p>
+                    <p className="text-[11.5px] leading-relaxed font-medium">
+                      {msg.text.startsWith('crm.chat.')
+                        ? t(msg.text).replace('{name}', tutors.find(t => t.id === selectedTutorId)?.name || 'Tutor')
+                        : msg.text}
+                    </p>
                     
                     {/* Anexo de Arquivo */}
                     {msg.attachment && (
@@ -390,7 +411,7 @@ export const CRMControl: React.FC = () => {
                           <span className="text-[9px] font-bold truncate max-w-[120px]">{msg.attachment.name}</span>
                         </div>
                         <button className="text-[8px] font-extrabold uppercase bg-stone-900/10 dark:bg-white/10 hover:bg-stone-900/20 px-2 py-1 rounded">
-                          Ver
+                          {t('crm.btn_view')}
                         </button>
                       </div>
                     )}
@@ -415,7 +436,7 @@ export const CRMControl: React.FC = () => {
                 type="button"
                 onClick={() => handleSendFile('pdf')}
                 className="p-2 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-850 rounded-lg cursor-pointer"
-                title="Anexar PDF"
+                title={t('crm.attach_pdf')}
               >
                 <FileText className="w-4 h-4" />
               </button>
@@ -423,15 +444,15 @@ export const CRMControl: React.FC = () => {
                 type="button"
                 onClick={() => handleSendFile('image')}
                 className="p-2 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-850 rounded-lg cursor-pointer"
-                title="Anexar Imagem"
+                title={t('crm.attach_image')}
               >
                 <ImageIcon className="w-4 h-4" />
               </button>
             </div>
-
+ 
             <input
               type="text"
-              placeholder="Digite uma mensagem..."
+              placeholder={t('crm.input_placeholder')}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               className="flex-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-4 py-2.5 outline-none text-xs focus:border-olive-500"
