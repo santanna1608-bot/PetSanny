@@ -526,6 +526,11 @@ const translations: Record<Language, Record<string, string>> = {
     'crm.chat.camp_confirm': 'Olá, {name}! Confirmamos o atendimento do seu pet amanhã na PetSanny às 14h00. Aguardamos vocês!',
     'crm.chat.camp_vaccine': '⚠️ Alerta de Saúde PetSanny: A vacina anual do seu pet está vencendo esta semana. Vamos agendar uma consulta preventiva de imunização?',
     'crm.chat.camp_promo': '🎉 Cupom Especial PetSanny! Seu pet merece um dia de rei. Use o cupom VIPPET e ganhe 15% de desconto no Banho + Hidratação nesta semana.',
+    'crm.empty_title': 'Seu Pipeline do CRM está Vazio',
+    'crm.empty_desc': 'Não encontramos nenhum tutor cadastrado neste tenant. Você pode adicionar clientes na aba "Clientes & Pets" ou clicar abaixo para gerar tutores de demonstração para testar.',
+    'crm.empty_button': 'Gerar Tutores de Demonstração',
+    'crm.toast_demo_created_title': 'Dados de Teste Criados',
+    'crm.toast_demo_created_desc': 'Tutores e pets de demonstração gerados com sucesso para este tenant!',
   },
   en: {
     // Sidebar
@@ -1044,6 +1049,11 @@ const translations: Record<Language, Record<string, string>> = {
     'crm.chat.camp_confirm': 'Hello, {name}! We confirm your pet\'s appointment tomorrow at PetSanny at 2:00 PM. We look forward to seeing you!',
     'crm.chat.camp_vaccine': '⚠️ PetSanny Health Alert: Your pet\'s annual vaccine is expiring this week. Let\'s schedule a preventive immunization visit?',
     'crm.chat.camp_promo': '🎉 PetSanny Special Coupon! Your pet deserves a royal treatment. Use the coupon VIPPET and get 15% off Bath + Hydration this week.',
+    'crm.empty_title': 'Your CRM Pipeline is Empty',
+    'crm.empty_desc': 'We did not find any registered tutors in this tenant. You can add clients in the "Customers & Pets" tab or click below to generate demo tutors for testing.',
+    'crm.empty_button': 'Generate Demo Tutors',
+    'crm.toast_demo_created_title': 'Demo Data Created',
+    'crm.toast_demo_created_desc': 'Demo tutors and pets successfully generated for this tenant!',
   },
   es: {
     // Sidebar
@@ -1562,6 +1572,11 @@ const translations: Record<Language, Record<string, string>> = {
     'crm.chat.camp_confirm': '¡Hola, {name}! Confirmamos la cita de tu mascota mañana en PetSanny a las 14h00. ¡Los esperamos!',
     'crm.chat.camp_vaccine': '⚠️ Alerta de Salud PetSanny: La vacuna anual de tu mascota vence esta semana. ¿Programamos una consulta preventiva de inmunización?',
     'crm.chat.camp_promo': '🎉 ¡Cupón Especial PetSanny! Tu mascota se merece un día de rey. Usa el cupón VIPPET y obtén un 15% de descuento en Baño + Hidratación esta semana.',
+    'crm.empty_title': 'Su Pipeline de CRM está Vacío',
+    'crm.empty_desc': 'No encontramos tutores registrados en este tenant. Puede agregar clientes en la pestaña "Clientes y Mascotas" o hacer clic a continuación para generar tutores de demostración.',
+    'crm.empty_button': 'Generar Tutores de Demostración',
+    'crm.toast_demo_created_title': 'Datos de Prueba Creados',
+    'crm.toast_demo_created_desc': '¡Tutores y mascotas de demostración generados con éxito para este tenant!',
   }
 };
 

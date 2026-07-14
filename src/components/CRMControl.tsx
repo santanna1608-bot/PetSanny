@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppointments } from '../contexts/AppointmentsContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { tutorsService } from '../lib/supabaseClient';
+import { tutorsService, petsService } from '../lib/supabaseClient';
 import type { Tutor } from '../lib/supabaseClient';
 import { 
   Send, 
@@ -120,6 +120,54 @@ export const CRMControl: React.FC = () => {
 
     loadCRMData();
   }, [currentTenant]);
+
+  const handleGenerateDemoTutors = async () => {
+    try {
+      // Cria 3 tutores de teste para o tenant atual
+      const t1 = await tutorsService.create({ tenant_id: currentTenant.id, name: 'Ana Souza', email: 'ana.souza@gmail.com', phone: '(11) 98888-7777' });
+      const t2 = await tutorsService.create({ tenant_id: currentTenant.id, name: 'Bruno Lima', email: 'bruno.lima@outlook.com', phone: '(11) 97777-6666' });
+      const t3 = await tutorsService.create({ tenant_id: currentTenant.id, name: 'Eliana Costa', email: 'eliana.costa@hotmail.com', phone: '(21) 96666-5555' });
+      
+      // Cria os pets correspondentes no banco
+      await petsService.create({ tenant_id: currentTenant.id, tutor_id: t1.id, name: 'Toby', species: 'Cão (Golden Retriever)', breed: 'Golden Retriever', birth_date: '2021-05-10' });
+      await petsService.create({ tenant_id: currentTenant.id, tutor_id: t2.id, name: 'Mel', species: 'Cão (Lhasa Apso)', breed: 'Lhasa Apso', birth_date: '2023-01-15' });
+      await petsService.create({ tenant_id: currentTenant.id, tutor_id: t3.id, name: 'Luna', species: 'Gata (SRD)', breed: 'SRD', birth_date: '2020-08-20' });
+
+      addToast(t('crm.toast_demo_created_title'), t('crm.toast_demo_created_desc'), 'success');
+      
+      // Recarrega os dados do CRM
+      const newList = await tutorsService.list(currentTenant.id);
+      setTutors(newList);
+      
+      const defaultPipeline: PipelineLead[] = newList.map((t, index) => {
+        const stages: PipelineLead['stage'][] = ['lead', 'first_contact', 'active', 'vip'];
+        return {
+          tutorId: t.id,
+          tutorName: t.name,
+          stage: stages[index % stages.length]
+        };
+      });
+      setPipeline(defaultPipeline);
+      savePipelineToStorage(defaultPipeline);
+      
+      const initialChats: Record<string, ChatMessage[]> = {};
+      newList.forEach(tut => {
+        initialChats[tut.id] = [
+          { id: '1', sender: 'agent', text: 'crm.chat.welcome', time: '09:15' },
+          { id: '2', sender: 'tutor', text: 'crm.chat.tutor_reply', time: '09:20' }
+        ];
+      });
+      setMessages(initialChats);
+      saveChatsToStorage(initialChats);
+      
+      if (newList.length > 0) {
+        setSelectedTutorId(newList[0].id);
+      }
+    } catch (err) {
+      console.error(err);
+      addToast('Erro', 'Não foi possível gerar dados de demonstração.', 'warning');
+    }
+  };
 
   const savePipelineToStorage = (updatedPipeline: PipelineLead[]) => {
     localStorage.setItem(`petsanny_crm_pipeline_${currentTenant.id}`, JSON.stringify(updatedPipeline));
@@ -254,31 +302,31 @@ export const CRMControl: React.FC = () => {
       {/* 1. Painel de Indicadores de Desempenho do CRM */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs">
-          <span className="text-[9px] text-stone-450 dark:text-stone-350 font-bold uppercase block mb-1">{t('crm.stats_sent')}</span>
+          <span className="text-[9px] text-stone-500 dark:text-stone-400 font-bold uppercase block mb-1">{t('crm.stats_sent')}</span>
           <span className="text-lg font-black text-stone-800 dark:text-stone-100">{sentCount}</span>
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs">
-          <span className="text-[9px] text-stone-450 dark:text-stone-350 font-bold uppercase block mb-1">{t('crm.stats_delivered')}</span>
+          <span className="text-[9px] text-stone-500 dark:text-stone-400 font-bold uppercase block mb-1">{t('crm.stats_delivered')}</span>
           <span className="text-lg font-black text-stone-800 dark:text-stone-100">{deliveredCount}</span>
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs">
-          <span className="text-[9px] text-stone-450 dark:text-stone-350 font-bold uppercase block mb-1">{t('crm.stats_read')}</span>
+          <span className="text-[9px] text-stone-500 dark:text-stone-400 font-bold uppercase block mb-1">{t('crm.stats_read')}</span>
           <span className="text-lg font-black text-stone-800 dark:text-stone-100">{readCount}</span>
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs">
-          <span className="text-[9px] text-stone-450 dark:text-stone-350 font-bold uppercase block mb-1">{t('crm.stats_replied')}</span>
+          <span className="text-[9px] text-stone-500 dark:text-stone-400 font-bold uppercase block mb-1">{t('crm.stats_replied')}</span>
           <span className="text-lg font-black text-stone-800 dark:text-stone-100">{replyCount}</span>
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 rounded-xl shadow-xs flex items-center justify-between">
           <div>
-            <span className="text-[9px] text-stone-450 dark:text-stone-350 font-bold uppercase block mb-1">{t('crm.stats_conversion')}</span>
+            <span className="text-[9px] text-stone-500 dark:text-stone-400 font-bold uppercase block mb-1">{t('crm.stats_conversion')}</span>
             <span className="text-lg font-black text-emerald-600 dark:text-emerald-450">{conversionRate}%</span>
           </div>
           <Percent className="w-5 h-5 text-emerald-500 opacity-60" />
         </div>
         <div className="bg-white dark:bg-stone-900 border border-stone-200/85 dark:border-stone-800 p-4 rounded-xl shadow-xs flex items-center justify-between">
           <div>
-            <span className="text-[9px] text-stone-450 dark:text-stone-350 font-bold uppercase block mb-1">{t('crm.stats_revenue')}</span>
+            <span className="text-[9px] text-stone-500 dark:text-stone-400 font-bold uppercase block mb-1">{t('crm.stats_revenue')}</span>
             <span className="text-lg font-black text-olive-650 dark:text-olive-400">R$ {revenueGenerated.toFixed(0)}</span>
           </div>
           <TrendingUp className="w-5 h-5 text-olive-500 opacity-60" />
@@ -286,10 +334,30 @@ export const CRMControl: React.FC = () => {
       </div>
 
       {/* 2. Grid Principal: Pipeline + Simulador WhatsApp */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        
-        {/* Pipeline Kanban Slim */}
-        <div className="xl:col-span-1 bg-white dark:bg-stone-900 rounded-2xl border border-stone-205 dark:border-stone-850 p-5 space-y-4">
+      {tutors.length === 0 ? (
+        <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-8 text-center space-y-5 animate-fade-in flex flex-col items-center justify-center py-16">
+          <div className="w-16 h-16 rounded-2xl bg-olive-500/10 dark:bg-olive-950/40 text-olive-650 dark:text-olive-400 flex items-center justify-center mb-2 shadow-inner">
+            <UserCheck className="w-8 h-8" />
+          </div>
+          <div className="max-w-md space-y-2">
+            <h4 className="font-extrabold text-base text-stone-800 dark:text-stone-100">{t('crm.empty_title')}</h4>
+            <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed font-medium">
+              {t('crm.empty_desc')}
+            </p>
+          </div>
+          <button
+            onClick={handleGenerateDemoTutors}
+            className="inline-flex items-center gap-2 bg-olive-600 hover:bg-olive-750 text-white font-extrabold px-5 py-3 rounded-xl cursor-pointer shadow-md hover:shadow-lg transition-all scale-100 hover:scale-102 active:scale-98 text-xs shrink-0"
+          >
+            <Sparkles className="w-4 h-4 text-emerald-350" />
+            <span>{t('crm.empty_button')}</span>
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          
+          {/* Pipeline Kanban Slim */}
+          <div className="xl:col-span-1 bg-white dark:bg-stone-900 rounded-2xl border border-stone-205 dark:border-stone-850 p-5 space-y-4">
           <h4 className="font-extrabold text-sm text-stone-800 dark:text-stone-100 flex items-center gap-1.5 pb-3 border-b border-stone-150 dark:border-stone-800">
             <UserCheck className="w-4 h-4 text-olive-600" />
             {t('crm.pipeline_title')}
@@ -469,6 +537,7 @@ export const CRMControl: React.FC = () => {
         </div>
 
       </div>
+      )}
 
     </div>
   );
