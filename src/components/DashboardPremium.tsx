@@ -359,10 +359,10 @@ export const DashboardPremium: React.FC = () => {
               />
 
               {/* Pontos de Destaque com Popups Hover */}
-              <circle cx="150" cy="110" r="5" fill="#10b981" stroke="#ffffff" strokeWidth="1.5" className="hover:scale-150 transition-all cursor-pointer" />
-              <circle cx="370" cy="80" r="5" fill="#10b981" stroke="#ffffff" strokeWidth="1.5" className="hover:scale-150 transition-all cursor-pointer" />
-              <circle cx="180" cy="80" r="5" fill="#2563eb" stroke="#ffffff" strokeWidth="1.5" className="hover:scale-150 transition-all cursor-pointer" />
-              <circle cx="410" cy="40" r="5" fill="#2563eb" stroke="#ffffff" strokeWidth="1.5" className="hover:scale-150 transition-all cursor-pointer" />
+              <circle cx="150" cy="110" r="5" fill="#10b981" stroke="#ffffff" strokeWidth="1.5" className="hover:scale-150 transition-all cursor-pointer" style={{ transformOrigin: 'center', transformBox: 'fill-box' }} />
+              <circle cx="370" cy="80" r="5" fill="#10b981" stroke="#ffffff" strokeWidth="1.5" className="hover:scale-150 transition-all cursor-pointer" style={{ transformOrigin: 'center', transformBox: 'fill-box' }} />
+              <circle cx="180" cy="80" r="5" fill="#2563eb" stroke="#ffffff" strokeWidth="1.5" className="hover:scale-150 transition-all cursor-pointer" style={{ transformOrigin: 'center', transformBox: 'fill-box' }} />
+              <circle cx="410" cy="40" r="5" fill="#2563eb" stroke="#ffffff" strokeWidth="1.5" className="hover:scale-150 transition-all cursor-pointer" style={{ transformOrigin: 'center', transformBox: 'fill-box' }} />
 
               {/* Rótulos Eixo X */}
               <text x="40" y="190" textAnchor="middle" className="text-[9px] fill-stone-450 dark:fill-stone-500 font-bold font-sans">{language === 'en' ? 'Day 01' : language === 'es' ? 'Día 01' : 'Dia 01'}</text>
@@ -396,7 +396,7 @@ export const DashboardPremium: React.FC = () => {
           <div className="flex justify-center my-4 relative">
             <svg width="150" height="150" viewBox="0 0 36 36" className="w-36 h-36">
               {/* Background Circle */}
-              <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f5f5f4" strokeWidth="3" />
+              <circle cx="18" cy="18" r="15.915" fill="none" strokeWidth="3" className="stroke-stone-150 dark:stroke-stone-800" />
               
               {/* Banho (40%) - Emerald */}
               <circle cx="18" cy="18" r="15.915" fill="none" stroke="#10b981" strokeWidth="4.2" strokeDasharray="40 60" strokeDashoffset="100" />
@@ -423,7 +423,7 @@ export const DashboardPremium: React.FC = () => {
             </div>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1.5 text-stone-600 dark:text-stone-300">
-                <span className="w-2 h-2 rounded-full bg-amber-650" /> {t('dashboard.haircut')}
+                <span className="w-2 h-2 rounded-full bg-amber-500" /> {t('dashboard.haircut')}
               </span>
               <span>25% (107)</span>
             </div>
@@ -435,7 +435,7 @@ export const DashboardPremium: React.FC = () => {
             </div>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1.5 text-stone-600 dark:text-stone-300">
-                <span className="w-2 h-2 rounded-full bg-purple-650" /> {t('dashboard.vaccines_others')}
+                <span className="w-2 h-2 rounded-full bg-purple-500" /> {t('dashboard.vaccines_others')}
               </span>
               <span>15% (65)</span>
             </div>
