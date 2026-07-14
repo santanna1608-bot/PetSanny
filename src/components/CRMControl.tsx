@@ -390,7 +390,7 @@ export const CRMControl: React.FC = () => {
                   <select
                     value={lead.stage}
                     onChange={(e) => handleMoveStage(lead.tutorId, e.target.value as any)}
-                    className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-850 rounded-lg p-2 font-semibold text-[10px] cursor-pointer"
+                    className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-850 text-stone-800 dark:text-stone-100 rounded-lg p-2 font-semibold text-[10px] cursor-pointer"
                   >
                     {stagesList.map(stG => (
                       <option key={stG} value={stG}>
@@ -461,7 +461,7 @@ export const CRMControl: React.FC = () => {
                   <div className={`max-w-[70%] p-3 rounded-2xl shadow-xs space-y-1.5 ${
                     isAgent 
                       ? 'bg-olive-600 text-white rounded-tr-none' 
-                      : 'bg-white dark:bg-stone-850 text-stone-850 dark:text-stone-150 border border-stone-150 dark:border-stone-800 rounded-tl-none'
+                      : 'bg-white dark:bg-stone-850 text-stone-800 dark:text-stone-200 border border-stone-150 dark:border-stone-800 rounded-tl-none'
                   }`}>
                     <p className="text-[11.5px] leading-relaxed font-medium">
                       {msg.text.startsWith('crm.chat.')
@@ -523,7 +523,7 @@ export const CRMControl: React.FC = () => {
               placeholder={t('crm.input_placeholder')}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              className="flex-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-4 py-2.5 outline-none text-xs focus:border-olive-500"
+              className="flex-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-4 py-2.5 outline-none text-xs focus:border-olive-500 text-stone-800 dark:text-stone-100"
             />
             
             <button
