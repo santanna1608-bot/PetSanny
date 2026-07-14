@@ -531,6 +531,7 @@ const translations: Record<Language, Record<string, string>> = {
     'crm.empty_button': 'Gerar Tutores de Demonstração',
     'crm.toast_demo_created_title': 'Dados de Teste Criados',
     'crm.toast_demo_created_desc': 'Tutores e pets de demonstração gerados com sucesso para este tenant!',
+    'crm.chat.welcome_short': 'Olá! Gostaríamos de falar sobre o seu pet.',
   },
   en: {
     // Sidebar
@@ -1054,6 +1055,7 @@ const translations: Record<Language, Record<string, string>> = {
     'crm.empty_button': 'Generate Demo Tutors',
     'crm.toast_demo_created_title': 'Demo Data Created',
     'crm.toast_demo_created_desc': 'Demo tutors and pets successfully generated for this tenant!',
+    'crm.chat.welcome_short': 'Hello! We would like to talk about your pet.',
   },
   es: {
     // Sidebar
@@ -1577,6 +1579,7 @@ const translations: Record<Language, Record<string, string>> = {
     'crm.empty_button': 'Generar Tutores de Demostración',
     'crm.toast_demo_created_title': 'Datos de Prueba Creados',
     'crm.toast_demo_created_desc': '¡Tutores y mascotas de demostración generados con éxito para este tenant!',
+    'crm.chat.welcome_short': '¡Hola! Nos gustaría hablar sobre su mascota.',
   }
 };
 

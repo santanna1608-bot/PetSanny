@@ -272,6 +272,23 @@ export const CRMControl: React.FC = () => {
     addToast(t('crm.toast_camp_title'), t('crm.toast_camp_desc').replace('{type}', t(`crm.btn_${campaignType === 'confirm' ? 'reminder' : campaignType}`)), 'success');
   };
 
+  const getWhatsAppLink = (text: string = '') => {
+    if (!selectedTutorId) return '#';
+    const tutor = tutors.find(t => t.id === selectedTutorId);
+    if (!tutor || !tutor.phone) return '#';
+    const cleanPhone = tutor.phone.replace(/\D/g, '');
+    // Se o telefone não começar com o código do país, assume 55 (Brasil)
+    const formattedPhone = cleanPhone.length <= 11 ? `55${cleanPhone}` : cleanPhone;
+    
+    // Resolve chaves de tradução dinâmicas antes de enviar para o WhatsApp real
+    let resolvedText = text;
+    if (text.startsWith('crm.chat.')) {
+      resolvedText = t(text).replace('{name}', tutor.name);
+    }
+    
+    return `https://api.whatsapp.com/send?phone=${formattedPhone}${resolvedText ? `&text=${encodeURIComponent(resolvedText)}` : ''}`;
+  };
+
   const getStageLabel = (stage: PipelineLead['stage']) => {
     switch (stage) {
       case 'lead': return t('crm.stage.lead');
@@ -414,13 +431,29 @@ export const CRMControl: React.FC = () => {
                 {selectedTutorId ? tutors.find(t => t.id === selectedTutorId)?.name[0].toUpperCase() : 'W'}
               </div>
               <div>
-                <h5 className="font-extrabold text-stone-805 dark:text-stone-100 leading-tight">
+                <h5 className="font-extrabold text-stone-855 dark:text-stone-100 leading-tight">
                   {selectedTutorId ? tutors.find(t => t.id === selectedTutorId)?.name : t('crm.select_tutor')}
                 </h5>
-                <span className="text-[9px] text-stone-450 dark:text-stone-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
-                  {t('crm.sim_active')}
-                </span>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-[9px] text-stone-450 dark:text-stone-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
+                    {t('crm.sim_active')}
+                  </span>
+                  {selectedTutorId && tutors.find(t => t.id === selectedTutorId)?.phone && (
+                    <a
+                      href={getWhatsAppLink(t('crm.chat.welcome_short'))}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[8.5px] bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-1.5 py-0.5 rounded-md shadow-xs cursor-pointer transition-all hover:scale-103 leading-none"
+                      title="Abrir WhatsApp Oficial"
+                    >
+                      <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 fill-current" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.858.002-2.634-1.023-5.11-2.885-6.974C16.526 1.909 14.053.886 11.419.887 5.985.887 1.56 5.308 1.556 10.746c-.002 1.776.467 3.511 1.358 5.044l-1.015 3.707 3.792-.993z"/>
+                      </svg>
+                      <span>WhatsApp Real</span>
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
  
@@ -517,21 +550,58 @@ export const CRMControl: React.FC = () => {
                 <ImageIcon className="w-4 h-4" />
               </button>
             </div>
+             <input
+               type="text"
+               placeholder={t('crm.input_placeholder')}
+               value={inputText}
+               onChange={(e) => setInputText(e.target.value)}
+               className="flex-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-4 py-2.5 outline-none text-xs focus:border-olive-500 text-stone-800 dark:text-stone-100"
+             />
+             
+             <div className="flex items-center gap-1.5">
+               <button
+                 type="submit"
+                 className="p-2.5 bg-olive-600 hover:bg-olive-750 text-white rounded-xl shadow-md cursor-pointer hover:scale-105 transition-all flex items-center justify-center shrink-0"
+                 title="Enviar no Simulador"
+               >
+                 <Send className="w-4 h-4" />
+               </button>
  
-            <input
-              type="text"
-              placeholder={t('crm.input_placeholder')}
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              className="flex-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-4 py-2.5 outline-none text-xs focus:border-olive-500 text-stone-800 dark:text-stone-100"
-            />
-            
-            <button
-              type="submit"
-              className="p-2.5 bg-olive-600 hover:bg-olive-750 text-white rounded-xl shadow-md cursor-pointer hover:scale-105 transition-all"
-            >
-              <Send className="w-4 h-4" />
-            </button>
+               {selectedTutorId && tutors.find(t => t.id === selectedTutorId)?.phone && (
+                 <a
+                   href={getWhatsAppLink(inputText)}
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   onClick={() => {
+                     if (inputText.trim()) {
+                       const now = new Date();
+                       const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                       const newMsg: ChatMessage = {
+                         id: Math.random().toString(36).substring(2, 9),
+                         sender: 'agent',
+                         text: inputText,
+                         time: timeStr
+                       };
+                       const updatedTutorMessages = [...(messages[selectedTutorId] || []), newMsg];
+                       const newChats = {
+                         ...messages,
+                         [selectedTutorId]: updatedTutorMessages
+                       };
+                       setMessages(newChats);
+                       saveChatsToStorage(newChats);
+                       setInputText('');
+                       setSentCount(prev => prev + 1);
+                     }
+                   }}
+                   className="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md cursor-pointer hover:scale-105 transition-all flex items-center justify-center shrink-0"
+                   title="Enviar via WhatsApp Real"
+                 >
+                   <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current animate-pulse-soft" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.858.002-2.634-1.023-5.11-2.885-6.974C16.526 1.909 14.053.886 11.419.887 5.985.887 1.56 5.308 1.556 10.746c-.002 1.776.467 3.511 1.358 5.044l-1.015 3.707 3.792-.993z"/>
+                   </svg>
+                 </a>
+               )}
+             </div>
           </form>
 
         </div>
