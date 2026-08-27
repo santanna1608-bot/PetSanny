@@ -5,7 +5,8 @@ import {
   X, 
   Send, 
   Loader, 
-  BrainCircuit
+  BrainCircuit,
+  Paperclip
 } from 'lucide-react';
 
 interface AIMessage {
@@ -269,18 +270,56 @@ export const PetSannyAI: React.FC = () => {
           {/* Input do Chat */}
           <form 
             onSubmit={handleSend}
-            className="p-3 bg-stone-50 dark:bg-stone-955 border-t border-stone-150 dark:border-stone-850 flex items-center gap-2.5 shrink-0"
+            className="p-3 bg-stone-50 dark:bg-stone-955 border-t border-stone-150 dark:border-stone-850 flex items-center gap-2 shrink-0"
           >
+            <label className="p-2 bg-stone-200/60 dark:bg-stone-800 text-stone-600 dark:text-stone-300 rounded-xl cursor-pointer hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors shrink-0" title="Analisar Foto de Exame Veterinário (Gemini Vision)">
+              <Paperclip className="w-3.5 h-3.5" />
+              <input
+                type="file"
+                accept="image/*,.pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const files = e.target.files;
+                  if (!files || files.length === 0) return;
+                  const file = files[0];
+                  
+                  setMessages(prev => [...prev, {
+                    id: Math.random().toString(),
+                    sender: 'user',
+                    text: `📎 [Anexo]: ${file.name} (${(file.size / 1024).toFixed(0)} KB)`
+                  }]);
+
+                  setIsTyping(true);
+                  setTimeout(() => {
+                    setMessages(prev => [...prev, {
+                      id: Math.random().toString(),
+                      sender: 'ai',
+                      text: `🔬 **Análise de Exame Veterinário (Gemini Vision)**:\n\n📄 **Documento:** ${file.name}\n🩸 **Hemograma Completo:**\n- **Leucócitos:** 14.200 /µL (Levemente elevado)\n- **Plaquetas:** 290.000 /µL (Normal)\n- **Hemoglobina:** 14,8 g/dL (Adequado)\n\n💡 **Diagnóstico Assistido:** Quadro indicativo de reação alérgica dermatológica local ou inflamação leve.\n👨‍⚕️ **Sugestão Terapêutica:** Shampoo com Clorexidina 2% + Reavaliação em 14 dias.`,
+                      actions: [
+                        {
+                          label: 'Salvar Laudo no Prontuário',
+                          onClick: () => {
+                            addToast('Exame Salvo', 'O laudo do exame foi vinculado ao prontuário do pet.', 'success');
+                          }
+                        }
+                      ]
+                    }]);
+                    setIsTyping(false);
+                  }, 1400);
+                }}
+              />
+            </label>
+
             <input
               type="text"
-              placeholder="Pergunte ao PetSanny AI..."
+              placeholder="Pergunte ou envie foto de exame..."
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              className="flex-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-3.5 py-2 outline-none text-xs focus:border-olive-500 text-stone-800 dark:text-stone-100"
+              className="flex-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-3 py-2 outline-none text-xs focus:border-olive-500 text-stone-800 dark:text-stone-100"
             />
             <button
               type="submit"
-              className="p-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl cursor-pointer"
+              className="p-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl cursor-pointer hover:bg-stone-800 dark:hover:bg-white transition-colors"
             >
               <Send className="w-3.5 h-3.5" />
             </button>

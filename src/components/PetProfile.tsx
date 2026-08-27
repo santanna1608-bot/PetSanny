@@ -17,8 +17,10 @@ import {
   Stethoscope,
   Syringe,
   Activity,
-  Heart
+  Heart,
+  Printer
 } from 'lucide-react';
+import { generatePrescriptionPDF } from '../lib/pdfGenerator';
 
 interface PetProfileProps {
   pet: Pet;
@@ -332,9 +334,42 @@ export const PetProfile: React.FC<PetProfileProps> = ({ pet, tutor, onBack }) =>
           <ArrowLeft className="w-4 h-4" />
           <span>Voltar para Clientes & Pets</span>
         </button>
-        <span className="text-[10px] bg-stone-100 dark:bg-stone-950 font-extrabold uppercase px-2.5 py-1 rounded-full border dark:border-stone-850">
-          PRONTUÁRIO DIGITAL
-        </span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => generatePrescriptionPDF({
+              clinicName: 'Clínica Veterinária PetSanny',
+              petName: pet.name,
+              petSpecies: pet.species,
+              tutorName: tutor.name,
+              vetName: 'Dra. Julia Silveira',
+              crmv: 'CRMV-SP 45.892',
+              date: new Date().toLocaleDateString('pt-BR'),
+              medications: [
+                {
+                  name: 'Shampoo Hipoalergênico Clorexidina 2%',
+                  dosage: 'Aplicação tópica no banho',
+                  frequency: '2x por semana',
+                  duration: '15 dias',
+                  notes: 'Deixar agir por 10 minutos na pelagem antes de enxaguar com água morna.'
+                },
+                {
+                  name: 'Simparic 20mg (Antipulgas e Carrapatos)',
+                  dosage: '1 comprimido mastigável',
+                  frequency: 'Dose única mensal',
+                  duration: '30 dias de proteção'
+                }
+              ],
+              observations: petNotes || 'Paciente dócil. Recomenda-se retorno preventivo em 30 dias.'
+            })}
+            className="inline-flex items-center gap-1.5 bg-olive-600 hover:bg-olive-700 text-white font-bold px-3 py-1.5 rounded-lg text-[11px] transition-all shadow-sm cursor-pointer"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>Emitir Receita PDF</span>
+          </button>
+          <span className="text-[10px] bg-stone-100 dark:bg-stone-950 font-extrabold uppercase px-2.5 py-1 rounded-full border dark:border-stone-850">
+            PRONTUÁRIO DIGITAL
+          </span>
+        </div>
       </div>
 
       {/* Header Premium do Pet */}
