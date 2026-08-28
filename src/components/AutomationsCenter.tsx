@@ -58,10 +58,9 @@ export const AutomationsCenter: React.FC = () => {
     return localStorage.getItem(`petsanny_evo_apikey_${currentTenant.id}`) || 'evo_token_secret_99882233';
   });
 
-  // Estado da imagem real do QR Code (base64 ou url)
   const [qrCodeData, setQrCodeData] = useState<string | null>(null);
   const [qrLoading, setQrLoading] = useState(false);
-  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Salva credenciais no LocalStorage
   const handleSaveCredentials = (newUrl: string, newInst: string, newKey: string) => {
