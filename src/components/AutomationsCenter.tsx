@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAppointments } from '../contexts/AppointmentsContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import confetti from 'canvas-confetti';
+import QRCode from 'qrcode';
 import { 
   Zap, 
   MessageSquare, 
@@ -269,7 +270,17 @@ export const AutomationsCenter: React.FC = () => {
           } else if (b64.startsWith('iVBORw0KGg') || b64.startsWith('/9j/')) {
             setQrCodeData(`data:image/png;base64,${b64}`);
           } else {
-            setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(b64)}`);
+            try {
+              const localQrDataUrl = await QRCode.toDataURL(b64, {
+                margin: 2,
+                width: 320,
+                color: { dark: '#000000', light: '#ffffff' }
+              });
+              setQrCodeData(localQrDataUrl);
+            } catch (err) {
+              console.error('Erro ao renderizar QRCode localmente:', err);
+              setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(b64)}`);
+            }
           }
         } else {
           setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https://petsanny.com/whatsapp/connect?instance=${instanceName}&t=${Date.now()}`);
@@ -361,7 +372,7 @@ export const AutomationsCenter: React.FC = () => {
       setIsConnected(true);
       localStorage.setItem(`petsanny_wa_connected_${currentTenant.id}`, 'true');
       
-      const phoneToSave = connectedPhone || '5521981062423';
+      const phoneToSave = connectedPhone || '5521983667676';
       setConnectedPhone(phoneToSave);
       localStorage.setItem(`petsanny_wa_phone_${currentTenant.id}`, phoneToSave);
 
@@ -379,17 +390,46 @@ export const AutomationsCenter: React.FC = () => {
     }, 1200);
   };
 
-  const handleDisconnect = () => {
+  const handleDisconnect = async () => {
     setIsConnected(false);
     localStorage.setItem(`petsanny_wa_connected_${currentTenant.id}`, 'false');
     addToast('WhatsApp Desconectado', `O canal de WhatsApp da instância ${instanceName} foi desconectado.`, 'warning');
+
+    const cleanUrl = apiUrl.replace(/\/$/, '');
+    try {
+      await fetch(`${cleanUrl}/instance/logout/${instanceName}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': apiKey
+        }
+      });
+    } catch {
+      // ignora se offline
+    }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     setIsConnected(false);
     localStorage.setItem(`petsanny_wa_connected_${currentTenant.id}`, 'false');
-    addToast('Instância Resetada', `A sessão da instância ${instanceName} foi reinicializada. Leia o QR Code novamente.`, 'info');
+    addToast('Instância Resetada', `A sessão da instância ${instanceName} foi purgada no servidor.`, 'info');
+
+    const cleanUrl = apiUrl.replace(/\/$/, '');
+    try {
+      await fetch(`${cleanUrl}/instance/logout/${instanceName}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'apikey': apiKey }
+      });
+      await fetch(`${cleanUrl}/instance/delete/${instanceName}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'apikey': apiKey }
+      });
+    } catch {
+      // ignora se offline
+    }
+
     setIsQrModalOpen(true);
+    fetchEvolutionQrCode();
   };
 
   return (
