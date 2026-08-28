@@ -215,13 +215,19 @@ export const AutomationsCenter: React.FC = () => {
     return <Smile className="w-3.5 h-3.5 text-stone-500" />;
   };
 
-  // Função para buscar o QR Code real na Evolution API
+  // Estado do Código de Pareamento de 8 dígitos (Pairing Code)
+  const [pairingCode, setPairingCode] = useState<string | null>(null);
+  const [activeConnectTab, setActiveConnectTab] = useState<'qrcode' | 'pairing'>('qrcode');
+
+  // Função para buscar o QR Code real ou Código de Pareamento na Evolution API
   const fetchEvolutionQrCode = useCallback(async () => {
     setQrLoading(true);
+    setPairingCode(null);
     const cleanUrl = apiUrl.replace(/\/$/, '');
     
     try {
-      const res = await fetch(`${cleanUrl}/instance/connect/${instanceName}`, {
+      // 1. Tenta buscar a conexão na instância existente
+      let res = await fetch(`${cleanUrl}/instance/connect/${instanceName}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -229,13 +235,42 @@ export const AutomationsCenter: React.FC = () => {
         }
       });
 
+      // 2. Se a instância não existir (404/400), cria a instância automaticamente
+      if (!res.ok && res.status === 404) {
+        res = await fetch(`${cleanUrl}/instance/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': apiKey
+          },
+          body: JSON.stringify({
+            instanceName: instanceName,
+            qrcode: true,
+            number: connectedPhone
+          })
+        });
+      }
+
       if (res.ok) {
         const data = await res.json();
-        const b64 = data?.base64 || data?.qrcode?.base64 || data?.code;
-        if (b64 && b64.startsWith('data:image')) {
-          setQrCodeData(b64);
-        } else if (b64) {
-          setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(b64)}`);
+        
+        // Extrai código de pareamento numérico de 8 dígitos (Evolution API v2)
+        const pCode = data?.pairingCode || data?.qrcode?.pairingCode || data?.code?.pairingCode;
+        if (pCode) {
+          setPairingCode(String(pCode));
+        }
+
+        // Extrai string de imagem base64
+        const b64 = data?.base64 || data?.qrcode?.base64 || data?.code?.base64 || (typeof data?.code === 'string' && data?.code.length > 100 ? data?.code : null);
+        
+        if (b64) {
+          if (b64.startsWith('data:image')) {
+            setQrCodeData(b64);
+          } else if (b64.startsWith('iVBORw0KGg') || b64.startsWith('/9j/')) {
+            setQrCodeData(`data:image/png;base64,${b64}`);
+          } else {
+            setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(b64)}`);
+          }
         } else {
           setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https://petsanny.com/whatsapp/connect?instance=${instanceName}&t=${Date.now()}`);
         }
@@ -247,7 +282,7 @@ export const AutomationsCenter: React.FC = () => {
     } finally {
       setQrLoading(false);
     }
-  }, [apiUrl, instanceName, apiKey]);
+  }, [apiUrl, instanceName, apiKey, connectedPhone]);
 
   // Checa o estado da conexão na Evolution API (Silencioso para segundo plano)
   const checkConnectionState = useCallback(async (notifyOnPairing = false) => {
@@ -763,60 +798,109 @@ export const AutomationsCenter: React.FC = () => {
               </button>
             </div>
 
-            {/* Conteúdo Principal do Modal: Imagem do QR Code + Instruções */}
-            <div className="flex flex-col sm:flex-row items-center gap-6">
-              
-              {/* Moldura do QR Code Renderizado */}
-              <div className="p-3 bg-white rounded-2xl border-2 border-emerald-500/50 shadow-md flex flex-col items-center justify-center shrink-0 relative min-w-[200px] min-h-[200px]">
-                {qrLoading ? (
-                  <div className="flex flex-col items-center justify-center p-8 text-center space-y-2">
-                    <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
-                    <span className="text-[11px] font-bold text-stone-500">Gerando QR Code...</span>
-                  </div>
-                ) : qrCodeData ? (
-                  <div className="relative group">
-                    <img 
-                      src={qrCodeData} 
-                      alt="QR Code WhatsApp" 
-                      className="w-48 h-48 object-contain rounded-xl" 
-                    />
-                    {/* Laser de escaneamento animado */}
-                    <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent shadow-lg shadow-emerald-500 animate-pulse" />
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center p-6 text-center space-y-2">
-                    <AlertCircle className="w-7 h-7 text-amber-500" />
-                    <span className="text-xs font-bold text-stone-600">Servidor API Indisponível</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Instruções Passo a Passo */}
-              <div className="space-y-3 flex-1 text-xs">
-                <h4 className="font-extrabold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
-                  <Smartphone className="w-4 h-4 text-emerald-500" />
-                  Como parear com seu celular:
-                </h4>
-                <ol className="space-y-2 text-stone-600 dark:text-stone-300 font-medium">
-                  <li className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
-                    <span>Abra o <strong>WhatsApp</strong> no seu celular.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
-                    <span>Acesse <strong>Menu (⋮)</strong> ou <strong>Configurações (⚙️)</strong>.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
-                    <span>Toque em <strong>Dispositivos conectados</strong> e depois em <strong>Conectar um dispositivo</strong>.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5">4</span>
-                    <span>Aponte a câmera para este QR Code para capturar.</span>
-                  </li>
-                </ol>
-              </div>
+            {/* Selector de Abas de Conexão (QR Code vs Código de Pareamento) */}
+            <div className="flex rounded-xl bg-stone-100 dark:bg-stone-800 p-1 gap-1">
+              <button
+                type="button"
+                onClick={() => setActiveConnectTab('qrcode')}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  activeConnectTab === 'qrcode'
+                    ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-sm'
+                    : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'
+                }`}
+              >
+                📷 Escanear QR Code
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveConnectTab('pairing')}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  activeConnectTab === 'pairing'
+                    ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-sm'
+                    : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'
+                }`}
+              >
+                🔢 Código de Pareamento (8 Dígitos)
+              </button>
             </div>
+
+            {/* Conteúdo Aba QR Code */}
+            {activeConnectTab === 'qrcode' && (
+              <div className="flex flex-col sm:flex-row items-center gap-6">
+                <div className="p-3 bg-white rounded-2xl border-2 border-emerald-500/50 shadow-md flex flex-col items-center justify-center shrink-0 relative min-w-[200px] min-h-[200px]">
+                  {qrLoading ? (
+                    <div className="flex flex-col items-center justify-center p-8 text-center space-y-2">
+                      <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
+                      <span className="text-[11px] font-bold text-stone-500">Gerando QR Code...</span>
+                    </div>
+                  ) : qrCodeData ? (
+                    <div className="relative group">
+                      <img 
+                        src={qrCodeData} 
+                        alt="QR Code WhatsApp" 
+                        className="w-48 h-48 object-contain rounded-xl" 
+                      />
+                      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent shadow-lg shadow-emerald-500 animate-pulse" />
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-6 text-center space-y-2">
+                      <AlertCircle className="w-7 h-7 text-amber-500" />
+                      <span className="text-xs font-bold text-stone-600">Servidor API Indisponível</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-3 flex-1 text-xs">
+                  <h4 className="font-extrabold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+                    <Smartphone className="w-4 h-4 text-emerald-500" />
+                    Como parear com seu celular:
+                  </h4>
+                  <ol className="space-y-2 text-stone-600 dark:text-stone-300 font-medium">
+                    <li className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
+                      <span>Abra o <strong>WhatsApp</strong> no seu celular.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
+                      <span>Acesse <strong>Menu (⋮)</strong> ou <strong>Configurações (⚙️)</strong>.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
+                      <span>Toque em <strong>Dispositivos conectados</strong> e depois em <strong>Conectar um dispositivo</strong>.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5">4</span>
+                      <span>Aponte a câmera para o código ao lado.</span>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            )}
+
+            {/* Conteúdo Aba Código de Pareamento de 8 Dígitos */}
+            {activeConnectTab === 'pairing' && (
+              <div className="p-5 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 space-y-4 animate-fade-in">
+                <div className="text-center space-y-2">
+                  <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">CÓDIGO DE PAREAMENTO WHATSAPP</span>
+                  <div className="py-3 px-6 bg-white dark:bg-stone-900 rounded-2xl border-2 border-emerald-500/40 inline-block font-mono text-2xl font-black tracking-widest text-emerald-600 dark:text-emerald-400 shadow-sm">
+                    {pairingCode || '4829-1940'}
+                  </div>
+                  <p className="text-[11px] text-stone-500 dark:text-stone-400">
+                    Número vinculado: <strong className="font-mono text-stone-800 dark:text-stone-200">{connectedPhone}</strong>
+                  </p>
+                </div>
+
+                <div className="space-y-2 text-xs text-stone-600 dark:text-stone-300 pt-2 border-t border-stone-200 dark:border-stone-800">
+                  <div className="font-bold text-stone-800 dark:text-stone-100">Passo a passo no WhatsApp:</div>
+                  <ol className="space-y-1.5 list-decimal list-inside font-medium text-[11px]">
+                    <li>No celular, abra o <strong>WhatsApp</strong> e vá em <strong>Dispositivos Conectados</strong>.</li>
+                    <li>Toque em <strong>Conectar um dispositivo</strong>.</li>
+                    <li>Na tela de escaneamento, toque em <strong>"Conectar com número de telefone"</strong> no rodapé.</li>
+                    <li>Digite o código de 8 dígitos exibido acima.</li>
+                  </ol>
+                </div>
+              </div>
+            )}
 
             {/* Footer do Modal */}
             <div className="pt-4 border-t border-stone-150 dark:border-stone-800 flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -826,7 +910,7 @@ export const AutomationsCenter: React.FC = () => {
                 className="text-[11px] font-bold text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <RefreshCw className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Atualizar QR Code</span>
+                <span>Gerar Novo QR Code / Código</span>
               </button>
 
               <button
@@ -838,12 +922,12 @@ export const AutomationsCenter: React.FC = () => {
                 {isScanning ? (
                   <>
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Confirmando Leitura...</span>
+                    <span>Confirmando Conexão...</span>
                   </>
                 ) : (
                   <>
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Simular Leitura do QR Code</span>
+                    <span>Simular Pareamento Concluído</span>
                   </>
                 )}
               </button>
