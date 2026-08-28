@@ -39,56 +39,75 @@ export const AutomationsCenter: React.FC = () => {
   const { t } = useLanguage();
   const [rules, setRules] = useState<AutomationRule[]>([]);
 
-  // Instância única calculada dinamicamente para a clínica ativa (Multi-Tenant SaaS)
-  const tenantInstanceId = `petsanny_${currentTenant.id.replace(/[^a-zA-Z0-9]/g, '_')}`;
+  // Instância padrão única para o tenant ativo
+  const fallbackTenantInst = `petsanny_${currentTenant.id.replace(/[^a-zA-Z0-9]/g, '_')}`;
 
-  // Estado da Conexão isolado por Tenant
-  const [isConnected, setIsConnected] = useState(() => {
+  // Estado da Conexão e Credenciais isolado por Tenant com inicializadores lazy seguros
+  const [isConnected, setIsConnected] = useState<boolean>(() => {
     const saved = localStorage.getItem(`petsanny_wa_connected_${currentTenant.id}`);
     return saved !== null ? JSON.parse(saved) : true;
   });
-  
-  const [connectedUser] = useState(currentTenant.ownerName || 'Gestor Sanny');
-  
-  const [connectedPhone, setConnectedPhone] = useState(() => {
+
+  const [connectedUser] = useState<string>(currentTenant.ownerName || 'Gestor Sanny');
+
+  const [connectedPhone, setConnectedPhone] = useState<string>(() => {
     return localStorage.getItem(`petsanny_wa_phone_${currentTenant.id}`) || (currentTenant.id.includes('2') ? '5511998877665' : '5521981062423');
+  });
+
+  const [apiUrl, setApiUrl] = useState<string>(() => {
+    return localStorage.getItem(`petsanny_evo_url_${currentTenant.id}`) || 'https://evolution.lf7mkt.xyz/';
+  });
+
+  const [instanceName, setInstanceName] = useState<string>(() => {
+    return localStorage.getItem(`petsanny_evo_instance_${currentTenant.id}`) || 'petsanny_matriz';
+  });
+
+  const [apiKey, setApiKey] = useState<string>(() => {
+    return localStorage.getItem(`petsanny_evo_apikey_${currentTenant.id}`) || 'evo_token_secret_99882233';
   });
 
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [showConfigDetails, setShowConfigDetails] = useState(false);
 
-  // Credenciais do Servidor Master Evolution API (Gerenciado pelo dono do SaaS)
-  const [apiUrl, setApiUrl] = useState(() => {
-    return localStorage.getItem(`petsanny_evo_url_${currentTenant.id}`) || 'https://api.evolution.petsanny.com';
-  });
-  const [instanceName, setInstanceName] = useState(() => {
-    return localStorage.getItem(`petsanny_evo_instance_${currentTenant.id}`) || tenantInstanceId;
-  });
-  const [apiKey, setApiKey] = useState(() => {
-    return localStorage.getItem(`petsanny_evo_apikey_${currentTenant.id}`) || 'evo_token_secret_99882233';
-  });
-
-  // Atualiza instância se trocar de clínica/tenant no topo
-  useEffect(() => {
-    const newTenantInst = `petsanny_${currentTenant.id.replace(/[^a-zA-Z0-9]/g, '_')}`;
-    setInstanceName(newTenantInst);
-    const savedStatus = localStorage.getItem(`petsanny_wa_connected_${currentTenant.id}`);
-    setIsConnected(savedStatus !== null ? JSON.parse(savedStatus) : true);
-    setConnectedPhone(localStorage.getItem(`petsanny_wa_phone_${currentTenant.id}`) || (currentTenant.id.includes('2') ? '5511998877665' : '5521981062423'));
-  }, [currentTenant]);
-
   const [qrCodeData, setQrCodeData] = useState<string | null>(null);
   const [qrLoading, setQrLoading] = useState(false);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Sincroniza credenciais ao alternar de Tenant no topo sem sobrescrever valores salvos
+  useEffect(() => {
+    const savedUrl = localStorage.getItem(`petsanny_evo_url_${currentTenant.id}`);
+    const savedInst = localStorage.getItem(`petsanny_evo_instance_${currentTenant.id}`);
+    const savedKey = localStorage.getItem(`petsanny_evo_apikey_${currentTenant.id}`);
+    const savedStatus = localStorage.getItem(`petsanny_wa_connected_${currentTenant.id}`);
+    const savedPhone = localStorage.getItem(`petsanny_wa_phone_${currentTenant.id}`);
+
+    setApiUrl(savedUrl || 'https://evolution.lf7mkt.xyz/');
+    setInstanceName(savedInst || 'petsanny_matriz');
+    setApiKey(savedKey || 'evo_token_secret_99882233');
+
+    if (savedStatus !== null) {
+      setIsConnected(JSON.parse(savedStatus));
+    } else {
+      setIsConnected(true);
+    }
+
+    setConnectedPhone(savedPhone || (currentTenant.id.includes('2') ? '5511998877665' : '5521981062423'));
+  }, [currentTenant]);
+
+  // Função centralizada para salvar e persistir as credenciais da Evolution API no LocalStorage
   const handleSaveCredentials = (newUrl: string, newInst: string, newKey: string) => {
-    setApiUrl(newUrl);
-    setInstanceName(newInst);
-    setApiKey(newKey);
-    localStorage.setItem(`petsanny_evo_url_${currentTenant.id}`, newUrl);
-    localStorage.setItem(`petsanny_evo_instance_${currentTenant.id}`, newInst);
-    localStorage.setItem(`petsanny_evo_apikey_${currentTenant.id}`, newKey);
+    const cleanUrl = newUrl.trim();
+    const cleanInst = newInst.trim() || fallbackTenantInst;
+    const cleanKey = newKey.trim();
+
+    setApiUrl(cleanUrl);
+    setInstanceName(cleanInst);
+    setApiKey(cleanKey);
+
+    localStorage.setItem(`petsanny_evo_url_${currentTenant.id}`, cleanUrl);
+    localStorage.setItem(`petsanny_evo_instance_${currentTenant.id}`, cleanInst);
+    localStorage.setItem(`petsanny_evo_apikey_${currentTenant.id}`, cleanKey);
   };
 
   useEffect(() => {
@@ -196,7 +215,6 @@ export const AutomationsCenter: React.FC = () => {
     const cleanUrl = apiUrl.replace(/\/$/, '');
     
     try {
-      // 1. Tenta buscar o QR Code da Evolution API real (GET /instance/connect/:instance)
       const res = await fetch(`${cleanUrl}/instance/connect/${instanceName}`, {
         method: 'GET',
         headers: {
@@ -207,23 +225,18 @@ export const AutomationsCenter: React.FC = () => {
 
       if (res.ok) {
         const data = await res.json();
-        // Trata formatos da Evolution API v1 e v2
         const b64 = data?.base64 || data?.qrcode?.base64 || data?.code;
         if (b64 && b64.startsWith('data:image')) {
           setQrCodeData(b64);
         } else if (b64) {
-          // Se for string pura, gera via API de QR Code de alta precisão
           setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(b64)}`);
         } else {
-          // Fallback dinâmico com QR Code válido escaneável
           setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https://petsanny.com/whatsapp/connect?instance=${instanceName}&t=${Date.now()}`);
         }
       } else {
-        // Se a API retornar erro de conexão/auth, usa QR Code real escaneável de demonstração
         setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https://petsanny.com/whatsapp/connect?instance=${instanceName}&t=${Date.now()}`);
       }
     } catch {
-      // Fallback gracioso se o servidor não responder
       setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https://petsanny.com/whatsapp/connect?instance=${instanceName}&t=${Date.now()}`);
     } finally {
       setQrLoading(false);
@@ -232,6 +245,7 @@ export const AutomationsCenter: React.FC = () => {
 
   // Checa o estado da conexão na Evolution API (Polling)
   const checkConnectionState = useCallback(async () => {
+    if (!apiUrl || !instanceName) return;
     const cleanUrl = apiUrl.replace(/\/$/, '');
     try {
       const res = await fetch(`${cleanUrl}/instance/connectionState/${instanceName}`, {
@@ -246,24 +260,38 @@ export const AutomationsCenter: React.FC = () => {
         const state = data?.instance?.state || data?.state;
         if (state === 'open' || state === 'connected') {
           setIsConnected(true);
-          setIsQrModalOpen(false);
-          if (data?.instance?.owner || data?.owner) {
-            setConnectedPhone(data?.instance?.owner || data?.owner);
+          localStorage.setItem(`petsanny_wa_connected_${currentTenant.id}`, 'true');
+          
+          const phone = data?.instance?.owner || data?.owner;
+          if (phone) {
+            const cleanPhone = phone.replace(/[^0-9]/g, '');
+            setConnectedPhone(cleanPhone);
+            localStorage.setItem(`petsanny_wa_phone_${currentTenant.id}`, cleanPhone);
           }
-          addToast('WhatsApp Conectado!', 'Instância pareada e ativa na Evolution API.', 'success');
+
+          setIsQrModalOpen(false);
+          addToast('WhatsApp Conectado!', `Instância ${instanceName} pareada e ativa na Evolution API.`, 'success');
           confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+        } else if (state === 'close' || state === 'connecting' || state === 'DISCONNECTED') {
+          // Se o servidor retornar explicitamente que está fechado
+          setIsConnected(false);
+          localStorage.setItem(`petsanny_wa_connected_${currentTenant.id}`, 'false');
         }
       }
     } catch {
-      // ignora em ambiente offline
+      // ignora se offline
     }
-  }, [apiUrl, instanceName, apiKey, addToast]);
+  }, [apiUrl, instanceName, apiKey, currentTenant.id, addToast]);
+
+  // Checagem de estado no mount
+  useEffect(() => {
+    checkConnectionState();
+  }, [checkConnectionState]);
 
   // Efeito ao abrir o modal de QR Code
   useEffect(() => {
     if (isQrModalOpen) {
       fetchEvolutionQrCode();
-      // Polling a cada 3 segundos para detectar quando o celular leu o QR Code
       pollIntervalRef.current = setInterval(() => {
         checkConnectionState();
       }, 3000);
@@ -276,15 +304,20 @@ export const AutomationsCenter: React.FC = () => {
     };
   }, [isQrModalOpen, fetchEvolutionQrCode, checkConnectionState]);
 
-  // Simula pareamento manual com confetes
+  // Simula pareamento manual com confetes e salva o estado persistente
   const handleSimulateScan = () => {
     setIsScanning(true);
     setTimeout(() => {
       setIsScanning(false);
       setIsConnected(true);
       localStorage.setItem(`petsanny_wa_connected_${currentTenant.id}`, 'true');
+      
+      const phoneToSave = connectedPhone || '5521981062423';
+      setConnectedPhone(phoneToSave);
+      localStorage.setItem(`petsanny_wa_phone_${currentTenant.id}`, phoneToSave);
+
       setIsQrModalOpen(false);
-      addToast('WhatsApp Conectado!', `Instância pareada para ${currentTenant.name}.`, 'success');
+      addToast('WhatsApp Conectado!', `Instância ${instanceName} pareada com sucesso!`, 'success');
       try {
         confetti({
           particleCount: 80,
@@ -300,13 +333,13 @@ export const AutomationsCenter: React.FC = () => {
   const handleDisconnect = () => {
     setIsConnected(false);
     localStorage.setItem(`petsanny_wa_connected_${currentTenant.id}`, 'false');
-    addToast('WhatsApp Desconectado', `O canal de WhatsApp do tenant ${currentTenant.name} foi desconectado.`, 'warning');
+    addToast('WhatsApp Desconectado', `O canal de WhatsApp da instância ${instanceName} foi desconectado.`, 'warning');
   };
 
   const handleReset = () => {
     setIsConnected(false);
-    setConnectedPhone('5521981062423');
-    addToast('Instância Resetada', 'A sessão do WhatsApp foi reinicializada. Por favor, leia o QR Code novamente.', 'info');
+    localStorage.setItem(`petsanny_wa_connected_${currentTenant.id}`, 'false');
+    addToast('Instância Resetada', `A sessão da instância ${instanceName} foi reinicializada. Leia o QR Code novamente.`, 'info');
     setIsQrModalOpen(true);
   };
 
@@ -342,7 +375,7 @@ export const AutomationsCenter: React.FC = () => {
             </p>
           </div>
 
-          {/* Mini Cards no Canto Superior Direito (Status, Canal e WhatsApp) */}
+          {/* Mini Cards no Canto Superior Direito */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full xl:w-auto">
             <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 space-y-1">
               <div className="flex items-center justify-between text-[10px] font-bold text-stone-400 uppercase tracking-wider">
@@ -467,7 +500,7 @@ export const AutomationsCenter: React.FC = () => {
                         value={apiUrl}
                         onChange={(e) => setApiUrl(e.target.value)}
                         placeholder="https://evolution.lf7mkt.xyz/"
-                        className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-3 py-1.5 text-xs text-stone-800 dark:text-stone-200 outline-none focus:border-olive-500"
+                        className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-3 py-1.5 text-xs text-stone-800 dark:text-stone-200 outline-none focus:border-olive-500 font-mono"
                       />
                     </div>
                     <div>
@@ -477,7 +510,7 @@ export const AutomationsCenter: React.FC = () => {
                         value={instanceName}
                         onChange={(e) => setInstanceName(e.target.value)}
                         placeholder="petsanny_matriz"
-                        className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-3 py-1.5 text-xs text-stone-800 dark:text-stone-200 outline-none focus:border-olive-500"
+                        className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-3 py-1.5 text-xs text-stone-800 dark:text-stone-200 outline-none focus:border-olive-500 font-mono"
                       />
                     </div>
                     <div>
@@ -487,7 +520,7 @@ export const AutomationsCenter: React.FC = () => {
                         value={apiKey}
                         onChange={(e) => setApiKey(e.target.value)}
                         placeholder="Sua Global API Key"
-                        className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-3 py-1.5 text-xs text-stone-800 dark:text-stone-200 outline-none focus:border-olive-500"
+                        className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-3 py-1.5 text-xs text-stone-800 dark:text-stone-200 outline-none focus:border-olive-500 font-mono"
                       />
                     </div>
                   </div>
@@ -542,7 +575,7 @@ export const AutomationsCenter: React.FC = () => {
                     </div>
                     <div>
                       <div className="font-bold text-stone-800 dark:text-stone-200 text-xs">Configurar WhatsApp</div>
-                      <div className="text-[10px] text-stone-400 font-mono">{connectedPhone}</div>
+                      <div className="text-[10px] text-stone-400 font-mono">{instanceName}</div>
                     </div>
                   </div>
                 </div>
