@@ -243,8 +243,8 @@ export const AutomationsCenter: React.FC = () => {
     }
   }, [apiUrl, instanceName, apiKey]);
 
-  // Checa o estado da conexão na Evolution API (Polling)
-  const checkConnectionState = useCallback(async () => {
+  // Checa o estado da conexão na Evolution API (Silencioso para segundo plano)
+  const checkConnectionState = useCallback(async (notifyOnPairing = false) => {
     if (!apiUrl || !instanceName) return;
     const cleanUrl = apiUrl.replace(/\/$/, '');
     try {
@@ -269,11 +269,17 @@ export const AutomationsCenter: React.FC = () => {
             localStorage.setItem(`petsanny_wa_phone_${currentTenant.id}`, cleanPhone);
           }
 
-          setIsQrModalOpen(false);
-          addToast('WhatsApp Conectado!', `Instância ${instanceName} pareada e ativa na Evolution API.`, 'success');
-          confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+          // Se a checagem veio do polling do modal de QR Code, notifica uma única vez e fecha o modal
+          if (notifyOnPairing) {
+            setIsQrModalOpen(false);
+            addToast('WhatsApp Conectado!', `Instância ${instanceName} pareada e ativa na Evolution API.`, 'success');
+            try {
+              confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+            } catch (e) {
+              console.error(e);
+            }
+          }
         } else if (state === 'close' || state === 'connecting' || state === 'DISCONNECTED') {
-          // Se o servidor retornar explicitamente que está fechado
           setIsConnected(false);
           localStorage.setItem(`petsanny_wa_connected_${currentTenant.id}`, 'false');
         }
@@ -283,17 +289,17 @@ export const AutomationsCenter: React.FC = () => {
     }
   }, [apiUrl, instanceName, apiKey, currentTenant.id, addToast]);
 
-  // Checagem de estado no mount
+  // Checagem de estado silenciosa no mount (disparada uma única vez ao trocar de tenant)
   useEffect(() => {
-    checkConnectionState();
-  }, [checkConnectionState]);
+    checkConnectionState(false);
+  }, [currentTenant.id]);
 
   // Efeito ao abrir o modal de QR Code
   useEffect(() => {
     if (isQrModalOpen) {
       fetchEvolutionQrCode();
       pollIntervalRef.current = setInterval(() => {
-        checkConnectionState();
+        checkConnectionState(true);
       }, 3000);
     } else {
       if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
