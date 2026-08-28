@@ -51,7 +51,7 @@ export const AutomationsCenter: React.FC = () => {
   const [connectedUser] = useState<string>(currentTenant.ownerName || 'Gestor Sanny');
 
   const [connectedPhone, setConnectedPhone] = useState<string>(() => {
-    return localStorage.getItem(`petsanny_wa_phone_${currentTenant.id}`) || (currentTenant.id.includes('2') ? '5511998877665' : '5521981062423');
+    return localStorage.getItem(`petsanny_wa_phone_${currentTenant.id}`) || (currentTenant.id.includes('2') ? '5511998877665' : '5521983667676');
   });
 
   const [apiUrl, setApiUrl] = useState<string>(() => {
@@ -92,11 +92,11 @@ export const AutomationsCenter: React.FC = () => {
       setIsConnected(true);
     }
 
-    setConnectedPhone(savedPhone || (currentTenant.id.includes('2') ? '5511998877665' : '5521981062423'));
+    setConnectedPhone(savedPhone || (currentTenant.id.includes('2') ? '5511998877665' : '5521983667676'));
   }, [currentTenant]);
 
   // Função centralizada para salvar e persistir as credenciais da Evolution API no LocalStorage
-  const handleSaveCredentials = (newUrl: string, newInst: string, newKey: string) => {
+  const handleSaveCredentials = (newUrl: string, newInst: string, newKey: string, newPhone?: string) => {
     const cleanUrl = newUrl.trim();
     const cleanInst = newInst.trim() || fallbackTenantInst;
     const cleanKey = newKey.trim();
@@ -108,6 +108,12 @@ export const AutomationsCenter: React.FC = () => {
     localStorage.setItem(`petsanny_evo_url_${currentTenant.id}`, cleanUrl);
     localStorage.setItem(`petsanny_evo_instance_${currentTenant.id}`, cleanInst);
     localStorage.setItem(`petsanny_evo_apikey_${currentTenant.id}`, cleanKey);
+
+    if (newPhone) {
+      const cleanPhone = newPhone.replace(/[^0-9]/g, '');
+      setConnectedPhone(cleanPhone);
+      localStorage.setItem(`petsanny_wa_phone_${currentTenant.id}`, cleanPhone);
+    }
   };
 
   useEffect(() => {
@@ -262,11 +268,13 @@ export const AutomationsCenter: React.FC = () => {
           setIsConnected(true);
           localStorage.setItem(`petsanny_wa_connected_${currentTenant.id}`, 'true');
           
-          const phone = data?.instance?.owner || data?.owner;
-          if (phone) {
-            const cleanPhone = phone.replace(/[^0-9]/g, '');
-            setConnectedPhone(cleanPhone);
-            localStorage.setItem(`petsanny_wa_phone_${currentTenant.id}`, cleanPhone);
+          const rawOwner = data?.instance?.owner || data?.instance?.ownerJid || data?.instance?.number || data?.owner || data?.ownerJid || data?.number;
+          if (rawOwner) {
+            const cleanPhone = String(rawOwner).split('@')[0].split(':')[0].replace(/[^0-9]/g, '');
+            if (cleanPhone.length >= 10) {
+              setConnectedPhone(cleanPhone);
+              localStorage.setItem(`petsanny_wa_phone_${currentTenant.id}`, cleanPhone);
+            }
           }
 
           // Se a checagem veio do polling do modal de QR Code, notifica uma única vez e fecha o modal
@@ -498,7 +506,7 @@ export const AutomationsCenter: React.FC = () => {
                     <Link2 className="w-4 h-4 text-emerald-500" />
                     <span>Configuração da Instância Evolution API</span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     <div>
                       <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">URL da API</label>
                       <input
@@ -529,6 +537,16 @@ export const AutomationsCenter: React.FC = () => {
                         className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-3 py-1.5 text-xs text-stone-800 dark:text-stone-200 outline-none focus:border-olive-500 font-mono"
                       />
                     </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">Número do WhatsApp (DDD + Número)</label>
+                      <input
+                        type="text"
+                        value={connectedPhone}
+                        onChange={(e) => setConnectedPhone(e.target.value)}
+                        placeholder="5521983667676"
+                        className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-3 py-1.5 text-xs text-stone-800 dark:text-stone-200 outline-none focus:border-olive-500 font-mono"
+                      />
+                    </div>
                   </div>
 
                   {/* Botão de Salvar Credenciais com Feedback Toast */}
@@ -536,8 +554,8 @@ export const AutomationsCenter: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        handleSaveCredentials(apiUrl, instanceName, apiKey);
-                        addToast('Credenciais Salvas com Sucesso!', `Instância ${instanceName} configurada para ${apiUrl}`, 'success');
+                        handleSaveCredentials(apiUrl, instanceName, apiKey, connectedPhone);
+                        addToast('Credenciais Salvas com Sucesso!', `Instância ${instanceName} configurada para o número ${connectedPhone}`, 'success');
                       }}
                       className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-4 py-2 rounded-xl text-xs transition-all cursor-pointer shadow-md flex items-center gap-2"
                     >
