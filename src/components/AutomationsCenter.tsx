@@ -39,30 +39,49 @@ export const AutomationsCenter: React.FC = () => {
   const { t } = useLanguage();
   const [rules, setRules] = useState<AutomationRule[]>([]);
 
-  // Estados da Conexão WhatsApp / Evolution API
-  const [isConnected, setIsConnected] = useState(true);
-  const [connectedUser] = useState('Luiz Fernando Santana');
-  const [connectedPhone, setConnectedPhone] = useState('5521981062423');
+  // Instância única calculada dinamicamente para a clínica ativa (Multi-Tenant SaaS)
+  const tenantInstanceId = `petsanny_${currentTenant.id.replace(/[^a-zA-Z0-9]/g, '_')}`;
+
+  // Estado da Conexão isolado por Tenant
+  const [isConnected, setIsConnected] = useState(() => {
+    const saved = localStorage.getItem(`petsanny_wa_connected_${currentTenant.id}`);
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+  
+  const [connectedUser] = useState(currentTenant.ownerName || 'Gestor Sanny');
+  
+  const [connectedPhone, setConnectedPhone] = useState(() => {
+    return localStorage.getItem(`petsanny_wa_phone_${currentTenant.id}`) || (currentTenant.id.includes('2') ? '5511998877665' : '5521981062423');
+  });
+
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [showConfigDetails, setShowConfigDetails] = useState(false);
 
-  // Credenciais salvas no LocalStorage da Clínica
+  // Credenciais do Servidor Master Evolution API (Gerenciado pelo dono do SaaS)
   const [apiUrl, setApiUrl] = useState(() => {
     return localStorage.getItem(`petsanny_evo_url_${currentTenant.id}`) || 'https://api.evolution.petsanny.com';
   });
   const [instanceName, setInstanceName] = useState(() => {
-    return localStorage.getItem(`petsanny_evo_instance_${currentTenant.id}`) || 'clinica-petsanny-sp';
+    return localStorage.getItem(`petsanny_evo_instance_${currentTenant.id}`) || tenantInstanceId;
   });
   const [apiKey, setApiKey] = useState(() => {
     return localStorage.getItem(`petsanny_evo_apikey_${currentTenant.id}`) || 'evo_token_secret_99882233';
   });
 
+  // Atualiza instância se trocar de clínica/tenant no topo
+  useEffect(() => {
+    const newTenantInst = `petsanny_${currentTenant.id.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    setInstanceName(newTenantInst);
+    const savedStatus = localStorage.getItem(`petsanny_wa_connected_${currentTenant.id}`);
+    setIsConnected(savedStatus !== null ? JSON.parse(savedStatus) : true);
+    setConnectedPhone(localStorage.getItem(`petsanny_wa_phone_${currentTenant.id}`) || (currentTenant.id.includes('2') ? '5511998877665' : '5521981062423'));
+  }, [currentTenant]);
+
   const [qrCodeData, setQrCodeData] = useState<string | null>(null);
   const [qrLoading, setQrLoading] = useState(false);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Salva credenciais no LocalStorage
   const handleSaveCredentials = (newUrl: string, newInst: string, newKey: string) => {
     setApiUrl(newUrl);
     setInstanceName(newInst);
@@ -263,8 +282,9 @@ export const AutomationsCenter: React.FC = () => {
     setTimeout(() => {
       setIsScanning(false);
       setIsConnected(true);
+      localStorage.setItem(`petsanny_wa_connected_${currentTenant.id}`, 'true');
       setIsQrModalOpen(false);
-      addToast('WhatsApp Conectado!', 'A leitura do QR Code foi confirmada com sucesso.', 'success');
+      addToast('WhatsApp Conectado!', `Instância pareada para ${currentTenant.name}.`, 'success');
       try {
         confetti({
           particleCount: 80,
@@ -279,7 +299,8 @@ export const AutomationsCenter: React.FC = () => {
 
   const handleDisconnect = () => {
     setIsConnected(false);
-    addToast('WhatsApp Desconectado', 'O canal de WhatsApp foi desconectado temporariamente.', 'warning');
+    localStorage.setItem(`petsanny_wa_connected_${currentTenant.id}`, 'false');
+    addToast('WhatsApp Desconectado', `O canal de WhatsApp do tenant ${currentTenant.name} foi desconectado.`, 'warning');
   };
 
   const handleReset = () => {
