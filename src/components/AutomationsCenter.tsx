@@ -465,8 +465,8 @@ export const AutomationsCenter: React.FC = () => {
                       <input
                         type="text"
                         value={apiUrl}
-                        onChange={(e) => handleSaveCredentials(e.target.value, instanceName, apiKey)}
-                        placeholder="https://sua-evolution-api.com"
+                        onChange={(e) => setApiUrl(e.target.value)}
+                        placeholder="https://evolution.lf7mkt.xyz/"
                         className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-3 py-1.5 text-xs text-stone-800 dark:text-stone-200 outline-none focus:border-olive-500"
                       />
                     </div>
@@ -475,8 +475,8 @@ export const AutomationsCenter: React.FC = () => {
                       <input
                         type="text"
                         value={instanceName}
-                        onChange={(e) => handleSaveCredentials(apiUrl, e.target.value, apiKey)}
-                        placeholder="clinica-petsanny-sp"
+                        onChange={(e) => setInstanceName(e.target.value)}
+                        placeholder="petsanny_matriz"
                         className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-3 py-1.5 text-xs text-stone-800 dark:text-stone-200 outline-none focus:border-olive-500"
                       />
                     </div>
@@ -485,11 +485,26 @@ export const AutomationsCenter: React.FC = () => {
                       <input
                         type="password"
                         value={apiKey}
-                        onChange={(e) => handleSaveCredentials(apiUrl, instanceName, e.target.value)}
+                        onChange={(e) => setApiKey(e.target.value)}
                         placeholder="Sua Global API Key"
                         className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl px-3 py-1.5 text-xs text-stone-800 dark:text-stone-200 outline-none focus:border-olive-500"
                       />
                     </div>
+                  </div>
+
+                  {/* Botão de Salvar Credenciais com Feedback Toast */}
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleSaveCredentials(apiUrl, instanceName, apiKey);
+                        addToast('Credenciais Salvas com Sucesso!', `Instância ${instanceName} configurada para ${apiUrl}`, 'success');
+                      }}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-4 py-2 rounded-xl text-xs transition-all cursor-pointer shadow-md flex items-center gap-2"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Salvar Credenciais da API</span>
+                    </button>
                   </div>
                 </div>
               )}
