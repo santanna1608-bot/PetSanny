@@ -219,11 +219,13 @@ export const AutomationsCenter: React.FC = () => {
   // Estado do Código de Pareamento de 8 dígitos (Pairing Code)
   const [pairingCode, setPairingCode] = useState<string | null>(null);
   const [activeConnectTab, setActiveConnectTab] = useState<'qrcode' | 'pairing'>('qrcode');
+  const [qrCountdown, setQrCountdown] = useState<number>(15);
 
   // Função para buscar o QR Code real ou Código de Pareamento na Evolution API
   const fetchEvolutionQrCode = useCallback(async () => {
     setQrLoading(true);
     setPairingCode(null);
+    setQrCountdown(15);
     const cleanUrl = apiUrl.replace(/\/$/, '');
     
     try {
@@ -247,7 +249,8 @@ export const AutomationsCenter: React.FC = () => {
           body: JSON.stringify({
             instanceName: instanceName,
             qrcode: true,
-            number: connectedPhone
+            number: connectedPhone,
+            integration: 'WHATSAPP-BAILEYS'
           })
         });
       }
@@ -256,31 +259,39 @@ export const AutomationsCenter: React.FC = () => {
         const data = await res.json();
         
         // Extrai código de pareamento numérico de 8 dígitos (Evolution API v2)
-        const pCode = data?.pairingCode || data?.qrcode?.pairingCode || data?.code?.pairingCode;
+        const pCode = data?.pairingCode || data?.qrcode?.pairingCode || data?.code?.pairingCode || data?.instance?.qrcode?.pairingCode;
         if (pCode) {
           setPairingCode(String(pCode));
         }
 
-        // Extrai string de imagem base64
-        const b64 = data?.base64 || data?.qrcode?.base64 || data?.code?.base64 || (typeof data?.code === 'string' && data?.code.length > 100 ? data?.code : null);
+        // Extrai base64 de imagem oficial da Evolution API
+        const rawBase64 = 
+          data?.base64 || 
+          data?.qrcode?.base64 || 
+          (typeof data?.qrcode === 'string' && data.qrcode.length > 50 ? data.qrcode : null) || 
+          data?.instance?.qrcode?.base64 ||
+          (typeof data?.code === 'string' && data.code.startsWith('data:image') ? data.code : null);
         
-        if (b64) {
-          if (b64.startsWith('data:image')) {
-            setQrCodeData(b64);
-          } else if (b64.startsWith('iVBORw0KGg') || b64.startsWith('/9j/')) {
-            setQrCodeData(`data:image/png;base64,${b64}`);
+        const rawCodeString = data?.code || data?.qrcode?.code || (typeof data?.code === 'string' ? data.code : null);
+
+        if (rawBase64) {
+          if (rawBase64.startsWith('data:image')) {
+            setQrCodeData(rawBase64);
           } else {
-            try {
-              const localQrDataUrl = await QRCode.toDataURL(b64, {
-                margin: 2,
-                width: 320,
-                color: { dark: '#000000', light: '#ffffff' }
-              });
-              setQrCodeData(localQrDataUrl);
-            } catch (err) {
-              console.error('Erro ao renderizar QRCode localmente:', err);
-              setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(b64)}`);
-            }
+            setQrCodeData(`data:image/png;base64,${rawBase64}`);
+          }
+        } else if (rawCodeString && typeof rawCodeString === 'string') {
+          try {
+            const localQrDataUrl = await QRCode.toDataURL(rawCodeString, {
+              margin: 2,
+              width: 320,
+              errorCorrectionLevel: 'L',
+              color: { dark: '#000000', light: '#ffffff' }
+            });
+            setQrCodeData(localQrDataUrl);
+          } catch (err) {
+            console.error('Erro ao renderizar QRCode localmente:', err);
+            setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(rawCodeString)}`);
           }
         } else {
           setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https://petsanny.com/whatsapp/connect?instance=${instanceName}&t=${Date.now()}`);
@@ -348,19 +359,32 @@ export const AutomationsCenter: React.FC = () => {
     checkConnectionState(false);
   }, [currentTenant.id]);
 
-  // Efeito ao abrir o modal de QR Code
+  // Efeito ao abrir o modal de QR Code com renovação automática de 15s
   useEffect(() => {
+    let countdownTimer: ReturnType<typeof setInterval> | null = null;
+
     if (isQrModalOpen) {
       fetchEvolutionQrCode();
       pollIntervalRef.current = setInterval(() => {
         checkConnectionState(true);
       }, 3000);
+
+      countdownTimer = setInterval(() => {
+        setQrCountdown(prev => {
+          if (prev <= 1) {
+            fetchEvolutionQrCode();
+            return 15;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     } else {
       if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
     }
 
     return () => {
       if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+      if (countdownTimer) clearInterval(countdownTimer);
     };
   }, [isQrModalOpen, fetchEvolutionQrCode, checkConnectionState]);
 
@@ -874,13 +898,17 @@ export const AutomationsCenter: React.FC = () => {
                       <span className="text-[11px] font-bold text-stone-500">Gerando QR Code...</span>
                     </div>
                   ) : qrCodeData ? (
-                    <div className="relative group">
+                    <div className="relative group flex flex-col items-center">
                       <img 
                         src={qrCodeData} 
                         alt="QR Code WhatsApp" 
                         className="w-48 h-48 object-contain rounded-xl" 
                       />
                       <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent shadow-lg shadow-emerald-500 animate-pulse" />
+                      <div className="mt-2 text-[10px] font-mono font-bold text-stone-500 dark:text-stone-400 flex items-center gap-1.5 bg-stone-100 dark:bg-stone-800 px-2.5 py-1 rounded-full border border-stone-200 dark:border-stone-700">
+                        <Clock className="w-3 h-3 text-emerald-500 animate-spin" />
+                        <span>Renovando QR Code em {qrCountdown}s</span>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center p-6 text-center space-y-2">
