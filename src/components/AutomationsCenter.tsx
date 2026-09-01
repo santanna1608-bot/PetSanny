@@ -6,8 +6,6 @@ import QRCode from 'qrcode';
 import { 
   Zap, 
   MessageSquare, 
-  Calendar, 
-  Smile, 
   Clock, 
   CheckCircle2, 
   RefreshCw, 
@@ -40,9 +38,6 @@ export const AutomationsCenter: React.FC = () => {
   const { t } = useLanguage();
   const [rules, setRules] = useState<AutomationRule[]>([]);
 
-  // Instância padrão única para o tenant ativo
-  const fallbackTenantInst = `petsanny_${currentTenant.id.replace(/[^a-zA-Z0-9]/g, '_')}`;
-
   // Estado da Conexão e Credenciais isolado por Tenant com inicializadores lazy seguros
   const [isConnected, setIsConnected] = useState<boolean>(() => {
     const saved = localStorage.getItem(`petsanny_wa_connected_${currentTenant.id}`);
@@ -71,8 +66,14 @@ export const AutomationsCenter: React.FC = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [showConfigDetails, setShowConfigDetails] = useState(false);
 
+  const [pairingCode, setPairingCode] = useState<string | null>(null);
+  const [activeConnectTab, setActiveConnectTab] = useState<'qrcode' | 'pairing'>('qrcode');
+  const [qrCountdown, setQrCountdown] = useState<number>(15);
+
   const [qrCodeData, setQrCodeData] = useState<string | null>(null);
   const [qrLoading, setQrLoading] = useState(false);
+  const [isRefreshingQr, setIsRefreshingQr] = useState(false);
+  const [qrError, setQrError] = useState<string | null>(null);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Sincroniza credenciais ao alternar de Tenant no topo sem sobrescrever valores salvos
@@ -99,7 +100,7 @@ export const AutomationsCenter: React.FC = () => {
   // Função centralizada para salvar e persistir as credenciais da Evolution API no LocalStorage
   const handleSaveCredentials = (newUrl: string, newInst: string, newKey: string, newPhone?: string) => {
     const cleanUrl = newUrl.trim();
-    const cleanInst = newInst.trim() || fallbackTenantInst;
+    const cleanInst = newInst.trim() || `petsanny_${currentTenant.id.replace(/[^a-zA-Z0-9]/g, '_')}`;
     const cleanKey = newKey.trim();
 
     setApiUrl(cleanUrl);
@@ -202,29 +203,40 @@ export const AutomationsCenter: React.FC = () => {
     ) {
       return <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />;
     }
-    if (action.includes('Calendar') || action === 'automations.rule1.action2') {
-      return <Calendar className="w-3.5 h-3.5 text-blue-500" />;
-    }
-    if (
-      action.includes('24h') || 
-      action.includes('Horas') || 
-      action === 'automations.rule1.action3' || 
-      action === 'automations.rule3.action1'
-    ) {
-      return <Clock className="w-3.5 h-3.5 text-amber-500" />;
-    }
-    return <Smile className="w-3.5 h-3.5 text-stone-500" />;
+    return <Clock className="w-3.5 h-3.5 text-stone-500" />;
   };
 
-  // Estado do Código de Pareamento de 8 dígitos (Pairing Code)
-  const [pairingCode, setPairingCode] = useState<string | null>(null);
-  const [activeConnectTab, setActiveConnectTab] = useState<'qrcode' | 'pairing'>('qrcode');
-  const [qrCountdown, setQrCountdown] = useState<number>(15);
+  // Gera um QR Code de demonstração válido para testes locais caso a API não responda
+  const generateDemoQrCode = useCallback(async () => {
+    setQrLoading(true);
+    setQrError(null);
+    try {
+      const mockPayload = `2@petsanny_session_${instanceName}_${Date.now()}_key_${Math.random().toString(36).substring(2, 9)}`;
+      const localQrDataUrl = await QRCode.toDataURL(mockPayload, {
+        margin: 2,
+        width: 320,
+        errorCorrectionLevel: 'M',
+        color: { dark: '#064e3b', light: '#ffffff' }
+      });
+      setQrCodeData(localQrDataUrl);
+      const randomPairing = Math.floor(10000000 + Math.random() * 90000000).toString().replace(/(\d{4})(\d{4})/, '$1-$2');
+      setPairingCode(randomPairing);
+    } catch (e) {
+      console.error('Erro ao gerar QRCode de demonstração:', e);
+      setQrError('Erro ao renderizar QR Code de teste.');
+    } finally {
+      setQrLoading(false);
+    }
+  }, [instanceName]);
 
   // Função para buscar o QR Code real ou Código de Pareamento na Evolution API
-  const fetchEvolutionQrCode = useCallback(async () => {
-    setQrLoading(true);
-    setPairingCode(null);
+  const fetchEvolutionQrCode = useCallback(async (isSilentRefresh = false) => {
+    if (isSilentRefresh && qrCodeData) {
+      setIsRefreshingQr(true);
+    } else {
+      setQrLoading(true);
+    }
+    setQrError(null);
     setQrCountdown(15);
     const cleanUrl = apiUrl.replace(/\/$/, '');
     
@@ -257,6 +269,21 @@ export const AutomationsCenter: React.FC = () => {
 
       if (res.ok) {
         const data = await res.json();
+
+        // Se a resposta indicar que a instância já está aberta/conectada
+        const state = data?.instance?.state || data?.state || data?.status;
+        if (state === 'open' || state === 'connected') {
+          setIsConnected(true);
+          localStorage.setItem(`petsanny_wa_connected_${currentTenant.id}`, 'true');
+          setIsQrModalOpen(false);
+          addToast('WhatsApp Conectado!', `A instância ${instanceName} já está ativa e pareada.`, 'success');
+          try {
+            confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+          } catch (e) {
+            console.error(e);
+          }
+          return;
+        }
         
         // Extrai código de pareamento numérico de 8 dígitos (Evolution API v2)
         const pCode = data?.pairingCode || data?.qrcode?.pairingCode || data?.code?.pairingCode || data?.instance?.qrcode?.pairingCode;
@@ -268,11 +295,16 @@ export const AutomationsCenter: React.FC = () => {
         const rawBase64 = 
           data?.base64 || 
           data?.qrcode?.base64 || 
-          (typeof data?.qrcode === 'string' && data.qrcode.length > 50 ? data.qrcode : null) || 
+          (typeof data?.qrcode === 'string' && data.qrcode.startsWith('data:image') ? data.qrcode : null) || 
+          (typeof data?.qrcode === 'string' && data.qrcode.length > 80 ? data.qrcode : null) || 
           data?.instance?.qrcode?.base64 ||
           (typeof data?.code === 'string' && data.code.startsWith('data:image') ? data.code : null);
         
-        const rawCodeString = data?.code || data?.qrcode?.code || (typeof data?.code === 'string' ? data.code : null);
+        const rawCodeString = 
+          data?.code || 
+          data?.qrcode?.code || 
+          data?.instance?.qrcode?.code || 
+          (typeof data?.code === 'string' && !data.code.startsWith('data:image') ? data.code : null);
 
         if (rawBase64) {
           if (rawBase64.startsWith('data:image')) {
@@ -280,31 +312,38 @@ export const AutomationsCenter: React.FC = () => {
           } else {
             setQrCodeData(`data:image/png;base64,${rawBase64}`);
           }
+          setQrError(null);
         } else if (rawCodeString && typeof rawCodeString === 'string') {
           try {
             const localQrDataUrl = await QRCode.toDataURL(rawCodeString, {
               margin: 2,
               width: 320,
-              errorCorrectionLevel: 'L',
-              color: { dark: '#000000', light: '#ffffff' }
+              errorCorrectionLevel: 'M',
+              color: { dark: '#064e3b', light: '#ffffff' }
             });
             setQrCodeData(localQrDataUrl);
+            setQrError(null);
           } catch (err) {
             console.error('Erro ao renderizar QRCode localmente:', err);
-            setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(rawCodeString)}`);
+            setQrError('Erro ao converter payload do WhatsApp em imagem.');
           }
         } else {
-          setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https://petsanny.com/whatsapp/connect?instance=${instanceName}&t=${Date.now()}`);
+          setQrError('Servidor API respondeu, mas não retornou payload do QR Code.');
+          if (!qrCodeData) setQrCodeData(null);
         }
       } else {
-        setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https://petsanny.com/whatsapp/connect?instance=${instanceName}&t=${Date.now()}`);
+        const errText = res.status === 401 ? 'API Key inválida' : `HTTP ${res.status}`;
+        setQrError(`Falha na resposta do servidor Evolution API (${errText}).`);
+        if (!qrCodeData) setQrCodeData(null);
       }
     } catch {
-      setQrCodeData(`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https://petsanny.com/whatsapp/connect?instance=${instanceName}&t=${Date.now()}`);
+      setQrError(`Servidor Evolution API (${apiUrl}) inacessível ou com CORS desativado.`);
+      if (!qrCodeData) setQrCodeData(null);
     } finally {
       setQrLoading(false);
+      setIsRefreshingQr(false);
     }
-  }, [apiUrl, instanceName, apiKey, connectedPhone]);
+  }, [apiUrl, instanceName, apiKey, connectedPhone, currentTenant.id, addToast, qrCodeData]);
 
   // Checa o estado da conexão na Evolution API (Silencioso para segundo plano)
   const checkConnectionState = useCallback(async (notifyOnPairing = false) => {
@@ -364,7 +403,7 @@ export const AutomationsCenter: React.FC = () => {
     let countdownTimer: ReturnType<typeof setInterval> | null = null;
 
     if (isQrModalOpen) {
-      fetchEvolutionQrCode();
+      fetchEvolutionQrCode(false);
       pollIntervalRef.current = setInterval(() => {
         checkConnectionState(true);
       }, 3000);
@@ -372,7 +411,7 @@ export const AutomationsCenter: React.FC = () => {
       countdownTimer = setInterval(() => {
         setQrCountdown(prev => {
           if (prev <= 1) {
-            fetchEvolutionQrCode();
+            fetchEvolutionQrCode(true);
             return 15;
           }
           return prev - 1;
@@ -891,8 +930,8 @@ export const AutomationsCenter: React.FC = () => {
             {/* Conteúdo Aba QR Code */}
             {activeConnectTab === 'qrcode' && (
               <div className="flex flex-col sm:flex-row items-center gap-6">
-                <div className="p-3 bg-white rounded-2xl border-2 border-emerald-500/50 shadow-md flex flex-col items-center justify-center shrink-0 relative min-w-[200px] min-h-[200px]">
-                  {qrLoading ? (
+                <div className="p-3 bg-white dark:bg-stone-950 rounded-2xl border-2 border-emerald-500/50 shadow-md flex flex-col items-center justify-center shrink-0 relative min-w-[210px] min-h-[210px]">
+                  {qrLoading && !qrCodeData ? (
                     <div className="flex flex-col items-center justify-center p-8 text-center space-y-2">
                       <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
                       <span className="text-[11px] font-bold text-stone-500">Gerando QR Code...</span>
@@ -906,14 +945,24 @@ export const AutomationsCenter: React.FC = () => {
                       />
                       <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent shadow-lg shadow-emerald-500 animate-pulse" />
                       <div className="mt-2 text-[10px] font-mono font-bold text-stone-500 dark:text-stone-400 flex items-center gap-1.5 bg-stone-100 dark:bg-stone-800 px-2.5 py-1 rounded-full border border-stone-200 dark:border-stone-700">
-                        <Clock className="w-3 h-3 text-emerald-500 animate-spin" />
-                        <span>Renovando QR Code em {qrCountdown}s</span>
+                        <Clock className={`w-3 h-3 text-emerald-500 ${isRefreshingQr ? 'animate-spin' : ''}`} />
+                        <span>{isRefreshingQr ? 'Atualizando QR Code...' : `Renovando QR Code em ${qrCountdown}s`}</span>
                       </div>
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center p-6 text-center space-y-2">
-                      <AlertCircle className="w-7 h-7 text-amber-500" />
-                      <span className="text-xs font-bold text-stone-600">Servidor API Indisponível</span>
+                    <div className="flex flex-col items-center justify-center p-4 text-center space-y-2 max-w-[200px]">
+                      <AlertCircle className="w-8 h-8 text-amber-500" />
+                      <span className="text-xs font-extrabold text-stone-700 dark:text-stone-300">API Evolution Indisponível</span>
+                      <p className="text-[10px] text-stone-400 font-medium leading-tight">
+                        {qrError || 'Não foi possível obter o QR Code real do servidor.'}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={generateDemoQrCode}
+                        className="mt-1 px-3 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-lg text-[10px] font-extrabold transition-colors border border-emerald-500/30 cursor-pointer"
+                      >
+                        ⚡ Gerar QR Code de Teste
+                      </button>
                     </div>
                   )}
                 </div>
@@ -951,7 +1000,7 @@ export const AutomationsCenter: React.FC = () => {
                 <div className="text-center space-y-2">
                   <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">CÓDIGO DE PAREAMENTO WHATSAPP</span>
                   <div className="py-3 px-6 bg-white dark:bg-stone-900 rounded-2xl border-2 border-emerald-500/40 inline-block font-mono text-2xl font-black tracking-widest text-emerald-600 dark:text-emerald-400 shadow-sm">
-                    {pairingCode || '4829-1940'}
+                    {pairingCode || 'Gerando...'}
                   </div>
                   <p className="text-[11px] text-stone-500 dark:text-stone-400">
                     Número vinculado: <strong className="font-mono text-stone-800 dark:text-stone-200">{connectedPhone}</strong>
@@ -972,14 +1021,24 @@ export const AutomationsCenter: React.FC = () => {
 
             {/* Footer do Modal */}
             <div className="pt-4 border-t border-stone-150 dark:border-stone-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={fetchEvolutionQrCode}
-                className="text-[11px] font-bold text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 flex items-center gap-1.5 transition-colors cursor-pointer"
-              >
-                <RefreshCw className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Gerar Novo QR Code / Código</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => fetchEvolutionQrCode(false)}
+                  className="text-[11px] font-bold text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 text-emerald-500 ${qrLoading ? 'animate-spin' : ''}`} />
+                  <span>Atualizar API</span>
+                </button>
+                <span className="text-stone-300 dark:text-stone-700">|</span>
+                <button
+                  type="button"
+                  onClick={generateDemoQrCode}
+                  className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <span>QR Code de Teste</span>
+                </button>
+              </div>
 
               <button
                 type="button"
