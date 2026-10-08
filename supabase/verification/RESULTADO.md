@@ -45,3 +45,11 @@ Tutor e pet identificados com TESTE foram criados pela interface. TESTE-document
 O fluxo de Blob com clique programático foi substituído por preparação de URL assinada do bucket privado (60 segundos, nome do arquivo no download) e link explícito Baixar arquivo. A interface remove o link após 55 segundos e ao trocar de pet. Erros ao preparar o acesso são propagados. Não há URL persistida nem bucket público.
 
 Validação real no navegador integrado: o clique no link gerou um evento de download, salvou TESTE-documento.png e os 68 bytes baixados foram comparados com o arquivo original: idênticos. 19 testes passaram e build passou. O teste de serviço verifica prazo, nome e propagação de bloqueios. O isolamento de download via API entre duas contas reais ainda exige validação própria.
+
+## Recuperação de senha
+
+Implementados solicitação de link, retorno dedicado e formulário de nova senha condicionado ao evento PASSWORD_RECOVERY. A sessão de recuperação não carrega os módulos da clínica. A resposta de solicitação não confirma existência de conta. Senhas devem coincidir e ter ao menos oito caracteres; erros do Supabase são tratados.
+
+O retorno local http://127.0.0.1:5174/?flow=recovery foi salvo e confirmado após recarregar a configuração do Supabase. Abrir esse endereço com uma sessão comum mostrou link inválido e não liberou campos de nova senha. O botão Esqueci minha senha abriu o formulário de solicitação.
+
+21 testes passaram, build passou e lint terminou sem erros (avisos existentes). Ainda não foi enviado e-mail real de recuperação nem alterada senha: o fluxo por e-mail e o login com a nova senha aguardam o titular. A Vercel permanece sem publicação destas alterações.

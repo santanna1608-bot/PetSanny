@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { PasswordRecovery } from './PasswordRecovery';
 import { useAuth } from "../contexts/AuthContext";
 import logoImg from "../assets/logo.png";
 import {
@@ -32,6 +33,7 @@ export const Login: React.FC<LoginProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
+  const [recovering, setRecovering] = useState(false);
 
   // Estados para o fluxo de Novo Cadastro
   const [isRegistering, setIsRegistering] = useState(
@@ -103,6 +105,7 @@ export const Login: React.FC<LoginProps> = ({
     setError(null);
   };
 
+  if (recovering) return <PasswordRecovery onBack={() => setRecovering(false)} />;
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950 flex flex-col justify-center items-center p-4 relative overflow-hidden font-sans text-stone-900 dark:text-stone-100 transition-colors duration-200">
       {/* Elementos Decorativos de Fundo */}
@@ -337,6 +340,7 @@ export const Login: React.FC<LoginProps> = ({
           </button>
         </form>
 
+        {!isRegistering && <button type="button" className="text-sm text-olive-700 underline" onClick={() => { setPassword(''); setRecovering(true); }}>Esqueci minha senha</button>}
         {/* Link de alternância */}
         <div className="text-center pt-2">
           <button

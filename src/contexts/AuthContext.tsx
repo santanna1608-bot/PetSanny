@@ -45,6 +45,7 @@ interface AuthContextType {
   updateProfile: (updates: ProfileUpdates) => Promise<void>;
   retryAccess: () => Promise<void>;
   isMock: boolean;
+  recoveryReady: boolean;
 }
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -53,6 +54,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [accessError, setAccessError] = useState<string | null>(null);
+  const [recoveryReady, setRecoveryReady] = useState(false);
+  const recovering = useRef(false);
   const generation = useRef(0);
   const mounted = useRef(false);
   const applyAccount = useCallback(async (account: User | null) => {
@@ -96,9 +99,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const timers = new Set<ReturnType<typeof setTimeout>>();
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       const timer = setTimeout(() => {
         timers.delete(timer);
+        if (event === 'PASSWORD_RECOVERY') {
+          recovering.current = true; generation.current++;
+          setRecoveryReady(!!session?.user); setUser(null); setAccessError(null); setLoading(false); return;
+        }
+        if (recovering.current && event !== 'SIGNED_OUT') { setLoading(false); return; }
+        if (event === 'SIGNED_OUT') { recovering.current = false; setRecoveryReady(false); }
+        if (new URLSearchParams(window.location.search).get('flow') === 'recovery') { setUser(null); setAccessError(null); setLoading(false); return; }
         void applyAccount(session?.user || null);
       }, 0);
       timers.add(timer);
@@ -186,6 +196,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         updateProfile,
         retryAccess,
         isMock: false,
+        recoveryReady,
       }}
     >
       {children}

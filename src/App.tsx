@@ -1,4 +1,5 @@
 import { TenantSetup } from "./components/TenantSetup";
+import { PasswordRecovery } from './components/PasswordRecovery';
 import { PlatformAdminPanel } from "./components/PlatformAdminPanel";
 import { configurationError } from "./lib/supabaseClient";
 import { useState, useEffect, lazy, Suspense } from "react";
@@ -452,13 +453,16 @@ function AppContent() {
   );
 }
 
+function AccessGate() {
+  const { recoveryReady } = useAuth();
+  if (recoveryReady || new URLSearchParams(window.location.search).get('flow') === 'recovery') return <PasswordRecovery reset />;
+  return <AppointmentsProvider><AppContent /></AppointmentsProvider>;
+}
 function App() {
   return (
     <LanguageProvider>
       <AuthProvider>
-        <AppointmentsProvider>
-          <AppContent />
-        </AppointmentsProvider>
+        <AccessGate />
       </AuthProvider>
     </LanguageProvider>
   );

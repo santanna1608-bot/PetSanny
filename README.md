@@ -18,4 +18,6 @@ As migrações foram aplicadas na nova base vazia; veja supabase/verification/RE
 
 Os testes automatizados cobrem serviços e resolução de acesso com respostas controladas. Não substituem testes de ponta a ponta nem auditoria completa.
 
-O acesso geral da plataforma é consultado pela RPC current_platform_admin, instalada pela terceira migração. Somente o cadastro privado definido pelo operador concede esse papel; metadata não concede acesso. Administradores gerais entram em um painel de consulta separado, sem precisar criar clínica. A criação e a validação da primeira conta administrativa ainda estão pendentes.
+Recuperação de senha: Esqueci minha senha solicita um link pelo Supabase. O retorno usa /?flow=recovery e a tela de nova senha exige o evento PASSWORD_RECOVERY. O endereço local http://127.0.0.1:5174/?flow=recovery está autorizado no Supabase; autorize também o endereço de produção antes de publicar. A troca real de senha deve ser concluída e validada pelo titular da conta.
+
+O acesso geral da plataforma é consultado pela RPC current_platform_admin, instalada pela terceira migração. Somente o cadastro privado definido pelo operador concede esse papel; metadata não concede acesso. Administradores gerais entram em um painel de consulta separado, sem precisar criar clínica. A primeira conta administrativa foi criada e seu acesso foi confirmado pelo usuário.
