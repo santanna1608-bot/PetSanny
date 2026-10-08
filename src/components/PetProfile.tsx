@@ -31,6 +31,13 @@ export function PetProfile({ pet, tutor, onBack }: PetProfileProps) {
   const [weights, setWeights] = useState<WeightRow[]>([]);
   const [reminders, setReminders] = useState<ReminderRow[]>([]);
   const [documents, setDocuments] = useState<DocumentRow[]>([]);
+  const [downloads, setDownloads] = useState<Record<string, { url: string; expiresAt: number }>>({});
+  useEffect(() => {
+    const timers = Object.entries(downloads).map(([id, link]) => setTimeout(() => {
+      setDownloads(previous => { const next = { ...previous }; delete next[id]; return next; });
+    }, Math.max(0, link.expiresAt - Date.now())));
+    return () => timers.forEach(clearTimeout);
+  }, [downloads]);
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -58,6 +65,7 @@ export function PetProfile({ pet, tutor, onBack }: PetProfileProps) {
     setWeights([]);
     setReminders([]);
     setDocuments([]);
+    setDownloads({});
     setNotes("");
     void Promise.all([
       medicalService.list(pet.tenant_id, { pet_id: pet.id }),
@@ -476,14 +484,17 @@ export function PetProfile({ pet, tutor, onBack }: PetProfileProps) {
                   <span className="flex-1">
                     {d.name} · {d.size}
                   </span>
-                  <button
+                  {downloads[d.id] ? <a href={downloads[d.id].url} download={d.name} className="text-olive-700 underline font-semibold">Baixar arquivo</a> : <button
                     disabled={busy}
                     onClick={() => {
-                      void perform(() => downloadPetDocument(d));
+                      void perform(async () => {
+                        const url = await downloadPetDocument(d);
+                        setDownloads(previous => ({ ...previous, [d.id]: { url, expiresAt: Date.now() + 55000 } }));
+                      });
                     }}
                   >
-                    Baixar
-                  </button>
+                    {busy ? "Preparando…" : "Preparar download"}
+                  </button>}
                   <button
                     disabled={busy}
                     onClick={() => setDeleteDocument(d)}

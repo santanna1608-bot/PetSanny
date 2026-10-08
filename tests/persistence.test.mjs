@@ -1,6 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {loadServices,fakeClient} from './service-loader.mjs';
+test('download prepara acesso temporário com nome do arquivo e propaga bloqueios',async()=>{
+  const client=fakeClient();let params;
+  client.storage={from:bucket=>({createSignedUrl:async(...args)=>{params=[bucket,...args];return {data:{signedUrl:'https://example.invalid/download'},error:null};}})};
+  const {exports}=await loadServices(client,'src/lib/domainServices.ts');
+  assert.equal(await exports.downloadPetDocument({name:'teste.png',storage_path:'clinic/pet/file.png'}),'https://example.invalid/download');
+  assert.equal(JSON.stringify(params),JSON.stringify(['pet-documents','clinic/pet/file.png',60,{download:'teste.png'}]));
+  const error={message:'access denied'};
+  client.storage={from:()=>({createSignedUrl:async()=>({data:null,error})})};
+  await assert.rejects(exports.downloadPetDocument({name:'teste.png',storage_path:'foreign/file.png'}),e=>e===error);
+});
 test('novo atendimento usa operação atômica e recebe tutor e pet vinculados',async()=>{
   const result={id:'appointment',tenant_id:'clinic',tutor_id:'tutor',pet_id:'pet'};
   const client=fakeClient([{data:[result],error:null}]); const {exports}=await loadServices(client);

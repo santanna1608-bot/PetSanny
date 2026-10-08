@@ -39,3 +39,9 @@ Limite: este teste não envia arquivos físicos nem executa download via API Sto
 Na MeuPet, a receita fictícia de R$ 12,34 foi criada e permaneceu após recarregar. Uma despesa fictícia de R$ 2,34 produziu saldo de R$ 10,00. O teste revelou custos estimados em 25% da receita no antigo DRE; esse cálculo foi removido. O resumo agora apresenta somente receitas, despesas e saldo registrados.
 
 Tutor e pet identificados com TESTE foram criados pela interface. TESTE-documento.png (imagem mínima sem dados pessoais) foi enviado com sucesso e permaneceu no prontuário após recarregar. A tentativa de download não produziu evento capturável no navegador integrado; integridade do arquivo baixado e isolamento dos arquivos físicos entre contas continuam pendentes. A tela de documentos ficou aberta para conferência manual. Os registros fictícios permanecem na MeuPet para rastrear o teste e ainda precisam de limpeza autorizada.
+
+## Correção do download
+
+O fluxo de Blob com clique programático foi substituído por preparação de URL assinada do bucket privado (60 segundos, nome do arquivo no download) e link explícito Baixar arquivo. A interface remove o link após 55 segundos e ao trocar de pet. Erros ao preparar o acesso são propagados. Não há URL persistida nem bucket público.
+
+Validação real no navegador integrado: o clique no link gerou um evento de download, salvou TESTE-documento.png e os 68 bytes baixados foram comparados com o arquivo original: idênticos. 19 testes passaram e build passou. O teste de serviço verifica prazo, nome e propagação de bloqueios. O isolamento de download via API entre duas contas reais ainda exige validação própria.

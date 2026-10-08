@@ -143,14 +143,10 @@ export async function uploadPetDocument(
 export async function downloadPetDocument(document: DocumentRow) {
   const { data, error } = await requireSupabase()
     .storage.from(DOCUMENT_BUCKET)
-    .download(document.storage_path);
+    .createSignedUrl(document.storage_path, 60, { download: document.name });
   if (error) throw error;
-  const url = URL.createObjectURL(data);
-  const link = window.document.createElement("a");
-  link.href = url;
-  link.download = document.name;
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  if (!data?.signedUrl) throw new Error("Não foi possível preparar o download. Tente novamente.");
+  return data.signedUrl;
 }
 export async function deletePetDocument(document: DocumentRow) {
   // Metadados permanecem se a remoção do arquivo falhar.
