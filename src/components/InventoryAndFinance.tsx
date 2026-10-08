@@ -762,33 +762,25 @@ export const InventoryAndFinance: React.FC = () => {
               {/* DRE Simplificado */}
               <div className="lg:col-span-2 bg-stone-50/50 dark:bg-stone-950/20 border border-stone-150 dark:border-stone-800 rounded-2xl p-5 space-y-4">
                 <h4 className="font-extrabold text-sm text-stone-850 dark:text-stone-100 pb-2 border-b border-stone-150 dark:border-stone-800">
-                  {t("inventory.dre_title")}
+                  Resumo dos lançamentos registrados
                 </h4>
 
                 <div className="space-y-2 text-[11px] font-bold">
                   <div className="flex items-center justify-between py-1 border-b border-stone-150/60 dark:border-stone-800/40">
                     <span className="text-stone-600 dark:text-stone-300">
-                      {t("inventory.dre_gross_revenue")}
+                      Receitas registradas
                     </span>
                     <span className="text-stone-800 dark:text-stone-100">
                       R$ {totalRevenue.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between py-1 border-b border-stone-150/60 dark:border-stone-800/40 text-rose-600 dark:text-rose-455">
-                    <span>{t("inventory.dre_variable_costs")}</span>
-                    <span>- R$ {(totalRevenue * 0.25).toFixed(2)}</span>
-                  </div>
-                  <div className="flex items-center justify-between py-1 border-b border-stone-150/60 dark:border-stone-800/40 text-emerald-600 dark:text-emerald-500">
-                    <span>{t("inventory.dre_contribution_margin")}</span>
-                    <span>R$ {(totalRevenue * 0.75).toFixed(2)}</span>
-                  </div>
                   <div className="flex items-center justify-between py-1 border-b border-stone-150/60 dark:border-stone-800/40 text-rose-650 dark:text-rose-455">
-                    <span>{t("inventory.dre_fixed_expenses")}</span>
+                    <span>Despesas registradas</span>
                     <span>- R$ {totalExpense.toFixed(2)}</span>
                   </div>
                   <div className="flex items-center justify-between pt-3 text-sm font-black border-t border-dashed border-stone-250">
                     <span className="text-stone-800 dark:text-stone-100">
-                      {t("inventory.dre_net_income")}
+                      Saldo dos lançamentos
                     </span>
                     <span
                       className={
@@ -797,7 +789,7 @@ export const InventoryAndFinance: React.FC = () => {
                           : "text-rose-600"
                       }
                     >
-                      R$ {(totalRevenue * 0.75 - totalExpense).toFixed(2)}
+                      R$ {netProfit.toFixed(2)}
                     </span>
                   </div>
                 </div>

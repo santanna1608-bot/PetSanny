@@ -33,3 +33,9 @@ O atendimento informado pelo usuário foi reparado com as permissões do proprie
 Em 08/10/2026, documents_finance_isolation.sql retornou PASS no Supabase. Usa duas clínicas temporárias e seus proprietários, documentos somente de metadados e lançamentos financeiros. Verifica leitura isolada, edição/exclusão de registros estrangeiros bloqueadas e inclusão financeira estrangeira rejeitada nas duas direções. Confere o predicado de autorização dos caminhos de Storage e rejeição de caminho inválido. Todos os fixtures estão em transação terminada por ROLLBACK.
 
 Limite: este teste não envia arquivos físicos nem executa download via API Storage. Upload/download real, autorização da API de arquivos e fluxo financeiro pela interface ainda precisam de validação. Não houve alteração de registros reais nem publicação na Vercel.
+
+## Validação dos módulos pela interface
+
+Na MeuPet, a receita fictícia de R$ 12,34 foi criada e permaneceu após recarregar. Uma despesa fictícia de R$ 2,34 produziu saldo de R$ 10,00. O teste revelou custos estimados em 25% da receita no antigo DRE; esse cálculo foi removido. O resumo agora apresenta somente receitas, despesas e saldo registrados.
+
+Tutor e pet identificados com TESTE foram criados pela interface. TESTE-documento.png (imagem mínima sem dados pessoais) foi enviado com sucesso e permaneceu no prontuário após recarregar. A tentativa de download não produziu evento capturável no navegador integrado; integridade do arquivo baixado e isolamento dos arquivos físicos entre contas continuam pendentes. A tela de documentos ficou aberta para conferência manual. Os registros fictícios permanecem na MeuPet para rastrear o teste e ainda precisam de limpeza autorizada.
