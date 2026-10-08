@@ -27,3 +27,9 @@ A migração 202610080003_platform_access.sql foi aplicada em 08/10/2026. curren
 A migração 202610080004_appointment_contacts.sql foi aplicada. save_appointment_with_contacts executa com os privilégios do usuário e RLS: cria tutor/pet novos ou valida os selecionados, e salva o atendimento na mesma transação. Selecionar um pet de outro tutor é rejeitado. O serviço do frontend chama essa operação e a lista de clientes recarrega quando novos atendimentos são criados.
 
 O atendimento informado pelo usuário foi reparado com as permissões do proprietário da clínica; tutor e pet foram vinculados, mantendo o status confirmed. appointment_contacts.sql retornou PASS para criação vinculada, rollback de todos os cadastros em falha e reparo repetido sem duplicação. Os fixtures desse teste foram revertidos. 18 testes de serviços/acesso passaram. A confirmação visual de Clientes & Pets após o reparo permanece com o usuário, pois a aba integrada não estava autenticada.
+
+## Isolamento de documentos e financeiro
+
+Em 08/10/2026, documents_finance_isolation.sql retornou PASS no Supabase. Usa duas clínicas temporárias e seus proprietários, documentos somente de metadados e lançamentos financeiros. Verifica leitura isolada, edição/exclusão de registros estrangeiros bloqueadas e inclusão financeira estrangeira rejeitada nas duas direções. Confere o predicado de autorização dos caminhos de Storage e rejeição de caminho inválido. Todos os fixtures estão em transação terminada por ROLLBACK.
+
+Limite: este teste não envia arquivos físicos nem executa download via API Storage. Upload/download real, autorização da API de arquivos e fluxo financeiro pela interface ainda precisam de validação. Não houve alteração de registros reais nem publicação na Vercel.
