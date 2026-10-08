@@ -30,4 +30,8 @@ Nenhum arquivo .env.local deve entrar no Git. Não inserir chaves privadas no fr
 
 Conferir login da clínica e do administrador, isolamento entre clínicas, confirmação de e-mail, recuperação de senha, persistência de cadastros e download de documentos. O login com senhas e a definição de nova senha devem ser feitos pelo titular.
 
-Estado atual: autenticação de produção preparada; publicação pendente de acesso ao painel da Vercel. Nenhum push ou deploy foi feito nesta etapa.
+Em 08/10/2026, VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY foram atualizadas na Vercel para o novo projeto (chave pública publishable, sem chaves privadas). A main do GitHub avançou de 2aa2727 para 244070b sem reescrita de histórico. A Vercel compilou esse commit e confirmou Ready, Production Current, associado a petsanny.vercel.app.
+
+Deploy: https://vercel.com/santanna1608-8405s-projects/pet-sanny/CBRksmCRGaGnVodZwzG49zXvdgph
+
+A validação de login com senha no domínio publicado aguarda o titular. A confirmação local da recuperação não substitui essa validação de produção.

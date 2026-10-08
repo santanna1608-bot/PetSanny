@@ -56,4 +56,4 @@ O retorno local http://127.0.0.1:5174/?flow=recovery foi salvo e confirmado apó
 
 ## Preparação de produção
 
-Site URL do Supabase ajustado para https://petsanny.vercel.app. Retornos exatos de confirmação (#auth) e recuperação (?flow=recovery) adicionados, mantendo os dois retornos locais. A interface confirmou quatro URLs autorizadas. O painel da Vercel está na tela de login e aguarda o titular para permitir configuração e publicação. Consulte PUBLICACAO.md.
+Site URL do Supabase ajustado para https://petsanny.vercel.app. Retornos exatos de confirmação (#auth) e recuperação (?flow=recovery) adicionados, mantendo os dois retornos locais. A interface confirmou quatro URLs autorizadas. Após o titular entrar na Vercel, URL e chave pública foram atualizadas. A main recebeu 244070b sem reescrita de histórico; a Vercel confirmou Ready e Production Current no domínio oficial. A página pública e o login com Esqueci minha senha carregaram após recarregar. Login real de produção aguarda o titular. Consulte PUBLICACAO.md.
