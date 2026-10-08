@@ -52,4 +52,8 @@ Implementados solicitação de link, retorno dedicado e formulário de nova senh
 
 O retorno local http://127.0.0.1:5174/?flow=recovery foi salvo e confirmado após recarregar a configuração do Supabase. Abrir esse endereço com uma sessão comum mostrou link inválido e não liberou campos de nova senha. O botão Esqueci minha senha abriu o formulário de solicitação.
 
-21 testes passaram, build passou e lint terminou sem erros (avisos existentes). Ainda não foi enviado e-mail real de recuperação nem alterada senha: o fluxo por e-mail e o login com a nova senha aguardam o titular. A Vercel permanece sem publicação destas alterações.
+21 testes passaram, build passou e lint terminou sem erros (avisos existentes). Posteriormente, o titular confirmou a redefinição pelo e-mail e o login com a nova senha na MeuPet. A Vercel permanece sem publicação destas alterações.
+
+## Preparação de produção
+
+Site URL do Supabase ajustado para https://petsanny.vercel.app. Retornos exatos de confirmação (#auth) e recuperação (?flow=recovery) adicionados, mantendo os dois retornos locais. A interface confirmou quatro URLs autorizadas. O painel da Vercel está na tela de login e aguarda o titular para permitir configuração e publicação. Consulte PUBLICACAO.md.
