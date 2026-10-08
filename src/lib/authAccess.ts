@@ -17,6 +17,11 @@ export async function resolveUser(account: User): Promise<AuthUser> {
   if (pending) return pending;
   const resolution = (async () => {
     const client = requireSupabase();
+    const { data: platformAdmin, error: platformError } = await client.rpc(
+      "current_platform_admin",
+    );
+    if (platformError) throw platformError;
+    const isPlatformAdmin = platformAdmin === true;
     const readMemberships = async () => {
       const { data, error } = await client
         .from("tenant_memberships")
@@ -30,6 +35,7 @@ export async function resolveUser(account: User): Promise<AuthUser> {
     const draft = account.user_metadata?.clinic_draft;
     if (
       !memberships.length &&
+      !isPlatformAdmin &&
       account.email_confirmed_at &&
       draft?.tenantName
     ) {
@@ -48,7 +54,7 @@ export async function resolveUser(account: User): Promise<AuthUser> {
       id: account.id,
       email: account.email || "",
       memberships,
-      is_super_admin: false,
+      is_super_admin: isPlatformAdmin,
       user_metadata: {
         name: account.user_metadata?.name || "",
         phone: account.user_metadata?.phone || "",

@@ -1,4 +1,5 @@
 import { TenantSetup } from "./components/TenantSetup";
+import { PlatformAdminPanel } from "./components/PlatformAdminPanel";
 import { configurationError } from "./lib/supabaseClient";
 import { useState, useEffect, lazy, Suspense } from "react";
 import {
@@ -253,6 +254,7 @@ function AppContent() {
       </main>
     );
   }
+  if (user?.is_super_admin && !authLoading) return <PlatformAdminPanel />;
   if (user && !user.memberships.length && !authLoading) return <TenantSetup />;
   if (authLoading || (user && !currentTenant.id && dataLoading)) {
     return (

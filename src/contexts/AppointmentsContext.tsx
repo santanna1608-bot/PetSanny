@@ -109,7 +109,7 @@ export const AppointmentsProvider: React.FC<{ children: React.ReactNode }> = ({
     setAppointments([]);
     setToasts([]);
     setTenantError(null);
-    if (!user?.memberships.length) {
+    if (!user?.memberships.length || user.is_super_admin) {
       setLoading(false);
       return;
     }
