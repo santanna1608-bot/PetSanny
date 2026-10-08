@@ -1,32 +1,19 @@
-# React + TypeScript + Vite
+# PetSanny
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Aplicativo React, TypeScript e Vite com Supabase. A configuração local usa o projeto dpcyahwodzpolzuznrrq.
 
-Currently, two official plugins are available:
+## Desenvolvimento
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Instale as dependências com npm ci. Copie .env.example para .env.local e configure URL e chave pública do mesmo projeto. Nunca coloque service_role, senha do banco ou tokens privados no frontend.
 
-## React Compiler
+Comandos: npm run dev, npm run build, npm run lint e npm test.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Estado desta entrega
 
-## Expanding the Oxlint configuration
+Autenticação consulta vínculos no banco; o cadastro da clínica usa bootstrap_tenant após confirmação do email. Agenda, tutores, pets, prontuário, estoque, financeiro e notas internas do CRM usam persistência remota. O logout encerra a sessão sem apagar registros. Documentos usam Storage privado com políticas por clínica.
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+As automações são rascunhos inativos. WhatsApp, cobrança, webhooks e assistente de IA ainda precisam de implementação no servidor. Não há superadministrador criado automaticamente. A página comercial ainda precisa de revisão das promessas e preços antes de comercialização.
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+As migrações foram aplicadas na nova base vazia; veja supabase/verification/RESULTADO.md. A versão hospedada na Vercel não foi alterada. Antes de publicar, configure as variáveis públicas na Vercel e revise Site URL/Redirect URLs e confirmação de email no Supabase. Teste cadastro, email, login, operações autenticadas, documentos e logout com uma conta real.
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Os testes automatizados cobrem serviços e resolução de acesso com respostas controladas. Não substituem testes de ponta a ponta nem auditoria completa.
