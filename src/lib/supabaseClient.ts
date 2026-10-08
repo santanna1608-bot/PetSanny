@@ -107,6 +107,15 @@ export function tableService<Row extends { id: string; tenant_id: string }>(
 const appointmentTable = tableService<Appointment>("appointments");
 export const appointmentsService = {
   ...appointmentTable,
+  async create(value: Omit<Appointment, "id" | "created_at">): Promise<Appointment> {
+    const { data, error } = await requireSupabase().rpc("save_appointment_with_contacts", {
+      p_appointment: value,
+    });
+    if (error) throw error;
+    const appointment = Array.isArray(data) && data.length === 1 ? data[0] : data;
+    if (!appointment?.id || !appointment.tutor_id || !appointment.pet_id) throw new Error("O atendimento não foi vinculado aos cadastros.");
+    return appointment as Appointment;
+  },
   async updateStatus(id: string, status: Appointment["status"]) {
     const updates: Partial<Appointment> = { status };
     if (status === "confirmed") updates.confirmed_at = new Date().toISOString();

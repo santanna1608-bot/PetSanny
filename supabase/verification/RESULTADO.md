@@ -21,3 +21,9 @@ A Vercel não foi publicada nesta etapa. Cobrança, webhooks, execução de auto
 A migração 202610080003_platform_access.sql foi aplicada em 08/10/2026. current_platform_admin consulta exclusivamente o usuário autenticado e o cadastro privado de administradores. Não recebe ID externo e não concede privilégios. O frontend usa essa resposta estrita para abrir PlatformAdminPanel, uma consulta das clínicas que também funciona com a base vazia. Não reutiliza os comandos simulados do painel antigo.
 
 16 testes de serviços/acesso passaram e a compilação passou. O login real do administrador permanece pendente: a conta indicada pelo usuário não foi encontrada no novo projeto. O formulário de criação ficou preparado no Supabase para o usuário definir a própria senha. Nenhum administrador foi inserido. O site na Vercel permanece na versão anterior.
+
+## Correção de Novo atendimento
+
+A migração 202610080004_appointment_contacts.sql foi aplicada. save_appointment_with_contacts executa com os privilégios do usuário e RLS: cria tutor/pet novos ou valida os selecionados, e salva o atendimento na mesma transação. Selecionar um pet de outro tutor é rejeitado. O serviço do frontend chama essa operação e a lista de clientes recarrega quando novos atendimentos são criados.
+
+O atendimento informado pelo usuário foi reparado com as permissões do proprietário da clínica; tutor e pet foram vinculados, mantendo o status confirmed. appointment_contacts.sql retornou PASS para criação vinculada, rollback de todos os cadastros em falha e reparo repetido sem duplicação. Os fixtures desse teste foram revertidos. 18 testes de serviços/acesso passaram. A confirmação visual de Clientes & Pets após o reparo permanece com o usuário, pois a aba integrada não estava autenticada.

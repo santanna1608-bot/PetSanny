@@ -1,6 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {loadServices,fakeClient} from './service-loader.mjs';
+test('novo atendimento usa operação atômica e recebe tutor e pet vinculados',async()=>{
+  const result={id:'appointment',tenant_id:'clinic',tutor_id:'tutor',pet_id:'pet'};
+  const client=fakeClient([{data:[result],error:null}]); const {exports}=await loadServices(client);
+  const created=await exports.appointmentsService.create({tenant_id:'clinic',tutor_name:'Tutor',pet_name:'Pet'});
+  assert.equal(created.pet_id,'pet');assert.equal(client.calls[0][1],'save_appointment_with_contacts');
+  assert.ok(!client.calls.some(c=>c[0]==='insert'));
+});
+test('falha na operação atômica não anuncia atendimento salvo',async()=>{
+  const error={message:'pet rejected'};const client=fakeClient([{data:null,error}]);const loaded=await loadServices(client);
+  await assert.rejects(loaded.exports.appointmentsService.create({tenant_id:'clinic'}),e=>e===error);
+  assert.equal(loaded.storageWrites(),0);
+});
 test('falha remota de cadastro é propagada e não grava fallback local',async()=>{
   const error={message:'RLS blocked'};const client=fakeClient([{data:null,error}]);const loaded=await loadServices(client);
   await assert.rejects(loaded.exports.tutorsService.create({tenant_id:'clinic-a',name:'Tutor',email:null,phone:null}),e=>e===error);

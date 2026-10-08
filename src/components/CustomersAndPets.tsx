@@ -20,7 +20,7 @@ import { ConfirmModal } from "./ConfirmModal";
 import { PetProfile } from "./PetProfile";
 
 export const CustomersAndPets: React.FC = () => {
-  const { currentTenant, addToast } = useAppointments();
+  const { currentTenant, addToast, appointments } = useAppointments();
   const { t } = useLanguage();
   const [tutors, setTutors] = useState<Tutor[]>([]);
   const [pets, setPets] = useState<Pet[]>([]);
@@ -85,7 +85,7 @@ export const CustomersAndPets: React.FC = () => {
     return () => {
       canceled = true;
     };
-  }, [currentTenant.id, addToast]);
+  }, [currentTenant.id, addToast, appointments.length]);
 
   const handleAddTutor = async (e: React.FormEvent) => {
     e.preventDefault();
