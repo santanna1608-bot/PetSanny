@@ -1,5 +1,6 @@
 import { TenantSetup } from "./components/TenantSetup";
 import { PasswordRecovery } from './components/PasswordRecovery';
+import { TutorPortal } from './components/TutorPortal';
 import { PlatformAdminPanel } from "./components/PlatformAdminPanel";
 import { configurationError } from "./lib/supabaseClient";
 import { useState, useEffect, lazy, Suspense } from "react";
@@ -455,6 +456,7 @@ function AppContent() {
 
 function AccessGate() {
   const { recoveryReady } = useAuth();
+  if (window.location.hash.startsWith('#visit=')) return <TutorPortal token={window.location.hash.slice(7)}/>;
   if (recoveryReady || new URLSearchParams(window.location.search).get('flow') === 'recovery') return <PasswordRecovery reset />;
   return <AppointmentsProvider><AppContent /></AppointmentsProvider>;
 }

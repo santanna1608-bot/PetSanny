@@ -19,6 +19,7 @@ import type {
   DocumentRow,
 } from "../lib/domainServices";
 import { ConfirmModal } from "./ConfirmModal";
+import { CarePassport } from './CarePassport';
 import { ArrowLeft, FileText, Scale, Calendar, Upload } from "lucide-react";
 interface PetProfileProps {
   pet: Pet;
@@ -148,6 +149,7 @@ export function PetProfile({ pet, tutor, onBack }: PetProfileProps) {
       <nav className="flex flex-wrap gap-3">
         {[
           ["medical", "Prontuário"],
+          ["care", "Passaporte de cuidados"],
           ["weights", "Peso"],
           ["reminders", "Lembretes"],
           ["docs", "Documentos"],
@@ -166,6 +168,7 @@ export function PetProfile({ pet, tutor, onBack }: PetProfileProps) {
         <p role="status">Carregando prontuário…</p>
       ) : loadError ? null : (
         <>
+          {tab === 'care' && <CarePassport key={pet.id} pet={pet}/>}
           {tab === "medical" && (
             <div className="grid md:grid-cols-2 gap-8">
               <form

@@ -26,7 +26,10 @@ export interface Appointment {
   price: number;
   appointment_date: string;
   appointment_time: string;
-  status: "pending" | "confirmed" | "completed";
+  status: "pending" | "confirmed" | "completed" | "canceled";
+  duration_minutes?: number;
+  cancellation_reason?: string | null;
+  care_stage?: 'scheduled' | 'received' | 'in_progress' | 'ready' | 'collected';
   confirmed_at: string | null;
   critical_notes: string | null;
   created_at?: string;

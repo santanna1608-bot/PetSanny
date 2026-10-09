@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { ReturnOpportunities } from './ReturnOpportunities';
+import { AgendaResults } from './AgendaResults';
 import { useAppointments } from "../contexts/AppointmentsContext";
 import { tutorsService, petsService } from "../lib/supabaseClient";
 import { financeService } from "../lib/domainServices";
@@ -52,7 +54,7 @@ export function DashboardPremium() {
   }, [currentTenant.id]);
   const today = localDate();
   const scheduled = appointments
-    .filter((a) => a.appointment_date === today)
+    .filter((a) => a.appointment_date === today && a.status !== 'canceled')
     .sort((a, b) => a.appointment_time.localeCompare(b.appointment_time));
   const money = (value: number) =>
     value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -133,12 +135,15 @@ export function DashboardPremium() {
                   pending: "Pendente",
                   confirmed: "Confirmado",
                   completed: "Concluído",
+                  canceled: "Cancelado",
                 }[a.status]
               }
             </span>
           </article>
         ))}
       </div>
+      <ReturnOpportunities key={currentTenant.id}/>
+      <AgendaResults key={currentTenant.id}/>
     </section>
   );
 }

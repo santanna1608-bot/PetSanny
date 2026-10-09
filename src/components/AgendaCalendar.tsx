@@ -21,10 +21,10 @@ export const AgendaCalendar: React.FC = () => {
     const todayStr = new Date().toISOString().split('T')[0];
     
     if (viewMode === 'today') {
-      return appointments.filter(app => app.appointment_date === todayStr);
+      return appointments.filter(app => app.appointment_date === todayStr && app.status !== 'canceled');
     } else {
       // Ordenar por data e hora para a visualização semanal
-      return [...appointments].sort((a, b) => {
+      return appointments.filter(app => app.status !== 'canceled').sort((a, b) => {
         const dateDiff = a.appointment_date.localeCompare(b.appointment_date);
         if (dateDiff !== 0) return dateDiff;
         return a.appointment_time.localeCompare(b.appointment_time);

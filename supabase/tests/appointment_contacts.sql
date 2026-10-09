@@ -5,7 +5,7 @@ SET LOCAL ROLE authenticated;
 DO $$ DECLARE p jsonb; a public.appointments; tc bigint; pc bigint; ac bigint; rejected boolean:=false; BEGIN
  SELECT to_jsonb(x) INTO p FROM public.appointments x LIMIT 1;
  IF p IS NULL THEN RAISE EXCEPTION 'Atendimento de referência ausente'; END IF;
- p:=p || jsonb_build_object('tutor_id',NULL,'pet_id',NULL,'tutor_name','Teste transacional','pet_name','Pet teste','price',-1);
+ p:=p || jsonb_build_object('tutor_id',NULL,'pet_id',NULL,'tutor_name','Teste transacional','pet_name','Pet teste','professional_name','TESTE TRANSACIONAL','price',-1);
  SELECT count(*) INTO tc FROM public.tutors;
  SELECT count(*) INTO pc FROM public.pets;
  SELECT count(*) INTO ac FROM public.appointments;

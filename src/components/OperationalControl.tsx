@@ -10,13 +10,15 @@ import {
   Plus
 } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
+import { ScheduleRecovery } from './ScheduleRecovery';
+import { CareProgress } from './CareProgress';
 
 interface OperationalControlProps {
   onOpenAddModal: () => void;
 }
 
 export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAddModal }) => {
-  const { appointments, changeAppointmentStatus, deleteAppointment } = useAppointments();
+  const { appointments, currentTenant, changeAppointmentStatus, deleteAppointment } = useAppointments();
   const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -43,7 +45,7 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
   });
 
   return (
-    <div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200 dark:border-stone-800 shadow-sm mb-8">
+    <><ScheduleRecovery key={currentTenant.id}/><CareProgress key={currentTenant.id}/><div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200 dark:border-stone-800 shadow-sm mb-8">
       {/* Topo com Título e Botão Novo */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
@@ -106,6 +108,7 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
             <option value="pending" className="dark:bg-stone-900">{t('operational.pending_plural')}</option>
             <option value="confirmed" className="dark:bg-stone-900">{t('operational.confirmed_plural')}</option>
             <option value="completed" className="dark:bg-stone-900">{t('operational.completed_plural')}</option>
+            <option value="canceled" className="dark:bg-stone-900">Cancelados</option>
           </select>
         </div>
       </div>
@@ -187,7 +190,7 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
                           ? 'bg-emerald-50 dark:bg-emerald-955/40 text-emerald-700 dark:text-emerald-455 border border-emerald-100 dark:border-emerald-900/50'
                           : 'bg-amber-50 dark:bg-amber-955/40 text-amber-700 dark:text-amber-455 border border-amber-100 dark:border-amber-900/50'
                       }`}>
-                        {app.status === 'completed' ? t('status.completed') : app.status === 'confirmed' ? t('status.confirmed') : t('status.pending')}
+                        {app.status === 'canceled' ? 'Cancelado' : app.status === 'completed' ? t('status.completed') : app.status === 'confirmed' ? t('status.confirmed') : t('status.pending')}
                       </span>
                     </td>
 
@@ -217,7 +220,7 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
                         )}
 
                         {/* Ação: Voltar para Pendente se Confirmado/Concluído */}
-                        {app.status !== 'pending' && (
+                        {app.status !== 'pending' && app.status !== 'canceled' && (
                           <button
                             onClick={() => changeAppointmentStatus(app.id, 'pending')}
                             className="p-1.5 bg-stone-100 dark:bg-stone-850 text-stone-400 dark:text-stone-500 hover:bg-stone-200 dark:hover:bg-stone-750 rounded-lg transition-colors cursor-pointer"
@@ -266,6 +269,6 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
         }}
         isDanger={true}
       />
-    </div>
+    </div></>
   );
 };
