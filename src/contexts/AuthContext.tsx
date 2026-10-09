@@ -167,13 +167,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
   const updateProfile = async (updates: ProfileUpdates) => {
     const { email, password, ...metadata } = updates;
-    const { error } = await requireSupabase().auth.updateUser({
+    const { data, error } = await requireSupabase().auth.updateUser({
       data: metadata,
       ...(email ? { email } : {}),
       ...(password ? { password } : {}),
     });
     if (error) throw error;
-    await retryAccess();
+    await applyAccount(data.user);
   };
   const logout = async () => {
     await signOut();

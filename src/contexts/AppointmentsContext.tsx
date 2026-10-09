@@ -102,6 +102,9 @@ export const AppointmentsProvider: React.FC<{ children: React.ReactNode }> = ({
     (id: string) => setToasts((prev) => prev.filter((t) => t.id !== id)),
     [],
   );
+  const accountId = user?.id;
+  const platformAdmin = user?.is_super_admin;
+  const membershipIds = JSON.stringify(user?.memberships.map(m => m.tenant_id) || []);
   useEffect(() => {
     let canceled = false;
     setTenants([]);
@@ -109,7 +112,8 @@ export const AppointmentsProvider: React.FC<{ children: React.ReactNode }> = ({
     setAppointments([]);
     setToasts([]);
     setTenantError(null);
-    if (!user?.memberships.length || user.is_super_admin) {
+    const tenantIds = JSON.parse(membershipIds) as string[];
+    if (!accountId || !tenantIds.length || platformAdmin) {
       setLoading(false);
       return;
     }
@@ -121,7 +125,7 @@ export const AppointmentsProvider: React.FC<{ children: React.ReactNode }> = ({
           .select("*")
           .in(
             "id",
-            user.memberships.map((m) => m.tenant_id),
+            tenantIds,
           );
         if (error) throw error;
         const values: Tenant[] = data.map((t) => ({
@@ -154,7 +158,7 @@ export const AppointmentsProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => {
       canceled = true;
     };
-  }, [user]);
+  }, [accountId, platformAdmin, membershipIds]);
   const fetchAppointments = useCallback(async () => {
     if (!user || !currentTenant.id) return;
     const requestedScope = scope;
