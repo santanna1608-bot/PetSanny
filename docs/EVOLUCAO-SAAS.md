@@ -27,6 +27,7 @@ Não definir preços finais antes de calcular custo de WhatsApp, armazenamento, 
 
 - Migrações 005 e 006 aplicadas; testes transacionais de agenda e isolamento do passaporte passaram no Supabase com ROLLBACK dos dados de teste.
 - Código dos novos recursos passou na compilação e nos 28 testes locais. A análise estática passou com avisos preexistentes.
-- Portal do tutor autorizado pelo usuário e migração 007 aplicada. Teste transacional no Supabase passou: leitura mínima, confirmação, pedido sem duplicação, aceite pela equipe, expiração/revogação e isolamento entre clínicas. Os novos recursos ainda não foram publicados na Vercel.
+- Portal do tutor autorizado pelo usuário e migração 007 aplicada. Teste transacional no Supabase passou: leitura mínima, confirmação, pedido sem duplicação, aceite pela equipe, expiração/revogação e isolamento entre clínicas. Interface local conferida na PetCare Barra: emissão e leitura do link e bloqueio após revogação, sem alterar a agenda de Thor. Passaporte aberto e conferido.
+- Publicação 9659946 enviada ao GitHub main. Vercel confirmou Ready/Production, domínio petsanny.vercel.app, implantação 8WSYcaA3ZnAHsveuCdeqsjZcd45s em 09/10/2026. WhatsApp, cobrança, IA e reconstrução da landing page continuam pendentes.
 - Recomendação para WhatsApp: API oficial com provedor gerenciado e número próprio por clínica. Provedor, contratação e custos ainda pendentes; nenhum envio real implementado.
 - Landing page permanece para depois da validação dos recursos, conforme solicitado.

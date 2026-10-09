@@ -16,6 +16,7 @@ import {
   CreditCard,
   Settings as SettingsIcon,
   X,
+  Cable,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -44,6 +45,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: "crm", label: t("menu.crm"), icon: MessageSquare },
     { id: "inventory", label: t("menu.inventory"), icon: Package },
     { id: "automations", label: t("menu.automations"), icon: Zap },
+    { id: "connections", label: "Conexões", icon: Cable },
     ...(isSuperAdmin
       ? [{ id: "saas", label: t("menu.saas"), icon: CreditCard }]
       : []),

@@ -83,6 +83,7 @@ const SaaSSubscriptions = lazy(() =>
   })),
 );
 import { Settings } from "./components/Settings";
+import { ConnectionsCenter } from "./components/ConnectionsCenter";
 
 const ComponentLoader = () => (
   <div className="flex flex-col items-center justify-center min-h-[300px] w-full p-8 gap-3">
@@ -434,6 +435,7 @@ function AppContent() {
               {activeTab === "customers" && <CustomersAndPets />}
               {activeTab === "saas" && <SaaSSubscriptions />}
               {activeTab === "settings" && <Settings />}
+              {activeTab === "connections" && <ConnectionsCenter key={currentTenant.id} />}
             </PageTransition>
           </Suspense>
         </main>
