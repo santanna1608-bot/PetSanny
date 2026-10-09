@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppointments } from "../contexts/AppointmentsContext";
 import { automationService } from "../lib/domainServices";
 import type { AutomationRow } from "../lib/domainServices";
+import { MessagePreviews } from './MessagePreviews';
 export function AutomationsCenter() {
   const { currentTenant, addToast } = useAppointments();
   const [rules, setRules] = useState<AutomationRow[]>([]);
@@ -29,6 +30,7 @@ export function AutomationsCenter() {
   return (
     <section className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-6 space-y-5">
       <h2 className="text-xl font-bold">Central de automações</h2>
+      <MessagePreviews key={currentTenant.id}/>
       <p className="rounded-xl bg-amber-50 text-amber-900 p-4">
         Você pode salvar rascunhos de regras. A execução automática, a conexão
         WhatsApp e o envio de mensagens estão em preparação.

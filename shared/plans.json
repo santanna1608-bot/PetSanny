@@ -1,0 +1,5 @@
+[
+ {"id":"essencial","name":"Essencial","price":97,"description":"Organize o dia a dia da sua clínica.","features":["Agenda e cadastro de tutores e pets","Prontuário, documentos e financeiro","Passaporte de cuidados"]},
+ {"id":"crescer","name":"Crescer","price":197,"description":"Acompanhe retornos e aproveite vagas.","features":["Tudo do Essencial","Lista de espera e recuperação de agenda","Portal do tutor e etapas do atendimento"]},
+ {"id":"profissional","name":"Profissional","price":297,"description":"Acompanhe a operação com mais contexto.","features":["Tudo do Crescer","Indicadores de recuperação da agenda","CRM interno e central de conexões"]}
+]
