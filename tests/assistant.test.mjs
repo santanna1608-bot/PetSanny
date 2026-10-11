@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyRequest, assistantText, routeRequest, validHistory, naturalRequest, naturalReply } from '../server/assistant.js';
+import { classifyRequest, assistantText, routeRequest, validHistory, naturalRequest, naturalReply, reviewedReply } from '../server/assistant.js';
 test('incerteza não executa rota de dados',async()=>{
  assert.equal(await classifyRequest('pedido','fake',async()=>({ok:true,json:async()=>({answers:{rota:{type:'choice',choice:'agenda',confidence:0.3}}})})),'fora');
 });
@@ -30,4 +30,11 @@ test('Jev recebe somente pedido, nunca dados da clínica',()=>{
 test('resumo conserva números e mensagem exige revisão sem envio',()=>{
  assert.match(assistantText('agenda',{total:4,confirmed:1,pending:1,completed:1,canceled:1}),/4 atendimentos/);
  assert.match(assistantText('mensagem'),/Nenhuma mensagem foi enviada/);
+});
+test('rascunho sem campos obrigatórios recebe modelo seguro',()=>{
+ const corrected=reviewedReply('Aqui é da clínica PetSanny.','mensagem');
+ assert.match(corrected,/\[nome da clínica\]/);assert.match(corrected,/\[nome do tutor\]/);assert.match(corrected,/\[nome do pet\]/);
+ assert.doesNotMatch(corrected,/clínica PetSanny/);
+ const valid=reviewedReply('Olá [nome do tutor], da [nome da clínica], retorno de [nome do pet].','mensagem');
+ assert.match(valid,/Nenhuma mensagem foi enviada/);
 });
