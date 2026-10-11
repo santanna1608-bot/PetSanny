@@ -29,7 +29,12 @@ export async function processAsaasEvent(config,body) {
   const found=await config.db.from('billing_orders').select('id,amount,subscription_id').eq('environment',config.environment).eq('checkout_id',checkout.id).maybeSingle();
   if(found.error||!found.data)throw Error('ORDER_NOT_READY');
   if(event==='CHECKOUT_PAID') {
-   const list=await asaasRequest(config,'/payments?checkoutSession='+encodeURIComponent(checkout.id)+'&limit=100');
+   let list=await asaasRequest(config,'/payments?checkoutSession='+encodeURIComponent(checkout.id)+'&limit=100');
+   if(Array.isArray(list.data)&&list.data.length===0&&!list.hasMore) {
+    // Alternativa restrita à referência opaca do pedido; nunca conciliar por nome ou valor apenas.
+    list=await asaasRequest(config,'/payments?externalReference='+encodeURIComponent(found.data.id)+'&limit=100');
+    if(!Array.isArray(list.data)||list.data.some(p=>p.externalReference!==found.data.id))throw Error('INCONSISTENT_PAYMENT');
+   }
    if(!Array.isArray(list.data)||!list.data.length||list.hasMore)throw Error('RECONCILIATION_REQUIRED');
    for(const p of list.data)await record(config,found.data,p,id+':'+p.id,event);
    const subscriptions=[...new Set(list.data.map(p=>p.subscription))];

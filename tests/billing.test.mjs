@@ -2,6 +2,28 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {checkoutPayload,safeCheckoutLink,checkoutLink,billingConfig,validWebhookToken,billingOwner} from '../server/billing.js';
 import {normalizedPayment,processAsaasEvent} from '../server/asaasEvents.js';
+
+test('checkout concilia pela referencia exata e rejeita resultados alheios ou incompletos',async t=>{
+ for(const scenario of ['valid','foreign','empty','partial','wrong-value'])await t.test(scenario,async()=>{
+  const previous=globalThis.fetch;const requests=[];const writes=[];
+  const payment={id:'pay_1',subscription:'sub_1',value:97,dueDate:'2026-10-10',status:'CONFIRMED',externalReference:'order_1'};
+  const query={select(){return this;},eq(){return this;},async maybeSingle(){return {data:{id:'order_1',amount:97,subscription_id:null}};}};
+  globalThis.fetch=async url=>{
+   requests.push(url);
+   let body;
+   if(url.includes('checkoutSession='))body={data:[],hasMore:false};
+   else if(url.includes('externalReference='))body={data:scenario==='empty'?[]:[{...payment,...scenario==='foreign'?{externalReference:'other'}:scenario==='wrong-value'?{value:197}:{}}],hasMore:scenario==='partial'};
+   else {assert.equal(url,'https://api-sandbox.asaas.com/v3/subscriptions/sub_1');body={id:'sub_1',status:'ACTIVE'};}
+   return {ok:true,json:async()=>body};
+  };
+  try {
+   const run=processAsaasEvent({environment:'sandbox',api:'https://api-sandbox.asaas.com/v3',key:'test',db:{from:()=>query,rpc:async(name,args)=>{writes.push({name,args});return {};}}},{id:'checkout-event',event:'CHECKOUT_PAID',checkout:{id:'checkout_1'}});
+   if(scenario==='valid'){await run;assert.deepEqual(writes.map(w=>w.name),['process_asaas_payment','process_asaas_subscription','process_asaas_checkout']);}
+   else {await assert.rejects(run,/INCONSISTENT_PAYMENT|RECONCILIATION_REQUIRED/);assert.equal(writes.length,0);}
+   assert.equal(requests[1],'https://api-sandbox.asaas.com/v3/payments?externalReference=order_1&limit=100');
+  } finally {globalThis.fetch=previous;}
+ });
+});
 test('checkout aceita somente plano do catalogo e valor definido no servidor',()=>{
  const body=checkoutPayload('crescer','order','https://petsanny.vercel.app',new Date('2026-10-09T12:00:00Z'));
  assert.equal(body.items[0].value,197);assert.deepEqual(body.chargeTypes,['RECURRENT']);assert.equal(body.subscription.cycle,'MONTHLY');
