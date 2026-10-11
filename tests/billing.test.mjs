@@ -3,6 +3,40 @@ import assert from 'node:assert/strict';
 import {checkoutPayload,safeCheckoutLink,checkoutLink,billingConfig,validWebhookToken,billingOwner} from '../server/billing.js';
 import {normalizedPayment,processAsaasEvent} from '../server/asaasEvents.js';
 
+test('simulacao de atraso preserva vencimento original somente no Sandbox',async t=>{
+ for(const environment of ['sandbox','production'])await t.test(environment,async()=>{
+  const previous=globalThis.fetch;const writes=[];
+  globalThis.fetch=async()=>({ok:true,json:async()=>({id:'pay_next',subscription:'sub_1',value:97,status:'CONFIRMED',dueDate:'2026-10-09',originalDueDate:'2026-11-10'})});
+  const query={select(){return this;},eq(){return this;},async maybeSingle(){return {data:{id:'order_1',amount:97,subscription_id:'sub_1'}};}};
+  try{
+   await processAsaasEvent({environment,api:environment==='sandbox'?'https://api-sandbox.asaas.com/v3':'https://api.asaas.com/v3',key:'test',db:{from:()=>query,rpc:async(name,args)=>{writes.push(args);return {};}}},{id:'period-event',event:'PAYMENT_CONFIRMED',payment:{id:'pay_next'}});
+   assert.equal(writes[0].p_due_date,environment==='sandbox'?'2026-11-10':'2026-10-09');
+  }finally{globalThis.fetch=previous;}
+ });
+});
+
+test('renovacao e atraso usam a cobranca recorrente atual e o ambiente do pedido',async t=>{
+ for(const scenario of [
+  {event:'PAYMENT_RECEIVED',status:'RECEIVED',dueDate:'2026-11-10'},
+  {event:'PAYMENT_OVERDUE',status:'OVERDUE',dueDate:'2026-11-10'},
+  {event:'PAYMENT_OVERDUE',status:'RECEIVED',dueDate:'2026-11-10'},
+ ])await t.test(scenario.event+' -> '+scenario.status,async()=>{
+  const previous=globalThis.fetch;const writes=[];const filters=[];
+  globalThis.fetch=async url=>{
+   assert.equal(url,'https://api-sandbox.asaas.com/v3/payments/pay_next');
+   return {ok:true,json:async()=>({id:'pay_next',subscription:'sub_existing',value:97,status:scenario.status,dueDate:scenario.dueDate})};
+  };
+  const query={select(){return this;},eq(key,value){filters.push([key,value]);return this;},async maybeSingle(){return {data:{id:'order_existing',amount:97,subscription_id:'sub_existing'}};}};
+  try{
+   await processAsaasEvent({environment:'sandbox',api:'https://api-sandbox.asaas.com/v3',key:'test',db:{from:()=>query,rpc:async(name,args)=>{writes.push({name,args});return {};}}},{id:'evt_next',event:scenario.event,payment:{id:'pay_next',status:'PENDING'}});
+   assert.deepEqual(filters,[['environment','sandbox'],['subscription_id','sub_existing']]);
+   assert.equal(writes.length,1);assert.equal(writes[0].name,'process_asaas_payment');
+   assert.equal(writes[0].args.p_payment_id,'pay_next');assert.equal(writes[0].args.p_due_date,'2026-11-10');
+   assert.equal(writes[0].args.p_status,scenario.status);assert.equal(writes[0].args.p_environment,'sandbox');
+  }finally{globalThis.fetch=previous;}
+ });
+});
+
 test('checkout concilia pela referencia exata e rejeita resultados alheios ou incompletos',async t=>{
  for(const scenario of ['valid','foreign','empty','partial','wrong-value'])await t.test(scenario,async()=>{
   const previous=globalThis.fetch;const requests=[];const writes=[];

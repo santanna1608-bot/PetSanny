@@ -2,13 +2,16 @@ import { asaasRequest } from './billing.js';
 export const checkoutEvents=['CHECKOUT_PAID','CHECKOUT_CANCELED','CHECKOUT_EXPIRED'];
 export const subscriptionEvents=['SUBSCRIPTION_CREATED','SUBSCRIPTION_UPDATED','SUBSCRIPTION_INACTIVATED','SUBSCRIPTION_DELETED'];
 export const paymentEvents=['PAYMENT_CREATED','PAYMENT_UPDATED','PAYMENT_CONFIRMED','PAYMENT_RECEIVED','PAYMENT_OVERDUE','PAYMENT_DELETED','PAYMENT_RESTORED','PAYMENT_REFUNDED','PAYMENT_PARTIALLY_REFUNDED','PAYMENT_REFUND_IN_PROGRESS','PAYMENT_REFUND_DENIED','PAYMENT_CHARGEBACK_REQUESTED','PAYMENT_CHARGEBACK_DISPUTE','PAYMENT_AWAITING_CHARGEBACK_REVERSAL','PAYMENT_RECEIVED_IN_CASH_UNDONE'];
-export function normalizedPayment(payment,order) {
+export function normalizedPayment(payment,order,environment='production') {
+ // O simulador de atraso do Sandbox antecipa dueDate e mantém o vencimento
+ // contratual em originalDueDate. A cobertura deve acompanhar a mensalidade original.
+ if(environment==='sandbox'&&payment.originalDueDate)payment={...payment,dueDate:payment.originalDueDate};
  if(typeof payment.id!=='string'||!payment.id||payment.id.length>200||typeof payment.status!=='string'||!payment.status||payment.status.length>80||!/^\d{4}-\d{2}-\d{2}$/.test(payment.dueDate)||Number(payment.value)!==Number(order.amount)||typeof payment.subscription!=='string'||!payment.subscription||payment.subscription.length>200||order.subscription_id&&order.subscription_id!==payment.subscription)throw Error('INCONSISTENT_PAYMENT');
  // Nenhum dado de cartão, token ou documento é armazenado.
  return {p_payment_id:payment.id,p_subscription_id:payment.subscription,p_amount:Number(payment.value),p_status:payment.deleted?'DELETED':payment.status,p_due_date:payment.dueDate};
 }
 async function record(config,order,payment,id,event) {
- const args=normalizedPayment(payment,order);
+ const args=normalizedPayment(payment,order,config.environment);
  const saved=await config.db.rpc('process_asaas_payment',{p_environment:config.environment,p_event_id:id,p_event:event,p_order_id:order.id,...args});
  if(saved.error)throw Error('PERSIST_FAILED');
 }
@@ -55,7 +58,7 @@ export async function processAsaasEvent(config,body) {
    if(list.hasMore)throw Error('PAYMENT_LIST_INCOMPLETE');
    if(!list.data.length)throw Error('CHECKOUT_PAYMENTS_NOT_FOUND');
    // Validar todo o lote antes da primeira gravação, inclusive a assinatura única.
-   for(const p of list.data)normalizedPayment(p,found.data);
+   for(const p of list.data)normalizedPayment(p,found.data,config.environment);
    if(new Set(list.data.map(p=>p.subscription)).size!==1)throw Error('INCONSISTENT_SUBSCRIPTION');
    for(const p of list.data)await record(config,found.data,p,id+':'+p.id,event);
    const subscriptions=[...new Set(list.data.map(p=>p.subscription))];
