@@ -28,7 +28,7 @@ const questions = [
 
 export function LandingPage({ onNavigateToAuth, theme, toggleTheme, isLoggedIn, onGoToDashboard }: Props) {
   const start = () => onNavigateToAuth('register');
-  const cta = 'inline-flex items-center justify-center gap-3 rounded-full bg-olive-600 px-7 py-4 font-bold text-white transition-colors hover:bg-olive-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-olive-600';
+  const cta = 'btn-cta-primary inline-flex items-center justify-center gap-3 rounded-full bg-olive-600 px-7 py-4 font-bold text-white hover:bg-olive-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-olive-600';
   return <div className="min-h-screen bg-[#faf8f2] text-stone-900 dark:bg-stone-950 dark:text-stone-100">
     <header className="sticky top-0 z-40 border-b border-stone-200/70 bg-[#faf8f2]/95 backdrop-blur dark:border-stone-800 dark:bg-stone-950/95">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-4">
@@ -48,7 +48,7 @@ export function LandingPage({ onNavigateToAuth, theme, toggleTheme, isLoggedIn, 
           <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs text-stone-500 dark:text-stone-400"><span className="flex items-center gap-1.5"><Check size={14} />Sem cartão</span><span className="flex items-center gap-1.5"><Check size={14} />10 consultas de IA no teste</span></div>
         </div>
 
-        <div className="relative rounded-[2rem] bg-[#e7e9dc] p-4 sm:p-7 dark:bg-olive-600/10">
+        <div className="animate-scale-reveal relative rounded-[2rem] bg-[#e7e9dc] p-4 sm:p-7 dark:bg-olive-600/10">
           <p className="mb-5 text-xs font-semibold tracking-widest text-stone-500 dark:text-stone-400">UMA ROTINA COM MAIS CONTEXTO</p>
           <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-xl dark:border-stone-700 dark:bg-stone-900">
             <div className="flex items-center justify-between border-b border-stone-100 px-5 py-4 dark:border-stone-800"><span className="flex items-center gap-2 text-sm font-bold"><img src={logo} alt="" className="h-7 w-7 rounded-full" />Meu painel</span><span className="text-xs text-stone-400">Exemplo ilustrativo</span></div>
