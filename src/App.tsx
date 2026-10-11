@@ -453,7 +453,7 @@ function AppContent() {
         </Suspense>
       )}
 
-      <PetSannyAI />
+      <PetSannyAI key={currentTenant.id} />
       <ToastContainer />
     </div>
   );
