@@ -7,12 +7,13 @@ test('checkout concilia pela referencia exata e rejeita resultados alheios ou in
  for(const scenario of ['valid','foreign','empty','partial','wrong-value'])await t.test(scenario,async()=>{
   const previous=globalThis.fetch;const requests=[];const writes=[];
   const payment={id:'pay_1',subscription:'sub_1',value:97,dueDate:'2026-10-10',status:'CONFIRMED',externalReference:'order_1'};
-  const query={select(){return this;},eq(){return this;},async maybeSingle(){return {data:{id:'order_1',amount:97,subscription_id:null}};}};
+  const query={select(){return this;},eq(){return this;},async maybeSingle(){return {data:{id:'order_1',amount:97,subscription_id:null,created_at:'2026-10-10T12:00:00Z'}};}};
   globalThis.fetch=async url=>{
    requests.push(url);
    let body;
    if(url.includes('checkoutSession='))body={data:[],hasMore:false};
    else if(url.includes('externalReference='))body={data:scenario==='empty'?[]:[{...payment,...scenario==='foreign'?{externalReference:'other'}:scenario==='wrong-value'?{value:197}:{}}],hasMore:scenario==='partial'};
+   else if(url.includes('dateCreated%5Bge%5D='))body={data:[],hasMore:false};
    else {assert.equal(url,'https://api-sandbox.asaas.com/v3/subscriptions/sub_1');body={id:'sub_1',status:'ACTIVE'};}
    return {ok:true,json:async()=>body};
   };
@@ -22,6 +23,27 @@ test('checkout concilia pela referencia exata e rejeita resultados alheios ou in
    else {await assert.rejects(run,new RegExp(scenario==='empty'?'CHECKOUT_PAYMENTS_NOT_FOUND':scenario==='partial'?'PAYMENT_LIST_INCOMPLETE':'INCONSISTENT_PAYMENT'));assert.equal(writes.length,0);}
    assert.equal(requests[1],'https://api-sandbox.asaas.com/v3/payments?externalReference=order_1&limit=100');
   } finally {globalThis.fetch=previous;}
+ });
+});
+test('consulta alternativa exige checkout exato, pagina completa e lote valido antes de gravar',async t=>{
+ for(const scenario of ['valid','foreign','partial','wrong-value','different-subscriptions'])await t.test(scenario,async()=>{
+  const previous=globalThis.fetch;const requests=[];const writes=[];
+  const payment={id:'pay_1',subscription:'sub_1',value:97,dueDate:'2026-10-10',status:'CONFIRMED',checkoutSession:'checkout_1'};
+  const query={select(){return this;},eq(){return this;},async maybeSingle(){return {data:{id:'order_1',amount:97,subscription_id:null,created_at:'2026-10-10T12:00:00Z'}};}};
+  globalThis.fetch=async url=>{
+   requests.push(url);let body;
+   if(url.includes('checkoutSession=')||url.includes('externalReference='))body={data:[],hasMore:false};
+   else if(url.includes('dateCreated%5Bge%5D='))body={data:scenario==='foreign'?[{...payment,checkoutSession:'other'}]:[payment,...scenario==='wrong-value'?[{...payment,id:'pay_2',value:197}]:scenario==='different-subscriptions'?[{...payment,id:'pay_2',subscription:'sub_other'}]:[]],hasMore:scenario==='partial'};
+   else body={id:'sub_1',status:'ACTIVE'};
+   return {ok:true,json:async()=>body};
+  };
+  try{
+   const run=processAsaasEvent({environment:'sandbox',api:'https://api-sandbox.asaas.com/v3',key:'test',db:{from:()=>query,rpc:async(name,args)=>{writes.push({name,args});return {};}}},{id:'checkout-event',event:'CHECKOUT_PAID',checkout:{id:'checkout_1'}});
+   if(scenario==='valid'){await run;assert.deepEqual(writes.map(w=>w.name),['process_asaas_payment','process_asaas_subscription','process_asaas_checkout']);}
+   else {await assert.rejects(run,new RegExp(scenario==='foreign'?'CHECKOUT_PAYMENTS_NOT_FOUND':scenario==='partial'?'PAYMENT_LIST_INCOMPLETE':scenario==='different-subscriptions'?'INCONSISTENT_SUBSCRIPTION':'INCONSISTENT_PAYMENT'));assert.equal(writes.length,0);}
+   assert.ok(requests.includes('https://api-sandbox.asaas.com/v3/payments?dateCreated%5Bge%5D=2026-10-10&limit=100&offset=0'));
+   if(scenario==='partial')assert.equal(requests.filter(p=>p.includes('offset=')).length,5);
+  }finally{globalThis.fetch=previous;}
  });
 });
 test('checkout aceita somente plano do catalogo e valor definido no servidor',()=>{

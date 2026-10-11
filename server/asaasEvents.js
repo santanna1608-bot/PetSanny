@@ -26,18 +26,37 @@ export async function processAsaasEvent(config,body) {
  }
  if(checkoutEvents.includes(event)) {
   if(typeof checkout?.id!=='string'||checkout.id.length>200)throw Error('INVALID_EVENT');
-  const found=await config.db.from('billing_orders').select('id,amount,subscription_id').eq('environment',config.environment).eq('checkout_id',checkout.id).maybeSingle();
+  const found=await config.db.from('billing_orders').select('id,amount,subscription_id,created_at').eq('environment',config.environment).eq('checkout_id',checkout.id).maybeSingle();
   if(found.error||!found.data)throw Error('ORDER_NOT_READY');
   if(event==='CHECKOUT_PAID') {
    let list=await asaasRequest(config,'/payments?checkoutSession='+encodeURIComponent(checkout.id)+'&limit=100');
+   if(Array.isArray(list.data)&&list.data.some(p=>p.checkoutSession!==checkout.id))throw Error('INCONSISTENT_PAYMENT');
    if(Array.isArray(list.data)&&list.data.length===0&&!list.hasMore) {
     // Alternativa restrita à referência opaca do pedido; nunca conciliar por nome ou valor apenas.
     list=await asaasRequest(config,'/payments?externalReference='+encodeURIComponent(found.data.id)+'&limit=100');
     if(!Array.isArray(list.data)||list.data.some(p=>p.externalReference!==found.data.id))throw Error('INCONSISTENT_PAYMENT');
    }
+   if(Array.isArray(list.data)&&list.data.length===0&&!list.hasMore) {
+    // O Sandbox pode retornar vazio no filtro direto mesmo com checkoutSession presente.
+    // Consulta limitada por data; somente o identificador exato permite conciliação.
+    if(typeof found.data.created_at!=='string'||!/^\d{4}-\d{2}-\d{2}/.test(found.data.created_at))throw Error('RECONCILIATION_REQUIRED');
+    const matched=[];
+    let complete=false;
+    for(let page=0;page<5;page++) {
+     const recent=await asaasRequest(config,'/payments?dateCreated%5Bge%5D='+found.data.created_at.slice(0,10)+'&limit=100&offset='+page*100);
+     if(!Array.isArray(recent.data)||typeof recent.hasMore!=='boolean')throw Error('PAYMENT_LIST_INVALID');
+     matched.push(...recent.data.filter(p=>p.checkoutSession===checkout.id));
+     if(!recent.hasMore){complete=true;break;}
+    }
+    if(!complete)throw Error('PAYMENT_LIST_INCOMPLETE');
+    list={data:matched,hasMore:false};
+   }
    if(!Array.isArray(list.data))throw Error('PAYMENT_LIST_INVALID');
    if(list.hasMore)throw Error('PAYMENT_LIST_INCOMPLETE');
    if(!list.data.length)throw Error('CHECKOUT_PAYMENTS_NOT_FOUND');
+   // Validar todo o lote antes da primeira gravação, inclusive a assinatura única.
+   for(const p of list.data)normalizedPayment(p,found.data);
+   if(new Set(list.data.map(p=>p.subscription)).size!==1)throw Error('INCONSISTENT_SUBSCRIPTION');
    for(const p of list.data)await record(config,found.data,p,id+':'+p.id,event);
    const subscriptions=[...new Set(list.data.map(p=>p.subscription))];
    for(const subscriptionId of subscriptions)await processAsaasEvent(config,{id:id+':subscription:'+subscriptionId,event:'SUBSCRIPTION_UPDATED',subscription:{id:subscriptionId}});
