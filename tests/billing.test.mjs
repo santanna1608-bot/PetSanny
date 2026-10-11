@@ -19,7 +19,7 @@ test('checkout concilia pela referencia exata e rejeita resultados alheios ou in
   try {
    const run=processAsaasEvent({environment:'sandbox',api:'https://api-sandbox.asaas.com/v3',key:'test',db:{from:()=>query,rpc:async(name,args)=>{writes.push({name,args});return {};}}},{id:'checkout-event',event:'CHECKOUT_PAID',checkout:{id:'checkout_1'}});
    if(scenario==='valid'){await run;assert.deepEqual(writes.map(w=>w.name),['process_asaas_payment','process_asaas_subscription','process_asaas_checkout']);}
-   else {await assert.rejects(run,/INCONSISTENT_PAYMENT|RECONCILIATION_REQUIRED/);assert.equal(writes.length,0);}
+   else {await assert.rejects(run,new RegExp(scenario==='empty'?'CHECKOUT_PAYMENTS_NOT_FOUND':scenario==='partial'?'PAYMENT_LIST_INCOMPLETE':'INCONSISTENT_PAYMENT'));assert.equal(writes.length,0);}
    assert.equal(requests[1],'https://api-sandbox.asaas.com/v3/payments?externalReference=order_1&limit=100');
   } finally {globalThis.fetch=previous;}
  });

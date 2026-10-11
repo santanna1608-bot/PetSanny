@@ -35,7 +35,9 @@ export async function processAsaasEvent(config,body) {
     list=await asaasRequest(config,'/payments?externalReference='+encodeURIComponent(found.data.id)+'&limit=100');
     if(!Array.isArray(list.data)||list.data.some(p=>p.externalReference!==found.data.id))throw Error('INCONSISTENT_PAYMENT');
    }
-   if(!Array.isArray(list.data)||!list.data.length||list.hasMore)throw Error('RECONCILIATION_REQUIRED');
+   if(!Array.isArray(list.data))throw Error('PAYMENT_LIST_INVALID');
+   if(list.hasMore)throw Error('PAYMENT_LIST_INCOMPLETE');
+   if(!list.data.length)throw Error('CHECKOUT_PAYMENTS_NOT_FOUND');
    for(const p of list.data)await record(config,found.data,p,id+':'+p.id,event);
    const subscriptions=[...new Set(list.data.map(p=>p.subscription))];
    for(const subscriptionId of subscriptions)await processAsaasEvent(config,{id:id+':subscription:'+subscriptionId,event:'SUBSCRIPTION_UPDATED',subscription:{id:subscriptionId}});

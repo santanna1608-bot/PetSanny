@@ -14,7 +14,7 @@ export default async function handler(req,res) {
  }
  if(![...checkoutEvents,...paymentEvents,...subscriptionEvents].includes(event))return res.json({received:true,ignored:true});
  try{await processAsaasEvent(config,req.body);return res.json({received:true});}catch(e){
-  const known=['INVALID_EVENT','INCONSISTENT_PAYMENT','INCONSISTENT_SUBSCRIPTION','ORDER_NOT_READY','RECONCILIATION_REQUIRED','PERSIST_FAILED','LOOKUP_FAILED','ASAAS_UNCERTAIN','ASAAS_REJECTED'];
+  const known=['INVALID_EVENT','INCONSISTENT_PAYMENT','INCONSISTENT_SUBSCRIPTION','ORDER_NOT_READY','RECONCILIATION_REQUIRED','PAYMENT_LIST_INVALID','PAYMENT_LIST_INCOMPLETE','CHECKOUT_PAYMENTS_NOT_FOUND','PERSIST_FAILED','LOOKUP_FAILED','ASAAS_UNCERTAIN','ASAAS_REJECTED'];
   const code=known.includes(e?.message)?e.message:'RECONCILIATION_FAILED';
   // Apenas código estático: nunca registrar payload, credenciais ou dados do pagador.
   console.error('Asaas webhook reconciliation:',code);
