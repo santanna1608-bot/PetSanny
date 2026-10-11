@@ -48,11 +48,54 @@
 
 @layer base {
   body {
-    @apply bg-stone-50 text-stone-900 font-sans antialiased transition-colors duration-200;
+    @apply bg-stone-50 text-stone-900 font-sans antialiased;
   }
   .dark body {
     @apply bg-stone-950 text-stone-100;
   }
+}
+
+/* Shared motion: short feedback in operations, progressive rhythm in content. */
+@keyframes surfaceEnter {
+  from { opacity: 0; transform: translate3d(0, 24px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes dialogEnter {
+  from { opacity: 0; transform: translate3d(0, 12px, 0) scale(.98); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes opacityEnter { from { opacity: 0; } to { opacity: 1; } }
+.motion-enter { animation: surfaceEnter 560ms var(--ease-out-quart) both; animation-delay: var(--motion-delay, 0ms); }
+.animate-fade-in { animation: opacityEnter 200ms var(--ease-out-quart) both; }
+.animate-scale-up { animation: dialogEnter 280ms var(--ease-out-quart) both; }
+#root button, #root a, #root summary {
+  transition-property: transform, opacity;
+  transition-duration: 220ms;
+  transition-timing-function: var(--ease-spring);
+}
+#root button:not(:disabled):active, #root a:active, #root summary:active {
+  transform: scale(.97);
+  transition-duration: 80ms;
+}
+#root button:disabled { cursor: not-allowed; }
+#root :is(button, a, summary):focus-visible { outline: 2px solid var(--color-olive-500); outline-offset: 4px; }
+#root details[open] > :not(summary) { animation: surfaceEnter 260ms var(--ease-out-quart) both; }
+@media (hover: hover) and (pointer: fine) {
+  #root button:not(:disabled):hover { transform: translate3d(0, -1px, 0); }
+  #root button svg { transition: transform 220ms var(--ease-out-quart); }
+  #root button:hover svg.lucide-arrow-right { transform: translate3d(3px, 0, 0); }
+}
+/* Replace legacy paint-heavy decorative effects with stable surfaces. */
+.price-shimmer, .gradient-anim, .morph-orb, .animate-float, .animate-pulse-soft { animation: none; }
+.feature-card-hover, .btn-cta-primary, .btn-cta-secondary { transition-property: transform, opacity; will-change: auto; }
+.nav-link::after { width: 100%; transform: scaleX(0); transform-origin: left; transition: transform 220ms var(--ease-out-quart); }
+.nav-link:hover::after { transform: scaleX(1); }
+.reveal-up, .reveal-left, .reveal-right, .reveal-scale { will-change: auto; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  #root *, #root *::before, #root *::after { animation: none !important; transition: none !important; }
+  #root .motion-enter { opacity: 1; transform: none; }
+  #root :is(button, a, summary):hover, #root :is(button, a, summary):active { transform: none !important; }
 }
 
 /* ─────────────────────────────────────────────
