@@ -49,3 +49,17 @@ test('cobranca nao confia no tenant informado sem vinculo autenticado',async()=>
  let queried=false;const db={auth:{getUser:async()=>({data:{user:null},error:Error('invalid')})},from:()=>{queried=true;}};
  assert.equal(await billingOwner({method:'GET',headers:{authorization:'Bearer invalid'},query:{tenantId:'50000000-0000-4000-8000-000000000011'}},db),null);assert.equal(queried,false);
 });
+
+test('assinatura consulta estado atual e preserva cancelamento diante de evento atrasado',async()=>{
+ const oldFetch=globalThis.fetch;const calls=[];
+ globalThis.fetch=async(url)=>{assert.equal(url,'https://api-sandbox.asaas.com/v3/subscriptions/sub_1');return {ok:true,json:async()=>({id:'sub_1',status:'ACTIVE',deleted:true})};};
+ const query={select(){return this;},eq(){return this;},async maybeSingle(){return {data:{id:'order_1'}};}};
+ try{await processAsaasEvent({environment:'sandbox',api:'https://api-sandbox.asaas.com/v3',key:'test',db:{from:()=>query,rpc:async(name,args)=>{calls.push({name,args});return {};}}},{id:'sub-event',event:'SUBSCRIPTION_CREATED',subscription:{id:'sub_1',status:'ACTIVE'}});
+ assert.equal(calls[0].name,'process_asaas_subscription');assert.equal(calls[0].args.p_status,'DELETED');assert.equal(calls[0].args.p_environment,'sandbox');}finally{globalThis.fetch=oldFetch;}
+});
+
+test('falha de persistencia da assinatura exige nova entrega em vez de confirmar sucesso',async()=>{
+ const oldFetch=globalThis.fetch;globalThis.fetch=async()=>({ok:true,json:async()=>({id:'sub_1',status:'INACTIVE'})});
+ const query={select(){return this;},eq(){return this;},async maybeSingle(){return {data:{id:'order_1'}};}};
+ try{await assert.rejects(processAsaasEvent({environment:'production',api:'https://api.asaas.com/v3',key:'test',db:{from:()=>query,rpc:async()=>({error:Error('database unavailable')})}},{id:'sub-event',event:'SUBSCRIPTION_INACTIVATED',subscription:{id:'sub_1'}}),/PERSIST_FAILED/);}finally{globalThis.fetch=oldFetch;}
+});

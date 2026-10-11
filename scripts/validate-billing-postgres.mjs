@@ -15,8 +15,9 @@ try {
  CREATE TABLE public.tenants(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),name text NOT NULL,status text NOT NULL DEFAULT 'trial',plan text NOT NULL DEFAULT 'Gold',price numeric NOT NULL DEFAULT 0,renewal_date date DEFAULT current_date+14);
  CREATE TABLE public.tenant_memberships(tenant_id uuid REFERENCES public.tenants(id),user_id uuid,role text,active boolean);
  `);
- for(const name of ['202610090009_billing_sandbox.sql','202610100010_billing_production.sql'])await db.exec(await readFile(new URL('../supabase/migrations/'+name,import.meta.url),'utf8'));
+ for(const name of ['202610090009_billing_sandbox.sql','202610100010_billing_production.sql','202610110011_subscription_lifecycle.sql'])await db.exec(await readFile(new URL('../supabase/migrations/'+name,import.meta.url),'utf8'));
  await db.exec(await readFile(new URL('../supabase/tests/billing_production.sql',import.meta.url),'utf8'));
+ await db.exec(await readFile(new URL('../supabase/tests/subscription_lifecycle.sql',import.meta.url),'utf8'));
  await db.exec(`
  BEGIN;
  INSERT INTO public.tenants(id,name,status) VALUES('10000000-0000-4000-8000-000000000001','Clínica isolada A','trial'),('10000000-0000-4000-8000-000000000002','Clínica isolada B','trial');

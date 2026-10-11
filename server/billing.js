@@ -25,7 +25,7 @@ export function billingConfig(env=process.env) {
  if(!['sandbox','production'].includes(environment))return null;
  const key=environment==='production'?env.ASAAS_PRODUCTION_API_KEY:env.ASAAS_API_KEY;
  if(!env.SUPABASE_SERVICE_ROLE_KEY||!env.VITE_SUPABASE_URL||!key||!env.ASAAS_WEBHOOK_TOKEN||env.ASAAS_WEBHOOK_TOKEN.length<32)return null;
- return {key,environment,enabled:environment==='sandbox'||env.ASAAS_PRODUCTION_ENABLED==='true',api:environment==='production'?'https://api.asaas.com/v3':'https://api-sandbox.asaas.com/v3',webhookToken:env.ASAAS_WEBHOOK_TOKEN,origin:env.APP_ORIGIN||'https://petsanny.vercel.app',
+ return {key,environment,reconcileSandbox:env.ASAAS_SANDBOX_RECONCILIATION==='true',enabled:environment==='sandbox'||env.ASAAS_PRODUCTION_ENABLED==='true',api:environment==='production'?'https://api.asaas.com/v3':'https://api-sandbox.asaas.com/v3',webhookToken:env.ASAAS_WEBHOOK_TOKEN,origin:env.APP_ORIGIN||'https://petsanny.vercel.app',
   db:createClient(env.VITE_SUPABASE_URL,env.SUPABASE_SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}})};
 }
 export async function asaasRequest(config,path,options={}) {
