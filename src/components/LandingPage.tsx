@@ -61,7 +61,7 @@ export function LandingPage({ onNavigateToAuth, theme, toggleTheme, isLoggedIn, 
         </div>
       </section>
 
-      <section className="border-y border-stone-200 bg-white px-6 py-9 dark:border-stone-800 dark:bg-stone-900"><div className="mx-auto grid max-w-7xl gap-5 text-center sm:grid-cols-3 sm:text-left"><p className="text-lg font-semibold">Menos informação espalhada.</p><p className="text-lg font-semibold">Mais clareza para a equipe.</p><p className="text-lg font-semibold text-olive-600">Mais atenção para cada pet.</p></div></section>
+      <section className="border-y border-stone-200 bg-white px-6 py-9 dark:border-stone-800 dark:bg-stone-900"><div className="mx-auto grid max-w-7xl items-center gap-5 text-center sm:grid-cols-3"><p className="text-lg font-semibold">Menos informação espalhada.</p><p className="text-lg font-semibold">Mais clareza para a equipe.</p><p className="text-lg font-semibold text-olive-600">Mais atenção para cada pet.</p></div></section>
 
       <section id="features" className="mx-auto max-w-7xl scroll-mt-32 px-6 py-20 lg:py-24">
         <div className="flex flex-wrap items-end justify-between gap-6"><div><p className="text-xs font-bold tracking-widest text-olive-600">O CUIDADO COMEÇA NA ORGANIZAÇÃO</p><h2 className="mt-4 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">A rotina cresce.<br />A organização precisa acompanhar.</h2></div><p className="max-w-sm text-sm leading-relaxed text-stone-500 dark:text-stone-400">Quando cada informação está no seu lugar, fica mais fácil saber o próximo passo. Do primeiro agendamento ao próximo retorno.</p></div>
