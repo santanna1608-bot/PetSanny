@@ -243,7 +243,7 @@ export const Login: React.FC<LoginProps> = ({
                   </span>
                 </div>
                 <p className="text-[9px] text-stone-450 dark:text-stone-500">
-                  14 dias de teste dos módulos disponíveis. Integrações e
+                  7 dias de teste dos módulos disponíveis. Integrações e
                   cobrança estão em preparação.
                 </p>
               </div>
@@ -353,7 +353,7 @@ export const Login: React.FC<LoginProps> = ({
           >
             {isRegistering
               ? "Já possui uma clínica cadastrada? Faça Login"
-              : "Não tem conta? Cadastre sua clínica (14 dias grátis)"}
+              : "Não tem conta? Cadastre sua clínica (7 dias grátis)"}
           </button>
         </div>
 

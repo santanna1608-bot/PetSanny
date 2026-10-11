@@ -30,7 +30,7 @@ export function TenantSetup() {
       >
         <h1 className="text-xl font-bold">Cadastre sua clínica</h1>
         <p>
-          Seu acesso foi confirmado. Complete os dados para iniciar os 14 dias
+          Seu acesso foi confirmado. Complete os dados para iniciar os 7 dias
           de teste.
         </p>
         <label className="block">
