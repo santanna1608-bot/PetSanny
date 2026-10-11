@@ -1,7 +1,7 @@
 -- Executar no SQL Editor como postgres. Todos os fixtures terminam em ROLLBACK.
 BEGIN;
 INSERT INTO auth.users(id,email,email_confirmed_at) VALUES('20000000-0000-4000-8000-000000000001','schedule-a@example.invalid',now()),('20000000-0000-4000-8000-000000000002','schedule-b@example.invalid',now());
-INSERT INTO public.tenants(id,name,status) VALUES('20000000-0000-4000-8000-000000000011','Teste agenda A','active'),('20000000-0000-4000-8000-000000000012','Teste agenda B','active');
+INSERT INTO public.tenants(id,name,status,plan) VALUES('20000000-0000-4000-8000-000000000011','Teste agenda A','active','Silver'),('20000000-0000-4000-8000-000000000012','Teste agenda B','active','Silver');
 INSERT INTO public.tenant_memberships(tenant_id,user_id,role) VALUES('20000000-0000-4000-8000-000000000011','20000000-0000-4000-8000-000000000001','owner'),('20000000-0000-4000-8000-000000000012','20000000-0000-4000-8000-000000000002','owner');
 INSERT INTO public.tutors(id,tenant_id,name,email) VALUES('20000000-0000-4000-8000-000000000021','20000000-0000-4000-8000-000000000011','Tutor A','a@example.invalid'),('20000000-0000-4000-8000-000000000022','20000000-0000-4000-8000-000000000012','Tutor B','b@example.invalid');
 INSERT INTO public.pets(id,tenant_id,tutor_id,name,species) VALUES('20000000-0000-4000-8000-000000000031','20000000-0000-4000-8000-000000000011','20000000-0000-4000-8000-000000000021','Pet A','Cão'),('20000000-0000-4000-8000-000000000032','20000000-0000-4000-8000-000000000012','20000000-0000-4000-8000-000000000022','Pet B','Cão');

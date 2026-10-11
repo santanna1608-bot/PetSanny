@@ -85,6 +85,7 @@ const SaaSSubscriptions = lazy(() =>
 import { Settings } from "./components/Settings";
 import { ConnectionsCenter } from "./components/ConnectionsCenter";
 import { BillingCenter } from './components/BillingCenter';
+import { PlanFeatureGate } from './components/PlanFeatureGate';
 
 const ComponentLoader = () => (
   <div className="flex flex-col items-center justify-center min-h-[300px] w-full p-8 gap-3">
@@ -422,7 +423,7 @@ function AppContent() {
                 </div>
               )}
 
-              {activeTab === "crm" && <CRMControl />}
+              {activeTab === "crm" && <PlanFeatureGate feature="crm"><CRMControl /></PlanFeatureGate>}
               {activeTab === "inventory" && <InventoryAndFinance />}
               {activeTab === "automations" && <AutomationsCenter />}
               {activeTab === "agenda" && (
@@ -436,7 +437,7 @@ function AppContent() {
               {activeTab === "customers" && <CustomersAndPets />}
               {activeTab === "saas" && <SaaSSubscriptions />}
               {activeTab === "settings" && <Settings />}
-              {activeTab === "connections" && <ConnectionsCenter key={currentTenant.id} />}
+              {activeTab === "connections" && <PlanFeatureGate feature="connections"><ConnectionsCenter key={currentTenant.id} /></PlanFeatureGate>}
               {activeTab === "billing" && <BillingCenter key={currentTenant.id} />}
             </PageTransition>
           </Suspense>

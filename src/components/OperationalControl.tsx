@@ -12,6 +12,7 @@ import {
 import { ConfirmModal } from './ConfirmModal';
 import { ScheduleRecovery } from './ScheduleRecovery';
 import { CareProgress } from './CareProgress';
+import { PlanFeatureGate } from './PlanFeatureGate';
 
 interface OperationalControlProps {
   onOpenAddModal: () => void;
@@ -45,7 +46,7 @@ export const OperationalControl: React.FC<OperationalControlProps> = ({ onOpenAd
   });
 
   return (
-    <><ScheduleRecovery key={currentTenant.id}/><CareProgress key={currentTenant.id}/><div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200 dark:border-stone-800 shadow-sm mb-8">
+    <><PlanFeatureGate feature="recovery"><ScheduleRecovery key={currentTenant.id}/></PlanFeatureGate><PlanFeatureGate feature="careStages"><CareProgress key={currentTenant.id}/></PlanFeatureGate><div className="bg-white dark:bg-stone-900 rounded-2xl p-6 border border-stone-200 dark:border-stone-800 shadow-sm mb-8">
       {/* Topo com Título e Botão Novo */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>

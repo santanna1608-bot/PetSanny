@@ -1,6 +1,6 @@
 BEGIN;
 INSERT INTO auth.users(id,email,email_confirmed_at) VALUES('50000000-0000-4000-8000-000000000001','connections@example.invalid',now());
-INSERT INTO public.tenants(id,name,status) VALUES('50000000-0000-4000-8000-000000000011','Teste conexoes A','active'),('50000000-0000-4000-8000-000000000012','Teste conexoes B','active');
+INSERT INTO public.tenants(id,name,status,plan) VALUES('50000000-0000-4000-8000-000000000011','Teste conexoes A','active','Gold'),('50000000-0000-4000-8000-000000000012','Teste conexoes B','active','Gold');
 INSERT INTO public.tenant_memberships(tenant_id,user_id,role) VALUES('50000000-0000-4000-8000-000000000011','50000000-0000-4000-8000-000000000001','owner');
 INSERT INTO public.integration_connections(tenant_id,channel,provider,display_name) VALUES('50000000-0000-4000-8000-000000000012','whatsapp','meta','Outra clinica');
 SELECT set_config('request.jwt.claim.sub','50000000-0000-4000-8000-000000000001',true);

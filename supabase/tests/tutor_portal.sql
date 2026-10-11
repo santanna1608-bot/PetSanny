@@ -1,6 +1,6 @@
 BEGIN;
 INSERT INTO auth.users(id,email,email_confirmed_at) VALUES('40000000-0000-4000-8000-000000000001','portal-a@example.invalid',now()),('40000000-0000-4000-8000-000000000002','portal-b@example.invalid',now());
-INSERT INTO public.tenants(id,name,status) VALUES('40000000-0000-4000-8000-000000000011','Teste portal A','active'),('40000000-0000-4000-8000-000000000012','Teste portal B','active');
+INSERT INTO public.tenants(id,name,status,plan) VALUES('40000000-0000-4000-8000-000000000011','Teste portal A','active','Silver'),('40000000-0000-4000-8000-000000000012','Teste portal B','active','Silver');
 INSERT INTO public.tenant_memberships(tenant_id,user_id,role) VALUES('40000000-0000-4000-8000-000000000011','40000000-0000-4000-8000-000000000001','owner'),('40000000-0000-4000-8000-000000000012','40000000-0000-4000-8000-000000000002','owner');
 INSERT INTO public.appointments(id,tenant_id,tutor_name,pet_name,pet_species,tutor_email,service_type,service_name,professional_name,price,appointment_date,appointment_time)
 VALUES('40000000-0000-4000-8000-000000000031','40000000-0000-4000-8000-000000000011','Tutor privado','Pet A','Cão','nao-compartilhar@example.invalid','aesthetic','Banho','Ana',10,'2030-01-10','10:00');

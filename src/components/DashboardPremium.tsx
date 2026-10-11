@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ReturnOpportunities } from './ReturnOpportunities';
 import { AgendaResults } from './AgendaResults';
+import { PlanFeatureGate } from './PlanFeatureGate';
 import { useAppointments } from "../contexts/AppointmentsContext";
 import { tutorsService, petsService } from "../lib/supabaseClient";
 import { financeService } from "../lib/domainServices";
@@ -142,8 +143,8 @@ export function DashboardPremium() {
           </article>
         ))}
       </div>
-      <ReturnOpportunities key={currentTenant.id}/>
-      <AgendaResults key={currentTenant.id}/>
+      <PlanFeatureGate feature="recovery"><ReturnOpportunities key={currentTenant.id}/></PlanFeatureGate>
+      <PlanFeatureGate feature="recoveryMetrics"><AgendaResults key={currentTenant.id}/></PlanFeatureGate>
     </section>
   );
 }
