@@ -56,7 +56,7 @@ export function PetSannyAI() {
         <section id="petsanny-assistant" aria-label="Assistente com IA" className="absolute right-0 bottom-16 w-80 max-w-[calc(100vw-2.5rem)] max-h-[75vh] overflow-y-auto rounded-2xl border bg-white dark:bg-stone-900 p-5 shadow-xl">
           <h2 className="font-bold">Assistente com IA</h2>
           {!eligible ? <p className="text-sm mt-2">Disponível no Profissional: 100 consultas por mês. Consulte os planos no menu de cobrança.</p> : <>
-            <p className="text-sm mt-2">Agenda, pendências e mensagens para revisar. A conversa é processada por OpenAI e TypeSafe; indicadores gerais da sua clínica são enviados à OpenAI. Não inclua dados pessoais ou prontuários.</p>
+            <p className="text-sm mt-2">Ajudo com agenda, pendências e mensagens para revisar. Não inclua dados pessoais ou prontuários.</p>
             <p className="text-xs mt-2">{remaining === null ? currentTenant.status === 'trial' ? '10 consultas durante o teste.' : '100 consultas por mês.' : `${remaining} consultas restantes.`}</p>
             <div className="flex flex-wrap gap-2 my-3">{['Resumo da agenda de hoje', 'Pendências de hoje', 'Mensagem de retorno'].map(text => <button key={text} disabled={busy || remaining === 0} onClick={() => void send(text)} className="border rounded p-2 text-xs">{text}</button>)}</div>
             <form onSubmit={e => { e.preventDefault(); void send(message); }}>
