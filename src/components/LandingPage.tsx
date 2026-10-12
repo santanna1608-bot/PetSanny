@@ -1,6 +1,7 @@
 import { ArrowRight, CalendarDays, HeartHandshake, ShieldCheck, Check, Sun, Moon, Sparkles, MessageCircle, Wallet, PawPrint, Headset, CheckCheck } from 'lucide-react';
 import logo from '../assets/logo.png';
 import plans from '../../shared/plans.json';
+import { SupportContact } from './SupportContact';
 
 interface Props {
   onNavigateToAuth: (mode: 'login' | 'register') => void;
@@ -85,6 +86,7 @@ export function LandingPage({ onNavigateToAuth, theme, toggleTheme, isLoggedIn, 
       <section id="faq" className="mx-auto grid max-w-7xl scroll-mt-32 gap-10 px-6 py-20 lg:grid-cols-[0.8fr_1.2fr]"><div><MessageCircle className="text-olive-600" size={30} /><h2 className="mt-5 text-3xl font-extrabold tracking-tight">Antes de começar,<br />vamos tirar as dúvidas.</h2><p className="mt-4 max-w-sm text-sm leading-relaxed text-stone-500">Entenda o teste, os planos e o que o assistente pode fazer pela sua rotina.</p></div><div>{questions.map(([question, answer]) => <details key={question} className="group border-b border-stone-200 py-5 first:pt-0 dark:border-stone-800"><summary className="cursor-pointer font-semibold leading-relaxed">{question}</summary><p className="mt-4 text-sm leading-relaxed text-stone-500 dark:text-stone-400">{answer}</p></details>)}</div></section>
 
       <section className="mx-auto max-w-7xl px-6 pb-20"><div className="rounded-[2rem] bg-[#e7e9dc] px-7 py-12 text-center dark:bg-stone-900 sm:px-12 sm:py-16"><p className="text-xs font-bold tracking-widest text-olive-600">O PRÓXIMO PASSO É SEU</p><h2 className="mx-auto mt-5 max-w-3xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">Seu próximo atendimento<br /><span className="font-serif font-normal italic text-olive-600">pode começar mais organizado.</span></h2><p className="mx-auto mt-5 max-w-xl text-stone-600 dark:text-stone-400">Conheça o PetSanny na prática. Explore os recursos, converse com o assistente e veja como eles se encaixam na sua clínica.</p><button onClick={start} className={`${cta} mt-8`}>Experimentar grátis por 7 dias<ArrowRight size={18} /></button><p className="mt-4 text-xs text-stone-500">Sem cartão · Confirmação por e-mail · 10 consultas de IA</p></div></section>
+      <div className="mx-auto max-w-7xl px-6 pb-12"><SupportContact /></div>
     </main>
     <footer className="border-t border-stone-200 px-6 py-7 dark:border-stone-800"><div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4"><span className="font-bold">PetSanny</span><p className="text-xs text-stone-500">© {new Date().getFullYear()} · Mais contexto para cuidar melhor.</p><a href="#faq" className="text-xs text-stone-500">Dúvidas frequentes</a></div></footer>
   </div>;
