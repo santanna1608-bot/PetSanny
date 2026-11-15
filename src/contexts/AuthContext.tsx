@@ -28,6 +28,7 @@ interface ProfileUpdates {
   name?: string;
   phone?: string;
   avatar_url?: string;
+  clinic_logo_url?: string;
   email?: string;
   password?: string;
 }

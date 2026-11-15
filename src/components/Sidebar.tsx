@@ -37,6 +37,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { user, logout } = useAuth();
   const { t } = useLanguage();
   const isSuperAdmin = !!user?.is_super_admin;
+  const clinicCustomLogo =
+    user?.user_metadata?.clinic_logo_url ||
+    (currentTenant?.id
+      ? (() => {
+          try {
+            return localStorage.getItem(
+              "petsanny_clinic_logo_" + currentTenant.id,
+            );
+          } catch {
+            return null;
+          }
+        })()
+      : null);
 
   const menuItems = [
     { id: "dashboard", label: t("menu.dashboard"), icon: LayoutDashboard },
@@ -71,17 +84,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex flex-col flex-1">
           {/* Header/Logo */}
           <div className="p-6 border-b border-stone-800 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               <img
-                src={logoImg}
-                alt="PetSanny Logo"
-                className="w-10 h-10 rounded-full object-contain shadow-md shadow-stone-950/50"
+                src={clinicCustomLogo || logoImg}
+                alt={currentTenant?.name || "PetSanny Logo"}
+                className="w-10 h-10 rounded-full object-contain shadow-md shadow-stone-950/50 bg-stone-950 p-0.5 shrink-0"
               />
-              <div>
-                <h1 className="text-lg font-bold text-stone-100 font-sans tracking-tight leading-none">
-                  PetSanny
+              <div className="min-w-0">
+                <h1 className="text-lg font-bold text-stone-100 font-sans tracking-tight leading-none truncate max-w-[130px]">
+                  {currentTenant?.name || "PetSanny"}
                 </h1>
-                <span className="text-[10px] text-stone-500 font-semibold uppercase tracking-wider">
+                <span className="text-[10px] text-stone-500 font-semibold uppercase tracking-wider block truncate">
                   {t("sidebar.tagline")}
                 </span>
               </div>

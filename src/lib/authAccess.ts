@@ -9,7 +9,12 @@ export interface AuthUser {
   email: string;
   memberships: Membership[];
   is_super_admin: boolean;
-  user_metadata: { name?: string; phone?: string; avatar_url?: string };
+  user_metadata: {
+    name?: string;
+    phone?: string;
+    avatar_url?: string;
+    clinic_logo_url?: string;
+  };
 }
 const resolutions = new Map<string, Promise<AuthUser>>();
 export async function resolveUser(account: User): Promise<AuthUser> {
@@ -59,6 +64,7 @@ export async function resolveUser(account: User): Promise<AuthUser> {
         name: account.user_metadata?.name || "",
         phone: account.user_metadata?.phone || "",
         avatar_url: account.user_metadata?.avatar_url || "",
+        clinic_logo_url: account.user_metadata?.clinic_logo_url || "",
       },
     };
   })();
