@@ -1,0 +1,12 @@
+{
+  "project_ref": "dpcyahwodzpolzuznrrq",
+  "supabase_url": "https://dpcyahwodzpolzuznrrq.supabase.co",
+  "storage_buckets": ["pet-documents"],
+  "destination": "/var/lib/petsanny-backup",
+  "pg_service_file": "/etc/petsanny-backup/pg_service.conf",
+  "pg_pass_file": "/etc/petsanny-backup/pgpass",
+  "storage_key_file": "/etc/petsanny-backup/storage-key",
+  "age_recipient_file": "/etc/petsanny-backup/recipient.txt",
+  "schedule_enabled": false,
+  "retention_delete_enabled": false
+}

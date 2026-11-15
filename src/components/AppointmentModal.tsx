@@ -151,7 +151,11 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
       !appointmentDate ||
       !appointmentTime
     ) {
-      alert(t("modal.validation_error"));
+      addToast(
+        "Campos obrigatórios",
+        t("modal.validation_error"),
+        "warning",
+      );
       return;
     }
 

@@ -33,13 +33,11 @@ export function CRMControl() {
     void Promise.all([
       tutorsService.list(currentTenant.id),
       conversationsService.list(currentTenant.id, { channel: "internal" }),
-      messagesService.list(currentTenant.id),
     ])
-      .then(([t, c, m]) => {
+      .then(([t, c]) => {
         if (!canceled) {
           setTutors(t);
           setConversations(c);
-          setMessages(m);
           setSelected(t[0]?.id || "");
         }
       })
@@ -53,10 +51,36 @@ export function CRMControl() {
       canceled = true;
     };
   }, [currentTenant.id]);
+
   const conversation = conversations.find((c) => c.tutor_id === selected);
-  const history = messages
-    .filter((m) => m.conversation_id === conversation?.id)
-    .sort((a, b) => (a.created_at || "").localeCompare(b.created_at || ""));
+
+  useEffect(() => {
+    let canceled = false;
+    if (!currentTenant.id || !conversation?.id) {
+      setMessages([]);
+      return;
+    }
+    void messagesService
+      .list(currentTenant.id, { conversation_id: conversation.id })
+      .then((m) => {
+        if (!canceled) setMessages(m);
+      })
+      .catch(() => {
+        if (!canceled)
+          addToast(
+            "Erro de conexão",
+            "Não foi possível carregar o histórico de anotações.",
+            "warning",
+          );
+      });
+    return () => {
+      canceled = true;
+    };
+  }, [currentTenant.id, conversation?.id, addToast]);
+
+  const history = [...messages].sort((a, b) =>
+    (a.created_at || "").localeCompare(b.created_at || ""),
+  );
   const changeStage = async (tutor: Tutor, stage: string) => {
     if (busy) return;
     setBusy(true);

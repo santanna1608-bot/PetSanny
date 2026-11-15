@@ -77,11 +77,6 @@ const CustomersAndPets = lazy(() =>
     default: m.CustomersAndPets,
   })),
 );
-const SaaSSubscriptions = lazy(() =>
-  import("./components/SaaSSubscriptions").then((m) => ({
-    default: m.SaaSSubscriptions,
-  })),
-);
 import { Settings } from "./components/Settings";
 import { ConnectionsCenter } from "./components/ConnectionsCenter";
 import { BillingCenter } from './components/BillingCenter';
@@ -435,7 +430,6 @@ function AppContent() {
                 </div>
               )}
               {activeTab === "customers" && <CustomersAndPets />}
-              {activeTab === "saas" && <SaaSSubscriptions />}
               {activeTab === "settings" && <Settings />}
               {activeTab === "connections" && <PlanFeatureGate feature="connections"><ConnectionsCenter key={currentTenant.id} /></PlanFeatureGate>}
               {activeTab === "billing" && <BillingCenter key={currentTenant.id} />}

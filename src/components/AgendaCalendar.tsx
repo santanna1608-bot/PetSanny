@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAppointments } from '../contexts/AppointmentsContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { localDate } from '../lib/dates';
 import { 
   Clock, 
   Stethoscope, 
@@ -18,7 +19,7 @@ export const AgendaCalendar: React.FC = () => {
 
   // Filtrar os agendamentos de acordo com o modo
   const getFilteredAppointments = () => {
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = localDate();
     
     if (viewMode === 'today') {
       return appointments.filter(app => app.appointment_date === todayStr && app.status !== 'canceled');
@@ -36,8 +37,10 @@ export const AgendaCalendar: React.FC = () => {
 
   // Formatar datas para melhor legibilidade
   const formatDateFriendly = (dateStr: string) => {
-    const todayStr = new Date().toISOString().split('T')[0];
-    const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+    const todayStr = localDate();
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = localDate(tomorrow);
 
     if (dateStr === todayStr) return t('agenda.today');
     if (dateStr === tomorrowStr) return t('agenda.tomorrow');

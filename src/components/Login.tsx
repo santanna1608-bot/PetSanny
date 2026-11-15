@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { PasswordRecovery } from './PasswordRecovery';
+import { LegalTermsModal } from './LegalTermsModal';
 import { useAuth } from "../contexts/AuthContext";
 import logoImg from "../assets/logo.png";
 import {
@@ -34,6 +35,12 @@ export const Login: React.FC<LoginProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
   const [recovering, setRecovering] = useState(false);
+  const [legalModalOpen, setLegalModalOpen] = useState(false);
+  const [legalModalTab, setLegalModalTab] = useState<'terms' | 'privacy'>('terms');
+  const openLegal = (tab: 'terms' | 'privacy') => {
+    setLegalModalTab(tab);
+    setLegalModalOpen(true);
+  };
 
   // Estados para o fluxo de Novo Cadastro
   const [isRegistering, setIsRegistering] = useState(
@@ -237,14 +244,13 @@ export const Login: React.FC<LoginProps> = ({
                   Assinatura PetSanny
                 </span>
                 <div className="text-lg font-black text-stone-850 dark:text-stone-100 leading-none">
-                  R$ 97,00
+                  A partir de R$ 97,00
                   <span className="text-[10px] font-normal text-stone-500 dark:text-stone-450">
                     /mês
                   </span>
                 </div>
                 <p className="text-[9px] text-stone-450 dark:text-stone-500">
-                  7 dias de teste dos módulos disponíveis. Integrações e
-                  cobrança estão em preparação.
+                  7 dias de teste gratuito sem cartão. Escolha o plano ideal após o período de testes.
                 </p>
               </div>
             </>
@@ -338,6 +344,27 @@ export const Login: React.FC<LoginProps> = ({
               </>
             )}
           </button>
+          {isRegistering && (
+            <p className="text-[10px] text-center text-stone-500 dark:text-stone-400 mt-2">
+              Ao cadastrar sua clínica, você concorda com os{" "}
+              <button
+                type="button"
+                onClick={() => openLegal("terms")}
+                className="text-olive-600 dark:text-olive-400 underline font-semibold cursor-pointer"
+              >
+                Termos de Uso
+              </button>{" "}
+              e a{" "}
+              <button
+                type="button"
+                onClick={() => openLegal("privacy")}
+                className="text-olive-600 dark:text-olive-400 underline font-semibold cursor-pointer"
+              >
+                Política de Privacidade
+              </button>
+              .
+            </p>
+          )}
         </form>
 
         {!isRegistering && <button type="button" className="text-sm text-olive-700 underline" onClick={() => { setPassword(''); setRecovering(true); }}>Esqueci minha senha</button>}
@@ -406,6 +433,11 @@ export const Login: React.FC<LoginProps> = ({
           </div>
         )}
       </div>
+      <LegalTermsModal
+        isOpen={legalModalOpen}
+        onClose={() => setLegalModalOpen(false)}
+        initialTab={legalModalTab}
+      />
     </div>
   );
 };
