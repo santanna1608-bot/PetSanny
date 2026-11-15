@@ -3,8 +3,7 @@ import { ReturnOpportunities } from './ReturnOpportunities';
 import { AgendaResults } from './AgendaResults';
 import { PlanFeatureGate } from './PlanFeatureGate';
 import { useAppointments } from "../contexts/AppointmentsContext";
-import { tutorsService, petsService } from "../lib/supabaseClient";
-import { financeService } from "../lib/domainServices";
+import { requireSupabase } from "../lib/supabaseClient";
 import { localDate } from "../lib/dates";
 import { Users, Calendar, DollarSign, AlertCircle } from "lucide-react";
 export function DashboardPremium() {
@@ -21,17 +20,31 @@ export function DashboardPremium() {
     setRevenue(0);
     setExpenses(0);
     setError("");
+    if (!currentTenant.id) return;
+    const month = localDate().slice(0, 7);
+    const startOfMonth = `${month}-01`;
+    const endOfMonth = `${month}-31`;
+    const db = requireSupabase();
+
     void Promise.all([
-      tutorsService.list(currentTenant.id),
-      petsService.list(currentTenant.id),
-      financeService.list(currentTenant.id),
+      db.from("tutors").select("id", { count: "exact", head: true }).eq("tenant_id", currentTenant.id),
+      db.from("pets").select("id", { count: "exact", head: true }).eq("tenant_id", currentTenant.id),
+      db.from("financial_transactions")
+        .select("transaction_type, value")
+        .eq("tenant_id", currentTenant.id)
+        .gte("transaction_date", startOfMonth)
+        .lte("transaction_date", endOfMonth),
     ])
-      .then(([t, p, f]) => {
+      .then(([tRes, pRes, fRes]) => {
         if (canceled) return;
-        const month = localDate().slice(0, 7);
-        const monthly = f.filter((i) => i.transaction_date.startsWith(month));
-        setTutors(t.length);
-        setPets(p.length);
+        if (tRes.error) throw tRes.error;
+        if (pRes.error) throw pRes.error;
+        if (fRes.error) throw fRes.error;
+
+        setTutors(tRes.count || 0);
+        setPets(pRes.count || 0);
+
+        const monthly = (fRes.data || []) as { transaction_type: string; value: number }[];
         setRevenue(
           monthly
             .filter((i) => i.transaction_type === "revenue")

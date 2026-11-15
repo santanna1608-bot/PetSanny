@@ -4,6 +4,10 @@ Status: procedimento proposto, ainda não executado. Não habilitar cobrança ap
 
 ## Backup e recuperação
 
+Verificação em 12/10/2026: painel do projeto dpcyahwodzpolzuznrrq identifica organização Free e informa que não inclui backups do projeto. Upgrade para Pro oferece até 7 dias de backups agendados. Não houve contratação, backup ou restauração nesta verificação. Evidência: supabase-backup-status.jpg.
+
+Documentação consultada: https://supabase.com/docs/guides/platform/backups. Backups do banco não incluem objetos armazenados pela Storage API; apenas seus metadados. Portanto, mesmo com plano pago, preparar cópia privada separada dos arquivos. No Free, a documentação recomenda exportações regulares via CLI e backups fora do projeto. Escolha de plano/destino aguarda o proprietário.
+
 1. Conferir no Supabase o plano contratado, retenção de backups, acesso ao restauro e limites. Registrar responsável, frequência e objetivos de perda máxima de dados e prazo de recuperação aprovados pelo proprietário.
 2. Garantir cópia independente dos objetos do bucket privado pet-documents e metadados correspondentes. Confirmar explicitamente a cobertura de arquivos: não presumir que backup do PostgreSQL inclui objetos.
 3. Guardar cópias em destino privado, cifrado e com acesso restrito; nunca dentro deste repositório ou de um diretório público.
@@ -50,3 +54,13 @@ Registrar evidência e resultado de cada item. Um build aprovado não substitui 
 ## Dados pendentes do fornecedor
 
 Razão social/nome, CNPJ quando aplicável, e-mail e canal de suporte/cancelamento, responsáveis de operação, regras comerciais e retenção. Não inventar esses dados e não publicar termos como definitivos sem sua definição e revisão apropriada.
+
+Contatos já fornecidos: santanna1608@gmail.com e WhatsApp (21) 98106-2423. O proprietário informou não ter CNPJ e identificou o fornecedor como LF7 Marketing & IA. Política aprovada: cancelamento solicitado a qualquer momento, interrompendo a próxima renovação e mantendo acesso até o fim do período já pago. Condições de estorno, identificação civil do responsável, retenção e demais regras ainda precisam ser definidas/revisadas antes de termos definitivos.
+
+Escolha aprovada em 12/10/2026: manter Supabase Free e preparar backup externo do banco e dos arquivos. Ainda não há destino contratado/configurado; nenhuma cópia foi executada. Preparar destino privado independente, credenciais restritas, cifragem, rotina de execução e ensaio de restauração. Não confundir exportação por cliente com backup integral do serviço.
+
+## Security Advisor — revisão pendente
+
+Em 12/10/2026 o painel exibiu zero erros, 12 avisos e quatro sugestões. Isso não é prova de ausência de vulnerabilidades. Avisos incluem SECURITY DEFINER executável por anon/authenticated (portal do tutor, bootstrap, administrador atual, extensão de trial e emissão/revogação de links); alguns são intencionais, exigindo conferência das validações internas e privilégios implantados.
+
+Também aparece public.rls_auto_enable() executável por público/autenticados; revisar tipo, uso e necessidade desses grants antes de alterar. Proteção contra senhas vazadas está desativada. Não foram alteradas permissões nem configurações de autenticação durante a inspeção.

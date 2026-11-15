@@ -56,3 +56,13 @@ Não houve execução nova de SQL, build limpo local ou teste de carga. Builds r
 6. Iniciar piloto com poucas clínicas e acompanhamento próximo; ampliar aquisição após observar operação real.
 
 WhatsApp automático não é condição para vender uma versão que declara claramente sua ausência. Também não é necessário implementar toda integração planejada: vender apenas recursos comprovados, com expectativas e suporte definidos.
+
+## Atualização após preparação — 12/10/2026
+
+Commit 1c5bd64: comando oficial inclui todos os arquivos de testes, rotina GitHub Actions criada, texto de IA corrigido no painel de cobrança e contatos de suporte/cancelamento incluídos na landing, configurações e cobrança. Contatos fornecidos pelo proprietário: santanna1608@gmail.com e WhatsApp (21) 98106-2423; informou não ter CNPJ, nome do fornecedor e regras comerciais ainda pendentes.
+
+GitHub Actions run 38266041095 terminou com sucesso (21s), com instalação limpa, lint, testes e build; há avisos de lint existentes, sem falha de execução. A validação automatizada remota está comprovada. Instalação local continua limitada pela extração parada no diretório sincronizado; não afirmar instalação local concluída.
+
+Vercel deployment BVW32QXfG8AJMjrqrKHTUaSLUu8y confirmado Ready/Preview em 12/10/2026 11:56:05 BRT, build de 18s. Interface de suporte conferida em https://pet-sanny-2giygwqqn-santanna1608-8405s-projects.vercel.app/. Evidência: commercial-support-preview.jpg.
+
+Essa atualização resolve a ausência de CI/cobertura do comando oficial e o texto desatualizado da IA na prévia. Produção ainda não recebeu esses novos contatos/textos. Backup/restauração, políticas definitivas, exportação, equipe e validação financeira permanecem pendentes; CI não executa ensaios SQL nem fluxos end-to-end de produção.

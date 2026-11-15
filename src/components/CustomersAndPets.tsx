@@ -89,8 +89,12 @@ export const CustomersAndPets: React.FC = () => {
 
   const handleAddTutor = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!tutorName) {
-      alert(t("customers.tutor_mandatory"));
+    if (!tutorName.trim()) {
+      addToast(
+        t("customers.toast_error"),
+        t("customers.tutor_mandatory"),
+        "warning",
+      );
       return;
     }
 
@@ -136,8 +140,12 @@ export const CustomersAndPets: React.FC = () => {
 
   const handleAddPet = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!petName || !expandedTutorId) {
-      alert(t("customers.pet_mandatory"));
+    if (!petName.trim() || !expandedTutorId) {
+      addToast(
+        t("customers.toast_error"),
+        t("customers.pet_mandatory"),
+        "warning",
+      );
       return;
     }
 

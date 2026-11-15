@@ -63,11 +63,6 @@ interface AppointmentsContextType {
   removeToast: (id: string) => void;
   isMock: boolean;
   tenants: Tenant[];
-  updateTenantSubscription: (
-    tenantId: string,
-    updates: Partial<Tenant>,
-  ) => Promise<void>;
-  deleteTenantSubscription: (tenantId: string) => Promise<void>;
 }
 const AppointmentsContext = createContext<AppointmentsContextType | undefined>(
   undefined,
@@ -252,23 +247,6 @@ export const AppointmentsProvider: React.FC<{ children: React.ReactNode }> = ({
       );
     }
   };
-  const updateTenantSubscription = async (
-    _id: string,
-    _updates: Partial<Tenant>,
-  ) => {
-    addToast(
-      "Operação indisponível",
-      "Assinaturas devem ser gerenciadas pelo serviço de cobrança.",
-      "warning",
-    );
-  };
-  const deleteTenantSubscription = async (_id: string) => {
-    addToast(
-      "Operação indisponível",
-      "Cancelamentos devem ser gerenciados pelo serviço de cobrança.",
-      "warning",
-    );
-  };
   return (
     <AppointmentsContext.Provider
       value={{
@@ -287,8 +265,6 @@ export const AppointmentsProvider: React.FC<{ children: React.ReactNode }> = ({
         removeToast,
         isMock: false,
         tenants,
-        updateTenantSubscription,
-        deleteTenantSubscription,
       }}
     >
       {children}

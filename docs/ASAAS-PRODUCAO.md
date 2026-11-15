@@ -2,6 +2,8 @@
 
 Preparado em 10/10/2026. Não houve cobrança real nem confirmação de webhook real nesta implementação.
 
+Validação em 10/10/2026: 44 testes automatizados passaram após restaurar as dependências; compilação aprovada. A migração e os testes transacionais foram executados juntos no SQL Editor do Supabase, com resultado PASS e rollback integral. A aplicação definitiva da migração foi enviada posteriormente; a confirmação final do resultado ficou pendente quando a conexão ao navegador voltou a falhar. O código foi enviado ao GitHub em `31b9d95`; a API publicada rejeitou consulta sem autenticação com HTTP 403.
+
 ## Configuração no servidor da Vercel
 
 - `ASAAS_PRODUCTION_API_KEY`: chave de produção, já informada pelo usuário na Vercel.

@@ -47,9 +47,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: "automations", label: t("menu.automations"), icon: Zap },
     { id: "connections", label: "Conexões", icon: Cable },
     { id: "billing", label: "Planos e cobrança", icon: CreditCard },
-    ...(isSuperAdmin
-      ? [{ id: "saas", label: t("menu.saas"), icon: CreditCard }]
-      : []),
     { id: "settings", label: t("menu.settings"), icon: SettingsIcon },
   ];
 

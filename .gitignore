@@ -8,9 +8,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+__pycache__/
+*.pyc
 dist
 dist-ssr
 *.local
+/*.jpg
+
 
 # Editor directories and files
 .vscode/*

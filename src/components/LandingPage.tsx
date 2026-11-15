@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { ArrowRight, CalendarDays, HeartHandshake, ShieldCheck, Check, Sun, Moon, Sparkles, MessageCircle, Wallet, PawPrint, Headset, CheckCheck } from 'lucide-react';
 import logo from '../assets/logo.png';
 import plans from '../../shared/plans.json';
 import { SupportContact } from './SupportContact';
+import { LegalTermsModal } from './LegalTermsModal';
 
 interface Props {
   onNavigateToAuth: (mode: 'login' | 'register') => void;
@@ -24,10 +26,16 @@ const questions = [
   ['Em qual plano o assistente está incluído?', 'No Profissional, com 100 consultas por mês compartilhadas pela clínica. Durante um teste gratuito válido, há 10 consultas ao todo. Cada pedido ao assistente conta como uma consulta.'],
   ['A IA altera registros ou envia mensagens?', 'Não. O assistente ajuda a consultar e preparar textos. Você revisa e decide o que fazer. Ele não envia mensagens, não altera a agenda e não oferece diagnóstico ou prescrição. Não inclua dados pessoais ou prontuários nas perguntas.'],
   ['O tutor precisa criar uma conta?', 'Para acompanhar o atendimento compartilhado, o tutor usa um link válido por 48 horas. A clínica pode revogá-lo. O link dá acesso somente ao atendimento compartilhado.'],
-  ['Já posso contratar um plano pago?', 'Você pode começar pelo teste gratuito. Os valores apresentados são os preços previstos dos pacotes; a contratação paga está em preparação e ainda não está disponível. WhatsApp automático também não está disponível.'],
+  ['Como funciona a contratação de um plano pago?', 'Você pode começar pelo teste de 7 dias grátis. A qualquer momento, acesse o menu de cobrança para contratar a assinatura mensal com segurança via cartão pelo Asaas. Não há fidelidade e o cancelamento pode ser feito quando desejar.'],
 ];
 
 export function LandingPage({ onNavigateToAuth, theme, toggleTheme, isLoggedIn, onGoToDashboard }: Props) {
+  const [legalOpen, setLegalOpen] = useState(false);
+  const [legalTab, setLegalTab] = useState<'terms' | 'privacy'>('terms');
+  const openLegal = (tab: 'terms' | 'privacy') => {
+    setLegalTab(tab);
+    setLegalOpen(true);
+  };
   const start = () => onNavigateToAuth('register');
   const cta = 'btn-cta-primary inline-flex items-center justify-center gap-3 rounded-full bg-olive-600 px-7 py-4 font-bold text-white hover:bg-olive-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-olive-600';
   return <div className="min-h-screen bg-[#faf8f2] text-stone-900 dark:bg-stone-950 dark:text-stone-100">
@@ -80,7 +88,7 @@ export function LandingPage({ onNavigateToAuth, theme, toggleTheme, isLoggedIn, 
       <section className="mx-auto max-w-7xl px-6 py-20"><div className="grid gap-10 lg:grid-cols-[1fr_1.4fr]"><div><p className="text-xs font-bold tracking-widest text-olive-600">COMECE PELA SUA ROTINA</p><h2 className="mt-4 text-3xl font-extrabold tracking-tight">Sete dias para<br />experimentar na prática.</h2><p className="mt-4 text-sm leading-relaxed text-stone-500">Sem cartão para iniciar. Você conhece o sistema antes de dar o próximo passo.</p></div><div className="grid gap-6 sm:grid-cols-3">{[['01', 'Crie sua clínica', 'Cadastre-se e confirme seu e-mail para começar.'], ['02', 'Organize o dia', 'Cadastre tutor, pet e atendimento com os dados da sua rotina.'], ['03', 'Converse com a IA', 'Use as 10 consultas do teste para explorar o assistente.']].map(([number, title, text]) => <article key={number} className="border-t border-stone-300 pt-6 dark:border-stone-700"><p className="font-serif text-4xl italic text-olive-600">{number}</p><h3 className="mt-5 font-bold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-stone-500">{text}</p></article>)}</div></div></section>
 
       <section id="pricing" className="scroll-mt-32 border-y border-stone-200 bg-white px-6 py-20 dark:border-stone-800 dark:bg-stone-900">
-        <div className="mx-auto max-w-7xl"><p className="text-center text-xs font-bold tracking-widest text-olive-600">UM PLANO PARA CADA FASE</p><h2 className="mt-4 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Comece simples. Cresça com contexto.</h2><p className="mx-auto mt-4 max-w-2xl text-center text-sm leading-relaxed text-stone-500">Experimente por 7 dias. Estes são os preços previstos dos pacotes; a contratação paga está em preparação e ainda não está disponível.</p><div className="mt-12 grid items-stretch gap-5 lg:grid-cols-3">{plans.map((plan, i) => <article key={plan.id} className={`relative flex flex-col rounded-2xl border p-7 sm:p-8 ${i === 2 ? 'border-olive-600 bg-[#f4f6ed] dark:bg-olive-600/10' : 'border-stone-200 bg-[#faf8f2] dark:border-stone-700 dark:bg-stone-950'}`}>{i === 2 && <span className="absolute -top-3 left-7 rounded-full bg-olive-600 px-3 py-1 text-[10px] font-bold tracking-wider text-white">COM ASSISTENTE IA</span>}<h3 className="text-xl font-bold">{plan.name}</h3><p className="mt-3 min-h-10 text-sm text-stone-500 dark:text-stone-400">{plan.description}</p><p className="mt-6 text-4xl font-extrabold tracking-tight"><span className="mr-1 text-xl font-normal">R$</span>{plan.price}<span className="text-sm font-normal tracking-normal text-stone-500">/mês</span></p><ul className="my-7 flex-1 space-y-4 text-sm">{plan.features.map(feature => <li key={feature} className="flex items-start gap-2.5"><Check size={17} className="mt-0.5 shrink-0 text-olive-600" />{feature}</li>)}</ul><button onClick={start} className="w-full rounded-full border border-olive-600 bg-olive-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-olive-700">Começar teste gratuito<ArrowRight size={15} className="ml-2 inline" /></button></article>)}</div><p className="mt-6 text-center text-xs text-stone-500">Sem cartão no teste. WhatsApp automático ainda não está disponível.</p></div>
+        <div className="mx-auto max-w-7xl"><p className="text-center text-xs font-bold tracking-widest text-olive-600">UM PLANO PARA CADA FASE</p><h2 className="mt-4 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Comece simples. Cresça com contexto.</h2><p className="mx-auto mt-4 max-w-2xl text-center text-sm leading-relaxed text-stone-500">Experimente por 7 dias grátis. Assinatura mensal recorrente sem fidelidade, cancele quando quiser.</p><div className="mt-12 grid items-stretch gap-5 lg:grid-cols-3">{plans.map((plan, i) => <article key={plan.id} className={`relative flex flex-col rounded-2xl border p-7 sm:p-8 ${i === 2 ? 'border-olive-600 bg-[#f4f6ed] dark:bg-olive-600/10' : 'border-stone-200 bg-[#faf8f2] dark:border-stone-700 dark:bg-stone-950'}`}>{i === 2 && <span className="absolute -top-3 left-7 rounded-full bg-olive-600 px-3 py-1 text-[10px] font-bold tracking-wider text-white">COM ASSISTENTE IA</span>}<h3 className="text-xl font-bold">{plan.name}</h3><p className="mt-3 min-h-10 text-sm text-stone-500 dark:text-stone-400">{plan.description}</p><p className="mt-6 text-4xl font-extrabold tracking-tight"><span className="mr-1 text-xl font-normal">R$</span>{plan.price}<span className="text-sm font-normal tracking-normal text-stone-500">/mês</span></p><ul className="my-7 flex-1 space-y-4 text-sm">{plan.features.map(feature => <li key={feature} className="flex items-start gap-2.5"><Check size={17} className="mt-0.5 shrink-0 text-olive-600" />{feature}</li>)}</ul><button onClick={start} className="w-full rounded-full border border-olive-600 bg-olive-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-olive-700">Começar teste gratuito<ArrowRight size={15} className="ml-2 inline" /></button></article>)}</div><p className="mt-6 text-center text-xs text-stone-500">Sem cartão no teste. WhatsApp automático ainda não está disponível.</p></div>
       </section>
 
       <section id="faq" className="mx-auto grid max-w-7xl scroll-mt-32 gap-10 px-6 py-20 lg:grid-cols-[0.8fr_1.2fr]"><div><MessageCircle className="text-olive-600" size={30} /><h2 className="mt-5 text-3xl font-extrabold tracking-tight">Antes de começar,<br />vamos tirar as dúvidas.</h2><p className="mt-4 max-w-sm text-sm leading-relaxed text-stone-500">Entenda o teste, os planos e o que o assistente pode fazer pela sua rotina.</p></div><div>{questions.map(([question, answer]) => <details key={question} className="group border-b border-stone-200 py-5 first:pt-0 dark:border-stone-800"><summary className="cursor-pointer font-semibold leading-relaxed">{question}</summary><p className="mt-4 text-sm leading-relaxed text-stone-500 dark:text-stone-400">{answer}</p></details>)}</div></section>
@@ -88,6 +96,19 @@ export function LandingPage({ onNavigateToAuth, theme, toggleTheme, isLoggedIn, 
       <section className="mx-auto max-w-7xl px-6 pb-20"><div className="rounded-[2rem] bg-[#e7e9dc] px-7 py-12 text-center dark:bg-stone-900 sm:px-12 sm:py-16"><p className="text-xs font-bold tracking-widest text-olive-600">O PRÓXIMO PASSO É SEU</p><h2 className="mx-auto mt-5 max-w-3xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">Seu próximo atendimento<br /><span className="font-serif font-normal italic text-olive-600">pode começar mais organizado.</span></h2><p className="mx-auto mt-5 max-w-xl text-stone-600 dark:text-stone-400">Conheça o PetSanny na prática. Explore os recursos, converse com o assistente e veja como eles se encaixam na sua clínica.</p><button onClick={start} className={`${cta} mt-8`}>Experimentar grátis por 7 dias<ArrowRight size={18} /></button><p className="mt-4 text-xs text-stone-500">Sem cartão · Confirmação por e-mail · 10 consultas de IA</p></div></section>
       <div className="mx-auto max-w-7xl px-6 pb-12"><SupportContact /></div>
     </main>
-    <footer className="border-t border-stone-200 px-6 py-7 dark:border-stone-800"><div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4"><span className="font-bold">PetSanny</span><p className="text-xs text-stone-500">© {new Date().getFullYear()} · Mais contexto para cuidar melhor.</p><a href="#faq" className="text-xs text-stone-500">Dúvidas frequentes</a></div></footer>
+    <footer className="border-t border-stone-200 px-6 py-7 dark:border-stone-800">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
+        <span className="font-bold">PetSanny</span>
+        <p className="text-xs text-stone-500">© {new Date().getFullYear()} · LF7 Marketing & IA · Todos os direitos reservados.</p>
+        <div className="flex items-center gap-4 text-xs text-stone-500">
+          <button type="button" onClick={() => openLegal('terms')} className="hover:text-olive-600 transition-colors cursor-pointer">Termos de Uso</button>
+          <span>•</span>
+          <button type="button" onClick={() => openLegal('privacy')} className="hover:text-olive-600 transition-colors cursor-pointer">Privacidade (LGPD)</button>
+          <span>•</span>
+          <a href="#faq" className="hover:text-olive-600 transition-colors">Dúvidas frequentes</a>
+        </div>
+      </div>
+    </footer>
+    <LegalTermsModal isOpen={legalOpen} onClose={() => setLegalOpen(false)} initialTab={legalTab} />
   </div>;
 }
