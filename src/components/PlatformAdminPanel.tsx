@@ -66,6 +66,62 @@ export function PlatformAdminPanel() {
     const [diagnosticOrder, setDiagnosticOrder] = useState(''), [diagnosing, setDiagnosing] = useState(false), [diagnostic, setDiagnostic] = useState<BillingDiagnostic | null>(null), [diagnosticError, setDiagnosticError] = useState('');
     const [reconciling, setReconciling] = useState(false), [reconciled, setReconciled] = useState(false);
     const [extendingTrial, setExtendingTrial] = useState(false);
+    const [manageStatus, setManageStatus] = useState<string>('trial');
+    const [managePlan, setManagePlan] = useState<string>('Bronze');
+    const [managePrice, setManagePrice] = useState<number>(0);
+    const [manageRenewal, setManageRenewal] = useState<string>('');
+    const [savingClinic, setSavingClinic] = useState(false);
+    const [manageSuccess, setManageSuccess] = useState('');
+    const [manageError, setManageError] = useState('');
+
+    function openClinicDetails(c: Clinic) {
+        setSelected(c);
+        setManageStatus(c.status);
+        setManagePlan(c.plan);
+        setManagePrice(Number(c.price));
+        setManageRenewal(c.renewal_date ? (c.renewal_date.length === 10 ? c.renewal_date : c.renewal_date.slice(0, 10)) : '');
+        setManageSuccess('');
+        setManageError('');
+    }
+
+    async function saveClinicChanges(overrideStatus?: string) {
+        if (!selected) return;
+        setSavingClinic(true);
+        setManageSuccess('');
+        setManageError('');
+        const statusToSave = overrideStatus || manageStatus;
+        try {
+            const session = await requireSupabase().auth.getSession();
+            if (!session.data.session) throw new Error('Entre novamente para gerenciar a clínica.');
+            const response = await fetch('/api/admin-manage-clinic', {
+                method: 'POST',
+                headers: {
+                    Authorization: 'Bearer ' + session.data.session.access_token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    tenantId: selected.id,
+                    status: statusToSave,
+                    plan: managePlan,
+                    price: managePrice,
+                    renewalDate: manageRenewal || null
+                })
+            });
+            const body = await response.json();
+            if (!response.ok || !body.success || !body.clinic) {
+                throw new Error(body.error || 'Não foi possível salvar as alterações da clínica.');
+            }
+            const updatedClinic: Clinic = { ...selected, ...body.clinic };
+            setSelected(updatedClinic);
+            setManageStatus(updatedClinic.status);
+            setClinics(prev => prev.map(c => c.id === updatedClinic.id ? updatedClinic : c));
+            setManageSuccess('Clínica atualizada com sucesso!');
+        } catch (err) {
+            setManageError(err instanceof Error ? err.message : 'Falha ao salvar alterações.');
+        } finally {
+            setSavingClinic(false);
+        }
+    }
     async function extendTrial(clinic: Clinic) {
         setExtendingTrial(true);
         try {
@@ -162,7 +218,15 @@ export function PlatformAdminPanel() {
     const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
     const expired = clinics.filter(c => c.status === 'trial' && c.renewal_date && c.renewal_date < today);
     const panel = 'rounded-2xl border border-stone-200 bg-white p-5';
-    const badge = (value: string) => <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-semibold">{labels[value] || value}</span>;
+    const badge = (value: string) => {
+        const colorMap: Record<string, string> = {
+            active: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+            trial: 'bg-amber-50 text-amber-700 border border-amber-200',
+            suspended: 'bg-rose-50 text-rose-700 border border-rose-200',
+            canceled: 'bg-stone-100 text-stone-600 border border-stone-200'
+        };
+        return <span className={`rounded-full px-3 py-1 text-xs font-semibold ${colorMap[value] || 'bg-stone-100 text-stone-700'}`}>{labels[value] || value}</span>;
+    };
     return <div className="min-h-screen bg-[#f7f7f2] text-stone-900 lg:flex">
  <aside className="bg-[#211f1b] text-white p-6 lg:w-64 lg:min-h-screen lg:shrink-0"><div className="text-2xl font-bold">PetSanny</div><p className="text-xs text-stone-400 mt-1">ADMINISTRAÇÃO GERAL</p><nav className="mt-8 flex flex-wrap gap-2 lg:flex-col">{sections.map(s => <button key={s.id} onClick={() => { setSection(s.id); setSelected(null); }} className={'flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-left ' + (section === s.id ? 'bg-[#526f39]' : 'hover:bg-white/10')}><s.icon size={18}/>{s.label}</button>)}</nav><div className="mt-10 flex gap-3 items-center">{renderAvatarHelper(user.user_metadata.avatar_url)}<div className="min-w-0 text-xs text-stone-400 break-all"><p className="text-white font-semibold">{user.user_metadata.name || "Administrador"}</p>{user.email}</div></div><button className="mt-4 flex gap-2 items-center text-sm" onClick={() => void logout().catch(() => setErrors(['Não foi possível sair. Tente novamente.']))}><LogOut size={16}/>Sair</button></aside>
  <main className="min-w-0 flex-1 p-5 md:p-8"><header className="flex flex-wrap justify-between items-center gap-4 mb-7"><div><p className="text-xs text-[#526f39] font-semibold flex gap-2 items-center"><ShieldCheck size={16}/>ACESSO VALIDADO PELO SERVIDOR</p><h1 className="text-2xl font-bold mt-2">{sections.find(s => s.id === section)?.label}</h1><p className="text-sm text-stone-500 mt-1">Acompanhe a operação do seu SaaS em um só lugar.</p></div><button disabled={loading} onClick={() => setRevision(v => v + 1)} className="flex items-center gap-2 bg-white border rounded-xl px-4 py-3 disabled:opacity-50"><RefreshCw size={16}/>Atualizar</button></header>
@@ -172,10 +236,169 @@ export function PlatformAdminPanel() {
  {section === 'billing' && diagnostic && orders.find(o => o.id === diagnosticOrder)?.status === 'paid' && <section className={panel + ' mb-5'}><h2 className="font-bold text-lg">Reprocessar cobrança de teste</h2><p className="text-sm text-stone-500 my-3">Atualiza os registros de pagamento e assinatura do Sandbox usando o estado atual do Asaas. Não cria cobrança e não ativa plano comercial.</p><button onClick={() => void reconcileTest()} disabled={diagnosing || reconciling || reconciled} className="bg-[#526f39] text-white rounded-xl px-4 py-2 disabled:opacity-50">{reconciling ? 'Reprocessando…' : 'Reprocessar teste'}</button>{reconciled && <p role="status" className="mt-3 text-green-800">Pagamento e assinatura de teste conciliados. A entrega automática do webhook ainda precisa ser conferida.</p>}</section>}
  {section === 'billing' && readiness?.environment === 'sandbox' && <section className={panel + ' mb-5'}><h2 className="font-bold text-lg">Conferir integração de teste</h2><p className="text-sm text-stone-500 mt-2">Consulta manual ao Asaas. Não cria cobranças nem altera pagamentos ou planos.</p><div className="flex flex-wrap gap-3 mt-4"><select aria-label="Pedido para conferir no Asaas" value={diagnosticOrder} onChange={e => {setDiagnosticOrder(e.target.value); setDiagnostic(null); setDiagnosticError('');}} disabled={diagnosing} className="border rounded-xl px-3 py-2 min-w-0"><option value="">Selecione uma cobrança de teste</option>{orders.filter(o => o.environment === 'sandbox').map(o => <option key={o.id} value={o.id}>{clinicName(o.tenant_id)} · {o.plan_id} · {date(o.created_at)} · {o.id.slice(0,8)}</option>)}</select><button onClick={() => void diagnoseBilling()} disabled={!diagnosticOrder || diagnosing} className="bg-[#526f39] text-white rounded-xl px-4 py-2 disabled:opacity-50">{diagnosing ? 'Consultando…' : 'Conferir no Asaas'}</button></div>{diagnosticError && <p role="alert" className="mt-4 text-red-800">{diagnosticError}</p>}{diagnostic && <div className="mt-4 overflow-x-auto"><table className="w-full text-sm text-left"><thead><tr>{['Consulta', 'Cobranças encontradas', 'Vínculo com checkout', 'Vínculo com pedido', 'Consulta completa'].map(label => <th key={label} className="p-2">{label}</th>)}</tr></thead><tbody>{([['Checkout', diagnostic.checkout], ['Checkout resumido', diagnostic.lean], ['Referência do pedido', diagnostic.reference], ['Desde a criação do pedido', diagnostic.recent]] as [string, DiagnosticSummary][]).map(([label, s]) => <tr key={label} className="border-t"><td className="p-2">{label}</td><td className="p-2">{s.count}</td><td className="p-2">{s.exactCheckout}</td><td className="p-2">{s.exactReference}</td><td className="p-2">{s.complete ? 'Sim' : 'Não'}</td></tr>)}</tbody></table><p className="text-xs text-stone-500 mt-3">Resultados sem vínculo exato não confirmam pagamento deste pedido. Esta conferência não comprova entrega do webhook.</p></div>}</section>}
  {section === 'overview' && <><div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">{[['Clínicas cadastradas', clinics.length], ['Clínicas ativas', clinics.filter(c => c.status === 'active').length], ['Em teste gratuito', clinics.filter(c => c.status === 'trial').length], ['Receita mensal contratada', money(clinics.filter(c => c.status === 'active').reduce((sum, c) => sum + Number(c.price), 0))]].map(([label, value]) => <div key={label} className={panel}><p className="text-sm text-stone-500">{label}</p><p className="text-3xl font-bold mt-3">{errors.length ? '—' : value}</p></div>)}</div><div className="grid xl:grid-cols-2 gap-5"><section className={panel}><h2 className="font-bold text-lg mb-3">Atenção necessária</h2><p className="py-2">{expired.length} testes gratuitos com prazo encerrado</p><p className="py-2">{orders.filter(o => ['failed', 'unknown'].includes(o.status)).length} cobranças para conferir</p><p className="py-2">{connections.filter(c => c.status !== 'connected').length} conexões das clínicas pendentes ou desconectadas</p><p className="text-xs text-stone-500 mt-4">A receita contratada usa o valor mensal cadastrado. Não representa dinheiro recebido.</p></section><section className={panel}><h2 className="font-bold text-lg mb-3">Cobrança comercial</h2><p>Asaas · {readiness?.environment==='production'?'Produção':'Sandbox'}</p><p className="text-sm text-stone-600 mt-3">Pagamentos de teste não ativam planos comerciais. Cobrança em produção, renovação automática e limites por pacote ainda precisam ser habilitados e validados.</p><button onClick={() => setSection('connections')} className="mt-4 text-[#526f39] font-semibold">Ver configuração das conexões →</button></section></div></>}
- {section === 'clinics' && <section className={panel}><div className="flex flex-wrap gap-3 mb-5"><label className="flex gap-2 items-center border rounded-xl px-3 py-2 flex-1"><Search size={18}/><input aria-label="Buscar clínica ou responsável" placeholder="Buscar clínica, responsável ou e-mail" className="w-full outline-none" value={search} onChange={e => setSearch(e.target.value)}/></label><select aria-label="Filtrar situação da clínica" className="border rounded-xl px-3 py-2" value={status} onChange={e => setStatus(e.target.value)}><option value="all">Todas as situações</option>{['active', 'trial', 'suspended', 'canceled'].map(s => <option key={s} value={s}>{labels[s]}</option>)}</select></div><div className="overflow-x-auto"><table className="w-full text-sm text-left"><thead className="text-stone-500"><tr>{['Clínica / responsável', 'Plano', 'Situação', 'Mensalidade', 'Prazo / renovação', ''].map((s, i) => <th key={i} className="p-3">{s}</th>)}</tr></thead><tbody>{filtered.map(c => <tr key={c.id} className="border-t"><td className="p-3"><strong>{c.name}</strong><p className="text-xs text-stone-500">{c.owner_email || 'Responsável não informado'}</p></td><td className="p-3">{c.plan}</td><td className="p-3">{badge(c.status)}</td><td className="p-3">{money(Number(c.price))}</td><td className="p-3">{date(c.renewal_date)}</td><td className="p-3"><button className="text-[#526f39] font-semibold" onClick={() => setSelected(c)}>Detalhes</button></td></tr>)}</tbody></table></div>{!filtered.length && <p className="py-6">Nenhuma clínica encontrada.</p>}</section>}
+ {section === 'clinics' && <section className={panel}><div className="flex flex-wrap gap-3 mb-5"><label className="flex gap-2 items-center border rounded-xl px-3 py-2 flex-1"><Search size={18}/><input aria-label="Buscar clínica ou responsável" placeholder="Buscar clínica, responsável ou e-mail" className="w-full outline-none" value={search} onChange={e => setSearch(e.target.value)}/></label><select aria-label="Filtrar situação da clínica" className="border rounded-xl px-3 py-2" value={status} onChange={e => setStatus(e.target.value)}><option value="all">Todas as situações</option>{['active', 'trial', 'suspended', 'canceled'].map(s => <option key={s} value={s}>{labels[s]}</option>)}</select></div><div className="overflow-x-auto"><table className="w-full text-sm text-left"><thead className="text-stone-500"><tr>{['Clínica / responsável', 'Plano', 'Situação', 'Mensalidade', 'Prazo / renovação', ''].map((s, i) => <th key={i} className="p-3">{s}</th>)}</tr></thead><tbody>{filtered.map(c => <tr key={c.id} className="border-t"><td className="p-3"><strong>{c.name}</strong><p className="text-xs text-stone-500">{c.owner_email || 'Responsável não informado'}</p></td><td className="p-3 font-medium">{c.plan}</td><td className="p-3">{badge(c.status)}</td><td className="p-3">{money(Number(c.price))}</td><td className="p-3">{date(c.renewal_date)}</td><td className="p-3"><button className="text-[#526f39] hover:underline font-semibold" onClick={() => openClinicDetails(c)}>Detalhes / Editar</button></td></tr>)}</tbody></table></div>{!filtered.length && <p className="py-6">Nenhuma clínica encontrada.</p>}</section>}
  {section === 'billing' && <section className={panel}><h2 className="font-bold text-lg">Histórico Asaas</h2><p className="text-sm text-stone-500 my-3">Somente cobranças registradas no PetSanny. Não inclui cobranças criadas diretamente no Asaas. Cada registro identifica produção ou teste.</p><div className="overflow-x-auto"><table className="w-full text-sm text-left"><thead><tr>{['Clínica', 'Plano solicitado', 'Valor', 'Situação', 'Criada em'].map(s => <th key={s} className="p-3">{s}</th>)}</tr></thead><tbody>{[...orders].sort((a, b) => b.created_at.localeCompare(a.created_at)).map(o => <tr key={o.id} className="border-t"><td className="p-3">{clinicName(o.tenant_id)}</td><td className="p-3 capitalize">{o.plan_id}</td><td className="p-3">{money(Number(o.amount))}</td><td className="p-3">{badge(o.status)}<small className="block mt-1">{o.environment==='production'?'Produção':'Teste'}</small></td><td className="p-3">{date(o.created_at)}</td></tr>)}</tbody></table></div>{!orders.length && <p className="py-6">Nenhuma cobrança registrada.</p>}</section>}
  {section === 'connections' && <><section className={panel + ' mb-5'}><h2 className="font-bold text-lg">Conexão da plataforma • Asaas</h2><p className="text-sm text-stone-500 mt-2">A presença das configurações não confirma conexão com o provedor nem entrega de eventos.</p>{readiness ? <div className="grid md:grid-cols-3 gap-3 mt-5">{[['Chave Asaas', readiness.asaasKey], ['Acesso do servidor ao banco', readiness.databaseKey], ['Segredo do webhook', readiness.webhookToken]].map(([label, ok]) => <div className="bg-stone-50 rounded-xl p-4" key={String(label)}><p className="text-sm">{label}</p><p className="font-semibold mt-2">{ok ? 'Configurado' : 'Pendente'}</p></div>)}</div> : <p className="mt-4 text-sm" role="status">{serverError || 'Verificando servidor…'}</p>}<p className="text-sm mt-4">WhatsApp oficial: ativação pendente. E-mail e calendário: integrações futuras.</p></section><section className={panel}><h2 className="font-bold text-lg mb-4">Conexões das clínicas</h2>{connections.map(c => <div key={c.id} className="border-t py-4 flex flex-wrap gap-4 justify-between"><div><strong>{clinicName(c.tenant_id)}</strong><p className="text-sm text-stone-500">{c.display_name} • {c.provider} • {c.channel}</p><p className="text-xs mt-1">Última verificação: {date(c.last_verified_at)}</p></div>{badge(c.status)}</div>)}{!connections.length && <p>Nenhuma conexão cadastrada.</p>}</section></>}
- {selected && <section className={panel + ' mt-5'}><div className="flex justify-between"><h2 className="text-lg font-bold">{selected.name}</h2><button onClick={() => setSelected(null)}>Fechar detalhes</button></div><p className="mt-3">Responsável: {selected.owner_name || 'Não informado'}</p><p className="text-sm mt-2">{selected.owner_email}</p><p className="text-sm mt-2">Endereço: {selected.location || 'Não informado'}</p><p className="text-sm mt-2">Cadastrada em: {date(selected.created_at)}</p><p className="text-sm mt-2">{orders.filter(o => o.tenant_id === selected.id).length} cobranças de teste • {connections.filter(c => c.tenant_id === selected.id).length} conexões cadastradas</p><p className="text-sm mt-3">Prazo atual: {date(selected.renewal_date)}</p>{selected.status === 'trial' && selected.trial_duration_days === 7 && !selected.trial_extended_at && <button disabled={extendingTrial} onClick={() => void extendTrial(selected)} className="mt-3 border rounded-xl px-4 py-2 disabled:opacity-50">{extendingTrial ? 'Estendendo…' : 'Estender teste por mais 7 dias'}</button>}{selected.trial_extended_at && <p role="status" className="text-sm mt-3">Extensão de 7 dias concedida.</p>}<p className="text-xs text-stone-500 mt-3">Identificador: {selected.id}</p></section>}
+ {selected && <section className={panel + ' mt-5'}>
+    <div className="flex flex-wrap justify-between items-start gap-4 border-b border-stone-200 pb-4">
+      <div>
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="text-xl font-bold text-stone-900">{selected.name}</h2>
+          {badge(selected.status)}
+          <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-semibold text-stone-700">Plano {selected.plan}</span>
+        </div>
+        <p className="text-xs text-stone-500 mt-1">ID da clínica: {selected.id}</p>
+      </div>
+      <button onClick={() => setSelected(null)} className="text-sm text-stone-500 hover:text-stone-900 border rounded-xl px-3 py-1.5 transition hover:bg-stone-50">
+        ✕ Fechar detalhes
+      </button>
+    </div>
+
+    {/* Área de Gerenciamento de Assinatura e Edição de Plano */}
+    <div className="mt-5 p-5 bg-[#fbfbf9] rounded-2xl border border-stone-200">
+      <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+        <div>
+          <h3 className="font-bold text-base text-stone-900">Gerenciamento de Assinatura e Plano</h3>
+          <p className="text-xs text-stone-500 mt-0.5">Altere a situação da assinatura (ativar/desativar), altere o plano comercial, mensalidade e data de renovação.</p>
+        </div>
+        <div>
+          {manageStatus === 'active' ? (
+            <button
+              disabled={savingClinic}
+              onClick={() => {
+                setManageStatus('suspended');
+                void saveClinicChanges('suspended');
+              }}
+              className="bg-rose-700 hover:bg-rose-800 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 disabled:opacity-50 shadow-sm"
+              title="Suspende temporariamente o acesso da clínica"
+            >
+              ⏸️ Desativar / Suspender assinatura
+            </button>
+          ) : (
+            <button
+              disabled={savingClinic}
+              onClick={() => {
+                setManageStatus('active');
+                void saveClinicChanges('active');
+              }}
+              className="bg-[#526f39] hover:bg-[#435b2e] text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 disabled:opacity-50 shadow-sm"
+              title="Ativa a assinatura e o acesso aos recursos do plano contratado"
+            >
+              ▶️ Ativar assinatura
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Situação */}
+        <div>
+          <label className="block text-xs font-semibold text-stone-700 mb-1.5">Situação da Assinatura</label>
+          <select
+            value={manageStatus}
+            onChange={e => setManageStatus(e.target.value)}
+            disabled={savingClinic}
+            className="w-full border rounded-xl px-3 py-2 bg-white text-sm outline-none focus:ring-2 focus:ring-[#526f39]"
+          >
+            <option value="active">Ativa (Acesso liberado)</option>
+            <option value="trial">Teste gratuito</option>
+            <option value="suspended">Suspensa / Desativada</option>
+            <option value="canceled">Cancelada</option>
+          </select>
+        </div>
+
+        {/* Plano */}
+        <div>
+          <label className="block text-xs font-semibold text-stone-700 mb-1.5">Plano</label>
+          <select
+            value={managePlan}
+            onChange={e => {
+              const newPlan = e.target.value;
+              setManagePlan(newPlan);
+              if (newPlan === 'Bronze') setManagePrice(97);
+              else if (newPlan === 'Silver') setManagePrice(197);
+              else if (newPlan === 'Gold') setManagePrice(297);
+            }}
+            disabled={savingClinic}
+            className="w-full border rounded-xl px-3 py-2 bg-white text-sm outline-none focus:ring-2 focus:ring-[#526f39]"
+          >
+            <option value="Bronze">Bronze (Essencial - R$ 97/mês)</option>
+            <option value="Silver">Silver (Crescer - R$ 197/mês)</option>
+            <option value="Gold">Gold (Profissional - R$ 297/mês)</option>
+          </select>
+        </div>
+
+        {/* Mensalidade */}
+        <div>
+          <label className="block text-xs font-semibold text-stone-700 mb-1.5">Mensalidade (R$)</label>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={managePrice}
+            onChange={e => setManagePrice(Number(e.target.value))}
+            disabled={savingClinic}
+            className="w-full border rounded-xl px-3 py-2 bg-white text-sm outline-none focus:ring-2 focus:ring-[#526f39]"
+          />
+        </div>
+
+        {/* Renovação */}
+        <div>
+          <label className="block text-xs font-semibold text-stone-700 mb-1.5">Prazo / Renovação</label>
+          <input
+            type="date"
+            value={manageRenewal}
+            onChange={e => setManageRenewal(e.target.value)}
+            disabled={savingClinic}
+            className="w-full border rounded-xl px-3 py-2 bg-white text-sm outline-none focus:ring-2 focus:ring-[#526f39]"
+          />
+        </div>
+      </div>
+
+      <div className="mt-4 pt-3 border-t border-stone-200/80 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            disabled={savingClinic}
+            onClick={() => void saveClinicChanges()}
+            className="bg-[#211f1b] hover:bg-stone-800 text-white font-semibold rounded-xl px-4 py-2 text-sm disabled:opacity-50 transition"
+          >
+            {savingClinic ? 'Salvando alterações…' : 'Salvar alterações'}
+          </button>
+          {selected.status === 'trial' && selected.trial_duration_days === 7 && !selected.trial_extended_at && (
+            <button
+              disabled={extendingTrial || savingClinic}
+              onClick={() => void extendTrial(selected)}
+              className="border border-stone-300 rounded-xl px-3 py-2 text-sm text-stone-700 hover:bg-stone-100 disabled:opacity-50 transition"
+            >
+              {extendingTrial ? 'Estendendo…' : 'Estender teste por mais 7 dias'}
+            </button>
+          )}
+          {selected.trial_extended_at && <span role="status" className="text-xs text-stone-500">Extensão de 7 dias já concedida.</span>}
+        </div>
+        {manageSuccess && <p role="status" className="text-sm font-semibold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">✓ {manageSuccess}</p>}
+        {manageError && <p role="alert" className="text-sm font-semibold text-rose-800 bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200">⚠ {manageError}</p>}
+      </div>
+    </div>
+
+    {/* Informações cadastrais e resumo */}
+    <div className="mt-5 grid sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-stone-600">
+      <div className="bg-stone-50 p-4 rounded-xl border border-stone-100">
+        <p className="text-xs font-semibold uppercase tracking-wider text-stone-400">Responsável</p>
+        <p className="font-semibold text-stone-900 mt-1">{selected.owner_name || 'Não informado'}</p>
+        <p className="text-xs text-stone-500 mt-0.5 break-all">{selected.owner_email || 'E-mail não informado'}</p>
+      </div>
+      <div className="bg-stone-50 p-4 rounded-xl border border-stone-100">
+        <p className="text-xs font-semibold uppercase tracking-wider text-stone-400">Localização e Registro</p>
+        <p className="font-semibold text-stone-900 mt-1">{selected.location || 'Não informado'}</p>
+        <p className="text-xs text-stone-500 mt-0.5">Cadastrada em {date(selected.created_at)}</p>
+      </div>
+      <div className="bg-stone-50 p-4 rounded-xl border border-stone-100">
+        <p className="text-xs font-semibold uppercase tracking-wider text-stone-400">Histórico de Atividade</p>
+        <p className="font-semibold text-stone-900 mt-1">{orders.filter(o => o.tenant_id === selected.id).length} cobranças registradas</p>
+        <p className="text-xs text-stone-500 mt-0.5">{connections.filter(c => c.tenant_id === selected.id).length} conexões cadastradas</p>
+      </div>
+    </div>
+  </section>}
  <p className="text-xs text-stone-500 mt-6">Última consulta: {updated}. Os dados são atualizados ao clicar em Atualizar.</p></>}
  </main></div>;
 }
