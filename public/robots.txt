@@ -1,0 +1,7 @@
+# robots.txt para PetSanny (https://pet-sanny.vercel.app/)
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /#dashboard
+
+Sitemap: https://pet-sanny.vercel.app/sitemap.xml

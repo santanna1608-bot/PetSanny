@@ -167,7 +167,7 @@ export function LandingPage({ onNavigateToAuth, theme, toggleTheme, isLoggedIn, 
             <div className="overflow-hidden rounded-2xl border border-stone-200/90 bg-white/95 shadow-xl dark:border-stone-700/80 dark:bg-stone-900/95 backdrop-blur-sm">
               <div className="flex items-center justify-between border-b border-stone-100 px-5 py-3.5 dark:border-stone-800">
                 <span className="flex items-center gap-2.5 text-sm font-bold">
-                  <img src={logo} alt="" className="h-7 w-7 rounded-full shadow-xs" />
+                  <img src={logo} alt="PetSanny - Gestão Veterinária" className="h-7 w-7 rounded-full shadow-xs" />
                   <span>Painel PetCare Sanny</span>
                 </span>
                 <span className="text-[11px] font-medium text-stone-400 flex items-center gap-1">
@@ -561,7 +561,7 @@ export function LandingPage({ onNavigateToAuth, theme, toggleTheme, isLoggedIn, 
       <footer className="border-t border-stone-200 px-6 py-8 dark:border-stone-800 bg-white/50 dark:bg-stone-950/50 backdrop-blur-xs">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="" className="h-6 w-6 rounded-full" />
+            <img src={logo} alt="PetSanny Logo" className="h-6 w-6 rounded-full" />
             <span className="font-bold">PetSanny</span>
           </div>
           <p className="text-xs text-stone-500">
