@@ -165,12 +165,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               const Icon = item.icon;
               const isActive = activeTab === item.id;
 
-              // Cor de destaque dependendo do tenant
-              const highlightBg =
-                currentTenant.id === "tenant-clinica-sanny-1"
-                  ? "bg-olive-500/10 text-olive-400 border-l-2 border-olive-500"
-                  : "bg-terracotta-500/10 text-terracotta-400 border-l-2 border-terracotta-500";
-
               return (
                 <button
                   key={item.id}
@@ -178,14 +172,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     setActiveTab(item.id);
                     onClose?.();
                   }}
-                  className={`flex items-center gap-3 px-4 py-3 text-xs font-semibold rounded-lg transition-all duration-200 ${
+                  className={`flex items-center gap-3 px-4 py-3 text-xs font-semibold rounded-xl transition-all duration-200 cursor-pointer ${
                     isActive
-                      ? highlightBg
-                      : "text-stone-400 hover:text-stone-200 hover:bg-stone-800/60 border-l-2 border-transparent"
+                      ? "bg-olive-600/15 text-olive-300 border-l-3 border-olive-500 shadow-xs font-bold"
+                      : "text-stone-400 hover:text-stone-100 hover:bg-stone-800/70 hover:translate-x-1 border-l-3 border-transparent"
                   }`}
                 >
-                  <Icon className="w-4 h-4 shrink-0" />
-                  {item.label}
+                  <Icon className={`w-4 h-4 shrink-0 transition-transform duration-200 ${isActive ? "scale-110 text-olive-400" : ""}`} />
+                  <span>{item.label}</span>
                 </button>
               );
             })}

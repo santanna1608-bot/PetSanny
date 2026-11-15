@@ -105,11 +105,13 @@ export function DashboardPremium() {
         ].map(({ label, value, icon: Icon }) => (
           <article
             key={label}
-            className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-5"
+            className="group bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-olive-500/40 cursor-default"
           >
-            <Icon className="text-olive-600" />
-            <h3 className="text-sm mt-3">{label}</h3>
-            <p className="text-2xl font-bold mt-2">{value}</p>
+            <div className="w-10 h-10 rounded-xl bg-olive-50 dark:bg-olive-950/40 border border-olive-200/50 dark:border-olive-800/50 flex items-center justify-center text-olive-600 transition-transform duration-200 group-hover:scale-110">
+              <Icon size={20} />
+            </div>
+            <h3 className="text-xs font-semibold text-stone-500 dark:text-stone-400 mt-3">{label}</h3>
+            <p className="text-2xl font-bold mt-1 text-stone-900 dark:text-stone-100">{value}</p>
           </article>
         ))}
       </div>
